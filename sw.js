@@ -4,14 +4,15 @@ const ASSETS = [
   '/techcards/',
   '/techcards/index.html',
   '/techcards/style.css',
-  '/techcards/manifest.json'
+  '/techcards/manifest.json',
+  '/techcards/1/learn.html',
+  '/techcards/1/style.css'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(ASSETS))
-      .catch((err) => console.log('Cache error:', err))
   );
   self.skipWaiting();
 });
