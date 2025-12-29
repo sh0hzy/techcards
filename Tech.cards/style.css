@@ -1,0 +1,299 @@
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f4f7fb, #e9eef5);
+      color: #1f2933;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 30;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0b3a6f;
+      text-decoration: none;
+    }
+
+    /* ===== HAMBURGER ===== */
+    .burger {
+      width: 28px;
+      height: 20px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .burger span {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #1f2933;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    .burger span:nth-child(1) { top: 0; }
+    .burger span:nth-child(2) { top: 8px; }
+    .burger span:nth-child(3) { top: 16px; }
+
+    .burger.active span:nth-child(1) { transform: rotate(45deg); top: 8px; }
+    .burger.active span:nth-child(2) { opacity: 0; }
+    .burger.active span:nth-child(3) { transform: rotate(-45deg); top: 8px; }
+
+    /* ===== MENU ===== */
+    .menu {
+      position: fixed;
+      top: 64px;
+      right: -220px;
+      width: 220px;
+      height: calc(100vh - 64px);
+      background: #ffffff;
+      box-shadow: -10px 0 25px rgba(0,0,0,0.08);
+      padding: 24px;
+      transition: right 0.3s ease;
+      z-index: 25;
+    }
+
+    .menu.active {
+      right: 0;
+    }
+
+    .menu a, .menu button {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1f2933;
+      text-decoration: none;
+      margin-bottom: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      text-align: left;
+    }
+
+    .menu a:hover, .menu button:hover {
+      color: #0b5ed7;
+    }
+
+    /* ===== MAIN (DESKTOP) ===== */
+    .main {
+      flex: 1;
+      padding: 96px 20px 40px; 
+      display: block;          
+    }
+
+    .page{
+      width: min(1200px, 100%);
+      margin: 0 auto;
+    }
+
+    .page-title{
+      font-size: clamp(20px, 2vw, 32px);
+      font-weight: 800;
+      color: #0b3a6f;
+      margin: 0 0 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .cards{
+      display: grid;
+      grid-template-columns: 1fr; /* mobile */
+      gap: 16px;
+    }
+
+    @media (min-width: 700px){
+      .cards{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (min-width: 1024px){
+      .cards{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    /* ===== CARD ===== */
+    .astm-card {
+      width: 100%;
+      max-width: 420px;       
+      justify-self: center;   
+
+      background-color: #ffffff;
+      border: 1px solid #d9dee3;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
+    }
+
+    @media (min-width: 700px){
+      .astm-card{
+        max-width: none;    
+      
+        justify-self: stretch;
+      }
+    }
+
+    @media (hover: hover){
+      .astm-card{
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      }
+      .astm-card:hover{
+        transform: translateY(-4px);
+        box-shadow: 0 18px 45px rgba(2, 6, 23, .12);
+        border-color: rgba(11, 94, 215, .25);
+      }
+    }
+
+    .astm-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .astm-description {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #374151;
+      margin-bottom: 16px;
+    }
+
+    .astm-divider {
+      height: 1px;
+      background-color: #e5e7eb;
+      margin: 16px 0;
+    }
+
+    .astm-benefits-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .astm-benefits {
+      list-style: none;
+      margin-bottom: 18px;
+    }
+
+    .astm-benefits li {
+      position: relative;
+      padding-left: 26px;
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #1f2933;
+    }
+
+    .astm-benefits li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 14px;
+      height: 14px;
+      background-color: #1f8f3a;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M6.1 11.2L2.8 7.9l1.4-1.4 1.9 1.9 5-5 1.4 1.4z'/%3E%3C/svg%3E") no-repeat center / contain;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M6.1 11.2L2.8 7.9l1.4-1.4 1.9 1.9 5-5 1.4 1.4z'/%3E%3C/svg%3E") no-repeat center / contain;
+    }
+
+    .astm-button {
+      margin-top: auto; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 0;
+      background-color: #0b5ed7;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 10px;
+      transition: transform 0.15s ease, background-color 0.2s ease;
+    }
+
+    .astm-button:hover {
+      background-color: #094bb5;
+      transform: translateY(-1px);
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .install-banner {
+  position: fixed;
+  bottom: -100px;
+  left: 20px;
+  right: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+  background: #0b3a6f;
+  color: #fff;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  z-index: 100;
+  transition: bottom 0.3s ease;
+}
+
+.install-banner.show {
+  bottom: 20px;
+}
+
+.install-banner p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.install-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.install-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#installBtn {
+  background: #fff;
+  color: #0b3a6f;
+}
+
+#dismissBtn {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
