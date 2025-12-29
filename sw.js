@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kazarbuild-v3';
+const CACHE_NAME = 'kazarbuild-v4';
 
 const ASSETS = [
   '/techcards/',
