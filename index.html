@@ -89,15 +89,12 @@
         toggleMenu();
       }
     });
-
-    // Регистрация Service Worker
+    
     if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
     .then((reg) => console.log('SW OK'))
     .catch((err) => console.log('SW error:', err));
 }
-
-    // Установка PWA
     let deferredPrompt;
     const installBanner = document.getElementById('installBanner');
     const installBtn = document.getElementById('installBtn');
