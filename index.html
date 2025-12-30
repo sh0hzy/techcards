@@ -24,10 +24,13 @@
     </div>
   </header>
 
-  <nav class="menu" id="menu">
-    <button type="button">Смена языка</button>
+<nav class="menu" id="menu">
+    <div class="language-switcher">
+        <button class="lang-btn active" data-lang="ru">RU</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+    </div>
     <a href="index.html">Тех.карты</a>
-  </nav>
+</nav>
   <div class="install-banner" id="installBanner">
     <p>Установить приложение для работы офлайн?</p>
     <div class="install-buttons">
@@ -107,10 +110,9 @@
           </a>
           </div>
         </div> 
-
       </div>
-      </section>
-    </div>
+    </section>
+  </div>
   </main>
 
   <footer class="footer"></footer>
@@ -157,6 +159,16 @@
 
     dismissBtn.addEventListener('click', () => {
       installBanner.classList.remove('show');
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.lang-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                buttons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
     });
     </script>
 

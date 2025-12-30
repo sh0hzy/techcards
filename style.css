@@ -77,6 +77,11 @@ body {
   padding: 24px;
   transition: right 0.3s ease;
   z-index: 25;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .menu.active {
@@ -100,6 +105,58 @@ body {
 .menu a:hover, .menu button:hover {
   color: #0b5ed7;
 }
+
+.menu a {
+  color: #374151;
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.menu a:hover {
+  background: #f3f4f6;
+}
+
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid #e53935;
+  border-radius: 20px;
+  padding: 2px;
+  background: transparent;
+}
+
+.lang-btn {
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lang-btn:hover:not(.active) {
+  color: #374151;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.lang-btn.active {
+  background: #4a90d9;
+  color: white;
+}
+
+
+
 
 /* ===== MAIN ===== */
 .main {

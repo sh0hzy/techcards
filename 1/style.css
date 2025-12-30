@@ -172,7 +172,7 @@ body {
 
 .section {
   background: #ffffff;
-  border-radius: 10px;
+  border-radius: 20px;
   padding: 40px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
@@ -196,7 +196,31 @@ body {
 }
 
 .section li {
-  font-size: 15px;
+  font-size: 16px;
+}
+
+.checklist {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.checklist h3 {
+  font-size: 24px;
+  padding-top: 20px;
+  margin-bottom: 10px;
+  margin-left: 40px;
+  color: #0b3a6f;
+}
+
+.checklist ul {
+  margin-top: 18px;
+  padding-left: 18px;
+}
+
+.checklist li {
+  font-size: 18px;
   margin-bottom: 10px;
 }
 
