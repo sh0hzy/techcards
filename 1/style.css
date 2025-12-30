@@ -185,7 +185,7 @@ body {
 
 .section p {
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.5;
   color: #374151;
   margin-bottom: 14px;
 }
@@ -215,8 +215,10 @@ body {
 }
 
 .checklist ul {
-  margin-top: 18px;
-  padding-left: 18px;
+  margin-top: 10px;
+  padding-left: 40px;
+  padding-bottom: 10px;
+
 }
 
 .checklist li {
@@ -263,6 +265,7 @@ body {
   gap: 12px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 400;
 }
 
 .checklist input[type="checkbox"] {
