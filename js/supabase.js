@@ -1,3 +1,5 @@
+// js/supabase.js
+
 const DB = {
   // Базовый fetch запрос
   async request(endpoint, options = {}) {
@@ -20,22 +22,66 @@ const DB = {
         throw new Error(`HTTP ${response.status}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      
+      // Сохраняем в localStorage как резервную копию
+      this.saveToLocalStorage(endpoint, data);
+      
+      return data;
     } catch (error) {
-      console.error('Supabase error:', error);
-      throw error;
+      console.warn('[DB] Request failed:', error.message);
+      
+      // Пробуем получить из localStorage
+      const cached = this.getFromLocalStorage(endpoint);
+      if (cached) {
+        console.log('[DB] Using localStorage cache for:', endpoint);
+        return cached;
+      }
+      
+      // Возвращаем пустой массив вместо ошибки
+      console.log('[DB] No cache, returning empty array');
+      return [];
     }
+  },
+
+  // Сохранение в localStorage
+  saveToLocalStorage(key, data) {
+    try {
+      const cacheKey = `db_${key.replace(/[?&=]/g, '_')}`;
+      localStorage.setItem(cacheKey, JSON.stringify({
+        data,
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      // localStorage может быть переполнен
+      console.warn('[DB] localStorage save failed:', e.message);
+    }
+  },
+
+  // Получение из localStorage
+  getFromLocalStorage(key) {
+    try {
+      const cacheKey = `db_${key.replace(/[?&=]/g, '_')}`;
+      const cached = localStorage.getItem(cacheKey);
+      
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        // Кэш валиден 7 дней для офлайн
+        const maxAge = 7 * 24 * 60 * 60 * 1000;
+        if (Date.now() - timestamp < maxAge) {
+          return data;
+        }
+      }
+    } catch (e) {
+      console.warn('[DB] localStorage read failed:', e.message);
+    }
+    return null;
   },
 
   // ============ CATEGORIES ============
   
   async getCategories() {
     return this.request('categories?order=sort_order.asc');
-  },
-
-  async getCategoryBySlug(slug) {
-    const data = await this.request(`categories?slug=eq.${slug}`);
-    return data[0] || null;
   },
 
   // ============ TAGS ============
@@ -46,26 +92,20 @@ const DB = {
 
   // ============ CARDS ============
   
-  // Получить все опубликованные карточки
   async getCards(options = {}) {
     let query = 'cards?is_published=eq.true';
-    
-    // Выборка с категорией
     query += '&select=*,category:categories(*)';
     
-    // Сортировка
     if (options.orderBy) {
       query += `&order=${options.orderBy}`;
     } else {
       query += '&order=created_at.desc';
     }
     
-    // Лимит
     if (options.limit) {
       query += `&limit=${options.limit}`;
     }
     
-    // Фильтр по категории
     if (options.categoryId) {
       query += `&category_id=eq.${options.categoryId}`;
     }
@@ -73,7 +113,6 @@ const DB = {
     return this.request(query);
   },
 
-  // Получить популярные карточки
   async getPopularCards(limit = 6) {
     return this.getCards({ 
       orderBy: 'views_count.desc', 
@@ -81,7 +120,6 @@ const DB = {
     });
   },
 
-  // Получить карточку по ID
   async getCardById(id) {
     const data = await this.request(
       `cards?id=eq.${id}&select=*,category:categories(*)`
@@ -89,101 +127,49 @@ const DB = {
     return data[0] || null;
   },
 
-  // Получить карточку по slug
-  async getCardBySlug(slug) {
-    const data = await this.request(
-      `cards?slug=eq.${slug}&select=*,category:categories(*)`
-    );
-    return data[0] || null;
-  },
-
-  // Поиск карточек
-  async searchCards(query, locale = 'ru') {
-    // Поиск по JSON полю title
-    const cards = await this.getCards();
-    
-    if (!query) return cards;
-    
-    const q = query.toLowerCase();
-    return cards.filter(card => {
-      const title = i18n.localize(card.title, '').toLowerCase();
-      const description = i18n.localize(card.description, '').toLowerCase();
-      return title.includes(q) || description.includes(q);
-    });
-  },
-
-  // Увеличить счётчик просмотров
+  // Увеличить счётчик просмотров (только онлайн)
   async incrementViews(cardId) {
+    if (!navigator.onLine) {
+      console.log('[DB] Offline, skipping view increment');
+      return;
+    }
+    
     try {
-      // Получаем текущее значение
       const card = await this.getCardById(cardId);
       if (!card) return;
 
-      // Обновляем
       await this.request(`cards?id=eq.${cardId}`, {
         method: 'PATCH',
         body: JSON.stringify({
           views_count: (card.views_count || 0) + 1
         })
       });
-
-      // Записываем в статистику
-      await this.request('card_views', {
-        method: 'POST',
-        body: JSON.stringify({
-          card_id: cardId,
-          locale: i18n.getLocale()
-        })
-      });
     } catch (e) {
-      console.error('Error incrementing views:', e);
+      // Игнорируем ошибки счётчика
     }
-  },
-
-  // ============ ADMIN (для будущего) ============
-  
-  async createCard(data) {
-    return this.request('cards', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
-  },
-
-  async updateCard(id, data) {
-    return this.request(`cards?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(data)
-    });
-  },
-
-  async deleteCard(id) {
-    return this.request(`cards?id=eq.${id}`, {
-      method: 'DELETE'
-    });
-  },
-
-  // ============ STORAGE ============
-  
-  getPublicUrl(bucket, path) {
-    return `${CONFIG.SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
-  },
-
-  async uploadFile(bucket, path, file) {
-    const url = `${CONFIG.SUPABASE_URL}/storage/v1/object/${bucket}/${path}`;
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'apikey': CONFIG.SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
-      },
-      body: file
-    });
-
-    if (!response.ok) {
-      throw new Error('Upload failed');
-    }
-
-    return this.getPublicUrl(bucket, path);
   }
 };
+
+// Предзагрузка данных при первом запуске
+(function prefetchData() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', doFetch);
+  } else {
+    setTimeout(doFetch, 1000);
+  }
+  
+  async function doFetch() {
+    if (!navigator.onLine) return;
+    
+    console.log('[Prefetch] Loading data for offline...');
+    try {
+      await Promise.all([
+        DB.getCategories(),
+        DB.getCards()
+      ]);
+      console.log('[Prefetch] Done');
+    } catch (e) {
+      console.warn('[Prefetch] Failed:', e.message);
+    }
+  }
+})();
