@@ -1,7 +1,4 @@
-// js/supabase.js
-
 const DB = {
-  // Базовый fetch запрос
   async request(endpoint, options = {}) {
     const url = `${CONFIG.SUPABASE_URL}/rest/v1/${endpoint}`;
     
@@ -23,28 +20,22 @@ const DB = {
       }
 
       const data = await response.json();
-      
-      // Сохраняем в localStorage как резервную копию
       this.saveToLocalStorage(endpoint, data);
       
       return data;
     } catch (error) {
-      console.warn('[DB] Request failed:', error.message);
-      
-      // Пробуем получить из localStorage
+      console.warn('[DB] Request failed:', error.message);      
       const cached = this.getFromLocalStorage(endpoint);
       if (cached) {
         console.log('[DB] Using localStorage cache for:', endpoint);
         return cached;
       }
-      
-      // Возвращаем пустой массив вместо ошибки
+
       console.log('[DB] No cache, returning empty array');
       return [];
     }
   },
 
-  // Сохранение в localStorage
   saveToLocalStorage(key, data) {
     try {
       const cacheKey = `db_${key.replace(/[?&=]/g, '_')}`;
@@ -53,12 +44,9 @@ const DB = {
         timestamp: Date.now()
       }));
     } catch (e) {
-      // localStorage может быть переполнен
       console.warn('[DB] localStorage save failed:', e.message);
     }
   },
-
-  // Получение из localStorage
   getFromLocalStorage(key) {
     try {
       const cacheKey = `db_${key.replace(/[?&=]/g, '_')}`;
@@ -66,7 +54,6 @@ const DB = {
       
       if (cached) {
         const { data, timestamp } = JSON.parse(cached);
-        // Кэш валиден 7 дней для офлайн
         const maxAge = 7 * 24 * 60 * 60 * 1000;
         if (Date.now() - timestamp < maxAge) {
           return data;
@@ -77,20 +64,14 @@ const DB = {
     }
     return null;
   },
-
-  // ============ CATEGORIES ============
   
   async getCategories() {
     return this.request('categories?order=sort_order.asc');
   },
-
-  // ============ TAGS ============
   
   async getTags() {
     return this.request('tags?order=name.asc');
   },
-
-  // ============ CARDS ============
   
   async getCards(options = {}) {
     let query = 'cards?is_published=eq.true';
@@ -126,8 +107,6 @@ const DB = {
     );
     return data[0] || null;
   },
-
-  // Увеличить счётчик просмотров (только онлайн)
   async incrementViews(cardId) {
     if (!navigator.onLine) {
       console.log('[DB] Offline, skipping view increment');
@@ -145,12 +124,10 @@ const DB = {
         })
       });
     } catch (e) {
-      // Игнорируем ошибки счётчика
     }
   }
 };
 
-// Предзагрузка данных при первом запуске
 (function prefetchData() {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', doFetch);

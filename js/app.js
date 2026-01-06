@@ -1,4 +1,3 @@
-
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -10,8 +9,6 @@ function debounce(func, wait) {
     timeout = setTimeout(later, wait);
   };
 }
-
-// Показать skeleton загрузку
 function showSkeletons(container, count = 6) {
   if (!container) return;
   container.innerHTML = Array(count).fill(`
@@ -22,9 +19,6 @@ function showSkeletons(container, count = 6) {
     </div>
   `).join('');
 }
-
-// ============ РЕНДЕР КАРТОЧЕК ============
-
 function renderCards(cards, container) {
   if (!container) return;
 
@@ -62,8 +56,6 @@ function renderCards(cards, container) {
     `;
   }).join('');
 }
-
-// Рендер категорий
 function renderCategories(categories, container) {
   if (!container) return;
 
@@ -77,9 +69,6 @@ function renderCategories(categories, container) {
     `;
   }).join('');
 }
-
-// ============ BURGER MENU ============
-
 function initBurgerMenu() {
   const burger = document.getElementById('burger');
   const menu = document.getElementById('menu');
@@ -99,7 +88,6 @@ function initBurgerMenu() {
     }
   });
 
-  // Закрыть меню при клике на ссылку
   menu.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       burger.classList.remove('active');
@@ -107,8 +95,6 @@ function initBurgerMenu() {
     });
   });
 }
-
-// ============ PWA INSTALL BANNER ============
 
 function initInstallBanner() {
   let deferredPrompt;
@@ -143,8 +129,6 @@ function initInstallBanner() {
   }
 }
 
-// ============ SERVICE WORKER ============
-
 function initServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
@@ -152,27 +136,19 @@ function initServiceWorker() {
       .catch((err) => console.log('SW error:', err));
   }
 }
-
-// ============ ИНИЦИАЛИЗАЦИЯ СТРАНИЦ ============
-
-// Главная страница
 async function initHomePage() {
   const cardsContainer = document.getElementById('cards-container');
   const categoriesContainer = document.getElementById('categories-container');
 
-  // Показываем skeleton
   if (cardsContainer) {
     showSkeletons(cardsContainer, 6);
   }
 
   try {
-    // Загружаем категории
     if (categoriesContainer) {
       const categories = await DB.getCategories();
       renderCategories(categories, categoriesContainer);
     }
-
-    // Загружаем популярные карточки
     if (cardsContainer) {
       const cards = await DB.getPopularCards(6);
       renderCards(cards, cardsContainer);
@@ -185,7 +161,6 @@ async function initHomePage() {
   }
 }
 
-// Страница каталога
 async function initCatalogPage() {
   const cardsContainer = document.getElementById('cards-container');
   const searchInput = document.getElementById('search-input');
@@ -199,7 +174,6 @@ async function initCatalogPage() {
     categoryId: null
   };
 
-  // Получаем параметры из URL
   const params = new URLSearchParams(window.location.search);
   currentFilters.categoryId = params.get('category');
   currentFilters.search = params.get('q') || '';
@@ -207,18 +181,13 @@ async function initCatalogPage() {
   if (searchInput && currentFilters.search) {
     searchInput.value = currentFilters.search;
   }
-
-  // Показываем skeleton
   showSkeletons(cardsContainer, 6);
 
   try {
-    // Загружаем данные
     [allCards, allCategories] = await Promise.all([
       DB.getCards(),
       DB.getCategories()
     ]);
-
-    // Рендерим фильтры категорий
     if (categoryFilters) {
       categoryFilters.innerHTML = allCategories.map(cat => `
         <label class="filter-checkbox">
@@ -228,7 +197,6 @@ async function initCatalogPage() {
         </label>
       `).join('');
 
-      // Слушаем изменения
       categoryFilters.querySelectorAll('input').forEach(cb => {
         cb.addEventListener('change', () => {
           const checked = categoryFilters.querySelectorAll('input:checked');
@@ -238,7 +206,6 @@ async function initCatalogPage() {
       });
     }
 
-    // Поиск с debounce
     if (searchInput) {
       const handleSearch = debounce((value) => {
         currentFilters.search = value;
@@ -250,7 +217,6 @@ async function initCatalogPage() {
       });
     }
 
-    // Первоначальный рендер
     filterAndRender();
 
   } catch (error) {
@@ -258,11 +224,9 @@ async function initCatalogPage() {
     cardsContainer.innerHTML = `<p class="error">${i18n.t('common.error')}</p>`;
   }
 
-  // Функция фильтрации и рендера
   function filterAndRender() {
     let filtered = [...allCards];
 
-    // Фильтр по поиску
     if (currentFilters.search) {
       const q = currentFilters.search.toLowerCase();
       filtered = filtered.filter(card => {
@@ -272,24 +236,20 @@ async function initCatalogPage() {
       });
     }
 
-    // Фильтр по категории
     if (currentFilters.categoryId) {
       filtered = filtered.filter(card => card.category_id === currentFilters.categoryId);
     }
 
-    // Обновляем счётчик
     if (resultsCount) {
       resultsCount.textContent = filtered.length > 0 
         ? i18n.t('catalog.found', { count: filtered.length })
         : '';
     }
 
-    // Рендерим
     renderCards(filtered, cardsContainer);
   }
 }
 
-// Страница карточки
 async function initCardPage() {
   const params = new URLSearchParams(window.location.search);
   const cardId = params.get('id');
@@ -314,7 +274,6 @@ async function initCardPage() {
       return;
     }
 
-    // Заполняем данные
     const title = i18n.localize(card.title, '');
     const description = i18n.localize(card.description, '');
     const content = i18n.localize(card.content, { sections: [] });
@@ -328,7 +287,6 @@ async function initCardPage() {
     if (categoryEl) categoryEl.textContent = categoryName;
     if (viewsEl) viewsEl.textContent = card.views_count || 0;
 
-    // Рендерим секции контента
     if (contentEl && content.sections && content.sections.length > 0) {
       contentEl.innerHTML = content.sections.map(section => `
         <section class="content-section">
@@ -338,7 +296,6 @@ async function initCardPage() {
       `).join('');
     }
 
-    // PDF кнопка
     if (downloadBtn) {
       if (pdfUrl) {
         downloadBtn.href = pdfUrl;
@@ -348,15 +305,12 @@ async function initCardPage() {
       }
     }
 
-    // Увеличиваем счётчик просмотров
     DB.incrementViews(cardId);
 
   } catch (error) {
     console.error('Error loading card:', error);
   }
 }
-
-// ============ ГЛОБАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ============
 
 document.addEventListener('DOMContentLoaded', () => {
   i18n.init();
@@ -365,9 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBurgerMenu();
   initInstallBanner();
   initServiceWorker();
-  initOfflineIndicator(); // <-- добавь эту строку
-
-  // Определяем текущую страницу и инициализируем
+  initOfflineIndicator();
   const page = document.body.dataset.page;
   
   switch (page) {
@@ -382,7 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
       break;
   }
 
-  // Обновляем при смене языка
   document.addEventListener('localeChanged', () => {
     switch (page) {
       case 'home':
@@ -398,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ============ ОФЛАЙН ИНДИКАТОР ============
+// ============ OFFLINE ============
 
 function initOfflineIndicator() {
   const indicator = document.createElement('div');
@@ -413,7 +364,7 @@ function initOfflineIndicator() {
       <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
       <line x1="12" y1="20" x2="12.01" y2="20"></line>
     </svg>
-    <span>${i18n.t('common.offline')}</span>
+    <span>${i18n.t('Offline')}</span>
   `;
   document.body.appendChild(indicator);
 
