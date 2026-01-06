@@ -375,55 +375,82 @@ body {
 /* ===== INSTALL BANNER ===== */
 .install-banner {
   position: fixed;
-  bottom: -100px;
-  left: 20px;
-  right: 20px;
+  top: 74px;
+  left: 12px;
+  right: 12px;
   max-width: 400px;
   margin: 0 auto;
-  background: #0b3a6f;
-  color: #fff;
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #1f2933;
+  padding: 14px 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   z-index: 100;
-  transition: bottom 0.3s ease;
+  
+  /* Анимация */
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+  visibility: hidden;
+  transition: all 0.3s ease;
 }
 
 .install-banner.show {
-  bottom: 20px;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  visibility: visible;
 }
 
 .install-banner p {
   margin: 0 0 12px;
   font-size: 14px;
   font-weight: 600;
+  color: #1f2933;
 }
 
 .install-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .install-buttons button {
   flex: 1;
-  padding: 10px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 #installBtn {
-  background: #fff;
-  color: #0b3a6f;
-}
-
-#dismissBtn {
-  background: rgba(255,255,255,0.2);
+  background: #1b98fb;
   color: #fff;
 }
 
+#installBtn:hover {
+  background: #0b7fdb;
+}
+
+#installBtn:active {
+  transform: scale(0.97);
+}
+
+#dismissBtn {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+#dismissBtn:hover {
+  background: #e5e7eb;
+}
+
+#dismissBtn:active {
+  transform: scale(0.97);
+}
 /* ===== OFFLINE  ===== */
 .offline-indicator {
   position: fixed;
