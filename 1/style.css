@@ -2,7 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;  
 }
 
 body {
@@ -165,7 +165,7 @@ body {
 
 /* ===== CONTENT ===== */
 .container {
-  max-width: 1000px;
+  max-width: 500px;
   margin: 0 auto;
   padding: 32px 20px 60px;
 }
@@ -173,7 +173,7 @@ body {
 .section {
   background: #ffffff;
   border-radius: 20px;
-  padding: 40px;
+  padding: 20px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
@@ -202,14 +202,14 @@ body {
 .checklist {
   background: #ffffff;
   border-radius: 20px;
-  padding: 40px;
+  padding: 20px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
 .checklist h3 {
   font-size: 24px;
   padding-top: 20px;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
   margin-left: 40px;
   color: #0b3a6f;
 }
@@ -217,12 +217,13 @@ body {
 .checklist ul {
   margin-top: 10px;
   padding-left: 40px;
+  font-size: 15px;
   padding-bottom: 10px;
 
 }
 
 .checklist li {
-  font-size: 18px;
+  font-size: 15px;
   margin-bottom: 10px;
 }
 
@@ -274,4 +275,40 @@ body {
   accent-color: #0b5ed7;
   cursor: pointer;
 }
+/* ===== LANGUAGE SWITCHER ===== */
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid #e53935;
+  border-radius: 20px;
+  padding: 2px;
+  background: transparent;
+  margin-bottom: 20px;
+}
+
+.lang-btn {
+  padding: 4px 12px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lang-btn:hover:not(.active) {
+  color: #1f2933;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.lang-btn.active {
+  background: #0b5ed7;
+  color: white;
+}
+
 /* =====  ===== */

@@ -1,120 +1,127 @@
-<!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<title>Демонтаж — Подробно</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css
-">
+  <!doctype html>
+  <html lang="ru">
+  <head>
+  <meta charset="utf-8">
+  <title>Демонтаж — Подробно</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css
+  ">
 
-</head>
+  </head>
 
-<body>
+  <body>
 
-<!-- HEADER -->
-<header class="header">
-  <a href="../index.html" class="logo">KAZARBUILD</a>
-  <div class="burger" id="burger">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</header>
+  <!-- HEADER -->
+  <header class="header">
+    <a href="../index.html" class="logo">KAZARBUILD</a>
+    <div class="burger" id="burger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
 
-<!-- MENU -->
-<nav class="menu" id="menu">
-  <button>Смена языка</button>
-  <a href="../index.html">Тех.карты</a>
-</nav>
+  <!-- MENU -->
+  <nav class="menu" id="menu">
+    <div class="language-switcher">
+      <button class="lang-btn active" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <a href="../index.html">Тех.карты</a>
+  </nav>    
 
-<div class="page-offset"></div>
+  <div class="page-offset"></div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="carousel" id="carousel">
-    <div class="slide"></div>
-    <div class="slide"></div>
-    <div class="slide"></div>
-  </div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="carousel" id="carousel">
+      <div class="slide"></div>
+      <div class="slide"></div>
+      <div class="slide"></div>
+    </div>
 
-  <div class="hero-content">
-    <h2>Демонтаж</h2>
-  </div>
-</section>
-
-<!-- BACK -->
-<div class="back-wrapper">
-  <a href="../index.html" class="back-btn">← Назад</a>
-</div>
-
-<!-- CONTENT -->
-<main class="container">
-  <section class="section">
-    <h3>О демонтажных работах</h3>
-    <p>
-      Демонтаж — это старт любого ремонта.
-      Мы работаем аккуратно, быстро и по технологии.
-    </p>
-
-    <ul>
-      <li>Демонтаж стен и конструкций</li>
-      <li>Подготовка помещений</li>
-      <li>Вынос и утилизация мусора</li>
-      <li>Соблюдение сроков</li>
-    </ul>
+    <div class="hero-content">
+      <h2>Демонтаж</h2>
+    </div>
   </section>
-  
-  <div class="checklist">
-    <h3>Чек-лист: </h3>
-    <ul class="checklist" id="checklist">
-      <li><label><input type="checkbox" data-key="chk1"> Lorem ipsum dolor sit.</label></li>
-      <li><label><input type="checkbox" data-key="chk2"> Lorem ipsum dolor sit amet.</label></li>
-      <li><label><input type="checkbox" data-key="chk3"> Lorem, ipsum dolor.</label></li>
-      <li><label><input type="checkbox" data-key="chk4"> Lorem, ipsum.</label></li>
-      <li><label><input type="checkbox" data-key="chk5"> Lorem ipsum dolor sit amet.</label></li>
-    </ul>
+
+  <!-- BACK -->
+  <div class="back-wrapper">
+    <a href="../index.html" class="back-btn">← Назад</a>
   </div>
-</main>
 
-<footer class="footer">
-</footer>
+  <!-- CONTENT -->
+  <main class="c                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ontainer">
+    <section class="section">
+      <h3>О демонтажных работах</h3>
+      <p>
+        Демонтаж — это старт любого ремонта.
+        Мы работаем аккуратно, быстро и по технологии.
+      </p>
 
-<script>
-/* burger toggle */
-const burger = document.getElementById("burger");
-const menu = document.getElementById("menu");
+      <ul>
+        <li>Демонтаж стен и конструкций</li>
+        <li>Подготовка помещений</li>
+        <li>Вынос и утилизация мусора</li>
+        <li>Соблюдение сроков</li>
+      </ul>
+    </section>
+    
+    <div class="checklist">
+      <h3>Чек-лист: </h3>
+      <ul class="checklist" id="checklist">
+        <li><label><input type="checkbox" data-key="chk1"> Lorem ipsum dolor sit.</label></li>
+        <li><label><input type="checkbox" data-key="chk2"> Lorem ipsum dolor sit amet.</label></li>
+        <li><label><input type="checkbox" data-key="chk3"> Lorem, ipsum dolor.</label></li>
+        <li><label><input type="checkbox" data-key="chk4"> Lorem, ipsum.</label></li>
+        <li><label><input type="checkbox" data-key="chk5"> Lorem ipsum dolor sit amet.</label></li>
+      </ul>
+    </div>
+  </main>
 
-burger.addEventListener("click", () => {
-  burger.classList.toggle("active");
-  menu.classList.toggle("active");
-});
+  <footer class="footer">
+  </footer>
 
-/* slider */
-const carousel = document.getElementById("carousel");
-const slides = document.querySelectorAll(".slide");
-let index = 0;
+  <script>
+  const burger = document.getElementById("burger");
+  const menu = document.getElementById("menu");
 
-setInterval(() => {
-  index = (index + 1) % slides.length;
-  carousel.style.transform = `translateX(-${index * 100}%)`;
-}, 4000);
-
-// Чек-лист с сохранением в localStorage
-const pageKey = location.pathname;
-
-document.querySelectorAll("#checklist input").forEach(cb => {
-  const key = pageKey + "_" + cb.dataset.key;
-  
-  // Восстановить состояние при загрузке
-  cb.checked = localStorage.getItem(key) === "true";
-  
-  // Сохранять при изменении
-  cb.addEventListener("change", () => {
-    localStorage.setItem(key, cb.checked);
+  burger.addEventListener("click", () => {
+    burger.classList.toggle("active");
+    menu.classList.toggle("active");
   });
-});
 
-</script>
+  const carousel = document.getElementById("carousel");
+  const slides = document.querySelectorAll(".slide");
+  let index = 0;
 
-</body>
-</html>
+  setInterval(() => {
+    index = (index + 1) % slides.length;
+    carousel.style.transform = `translateX(-${index * 100}%)`;
+  }, 4000);
+
+  const pageKey = location.pathname;
+
+  document.querySelectorAll("#checklist input").forEach(cb => {
+    const key = pageKey + "_" + cb.dataset.key;
+    
+    cb.checked = localStorage.getItem(key) === "true";
+    
+    cb.addEventListener("change", () => {
+      localStorage.setItem(key, cb.checked);
+    });
+  });
+
+  const langButtons = document.querySelectorAll('.lang-btn');
+  langButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      langButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const lang = this.dataset.lang;
+      console.log('Selected language:', lang);
+    });
+  });
+  </script>
+
+  </body>
+  </html>

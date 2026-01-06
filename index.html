@@ -11,10 +11,9 @@
   <meta name="apple-mobile-web-app-title" content="KAZARBUILD">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="style.css">
-
 </head>
 
-<body>
+<body data-page="home">
   <header class="header">
     <a href="index.html" class="logo">KAZARBUILD</a>
     <div class="burger" id="burger" aria-label="Открыть меню" role="button" tabindex="0">
@@ -24,153 +23,55 @@
     </div>
   </header>
 
-<nav class="menu" id="menu">
+  <nav class="menu" id="menu">
     <div class="language-switcher">
-        <button class="lang-btn active" data-lang="ru">RU</button>
-        <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn active" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="kk">KK</button>
+      <button class="lang-btn" data-lang="uz">UZ</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="tk">TK</button>
     </div>
-    <a href="index.html">Тех.карты</a>
-</nav>
+    <a href="index.html" data-i18n="nav.catalog">Тех.карты</a>
+  </nav>
+
   <div class="install-banner" id="installBanner">
-    <p>Установить приложение для работы офлайн?</p>
+    <p data-i18n="common.install">Установить приложение для работы офлайн?</p>
     <div class="install-buttons">
-      <button id="installBtn">Установить</button>
-      <button id="dismissBtn">Позже</button>
+      <button id="installBtn" data-i18n="common.installBtn">Установить</button>
+      <button id="dismissBtn" data-i18n="common.later">Позже</button>
     </div>
   </div>
   <main class="main">
     <div class="page">
-      <h1 class="page-title">Технологические карты</h1>
-      <section class="cards">
-        <div class="astm-card">
-          <h3 class="astm-title">Демонтажные работы</h3>
-          <p class="astm-description">
-            Профессиональный демонтаж для ремонта, перепланировки и строительства.
-            Быстро, аккуратно и без лишних проблем.
-          </p>
-          <div class="astm-divider"></div>
-          <div class="astm-bottom">
-            <ul class="astm-benefits">
-              <li>1</li>
-              <li>2</li>
-              <li>3</li>
-              <li>...</li>
-            </ul>
-          <div class="astm-divider-vertical"></div>
-          <a href="1/learn.html" class="astm-button">
-            <svg viewBox="0 0 24 24">
-              <path d="M9 18l6-6-6-6"/>
-            </svg>
-          </a>
-          </div>
-        </div> 
-        
-                <div class="astm-card">
-          <h3 class="astm-title">Демонтажные работы</h3>
-          <p class="astm-description">
-            Профессиональный демонтаж для ремонта, перепланировки и строительства.
-            Быстро, аккуратно и без лишних проблем.
-          </p>
-          <div class="astm-divider"></div>
-          <div class="astm-bottom">
-            <ul class="astm-benefits">
-              <li>1</li>
-              <li>2</li>
-              <li>3</li>
-              <li>...</li>
-            </ul>
-          <div class="astm-divider-vertical"></div>
-          <a href="1/learn.html" class="astm-button">
-            <svg viewBox="0 0 24 24">
-              <path d="M9 18l6-6-6-6"/>
-            </svg>
-          </a>
-          </div>
-        </div> 
-
-                <div class="astm-card">
-          <h3 class="astm-title">Демонтажные работы</h3>
-          <p class="astm-description">
-            Профессиональный демонтаж для ремонта, перепланировки и строительства.
-            Быстро, аккуратно и без лишних проблем.
-          </p>
-          <div class="astm-divider"></div>
-          <div class="astm-bottom">
-            <ul class="astm-benefits">
-              <li>1</li>
-              <li>2</li>
-              <li>3</li>
-              <li>...</li>
-            </ul>
-          <div class="astm-divider-vertical"></div>
-          <a href="1/learn.html" class="astm-button">
-            <svg viewBox="0 0 24 24">
-              <path d="M9 18l6-6-6-6"/>
-            </svg>
-          </a>
-          </div>
-        </div> 
-      </div>
-    </section>
-  </div>
+      <h1 class="page-title" data-i18n="home.title">Технологические карты</h1>
+      
+      <!-- Карточки загружаются из Supabase -->
+      <section class="cards" id="cards-container">
+        <!-- Skeleton loading -->
+        <div class="astm-card skeleton">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="astm-card skeleton">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="astm-card skeleton">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+      </section>
+    </div>
   </main>
-
   <footer class="footer"></footer>
-  <script>
-    const burger = document.getElementById("burger");
-    const menu = document.getElementById("menu");
 
-    function toggleMenu() {
-      burger.classList.toggle("active");
-      menu.classList.toggle("active");
-    }
-
-    burger.addEventListener("click", toggleMenu);
-    burger.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        toggleMenu();
-      }
-    });
-
-    if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-    .then((reg) => console.log('SW OK'))
-    .catch((err) => console.log('SW error:', err));
-}
-    let deferredPrompt;
-    const installBanner = document.getElementById('installBanner');
-    const installBtn = document.getElementById('installBtn');
-    const dismissBtn = document.getElementById('dismissBtn');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBanner.classList.add('show');
-    });
-
-    installBtn.addEventListener('click', () => {
-      installBanner.classList.remove('show');
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choice) => {
-        deferredPrompt = null;
-      });
-    });
-
-    dismissBtn.addEventListener('click', () => {
-      installBanner.classList.remove('show');
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const buttons = document.querySelectorAll('.lang-btn');
-        buttons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                buttons.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-    });
-    </script>
-
+  <!-- SCRIPTS -->
+  <script src="js/config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
