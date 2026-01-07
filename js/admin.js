@@ -1,6 +1,4 @@
-
-const ADMIN_PASSWORD = 'kazarbuild2024'; // Поменяй на свой пароль
-
+const ADMIN_PASSWORD = 'kazar27'; 
 let categories = [];
 let cards = [];
 let currentEditId = null;
