@@ -51,37 +51,22 @@
   }
 
   function bindEvents() {
-    // Auth
     elements.authForm?.addEventListener('submit', handleLogin);
     elements.logoutBtn?.addEventListener('click', handleLogout);
-
-    // Language tabs
     elements.langTabs?.addEventListener('click', handleLangTabClick);
-
-    // Cards
     elements.addCardBtn?.addEventListener('click', createNewCard);
-
-    // Hero images
     elements.heroUploadZone?.addEventListener('click', () => elements.heroFileInput?.click());
     elements.heroUploadZone?.addEventListener('dragover', handleDragOver);
     elements.heroUploadZone?.addEventListener('dragleave', handleDragLeave);
     elements.heroUploadZone?.addEventListener('drop', handleHeroDrop);
     elements.heroFileInput?.addEventListener('change', handleHeroFileSelect);
     elements.heroUrlAdd?.addEventListener('click', handleHeroUrlAdd);
-
-    // Sections
     elements.addSectionBtn?.addEventListener('click', () => addSection());
-
-    // Actions
     elements.saveBtn?.addEventListener('click', saveCard);
     elements.deleteBtn?.addEventListener('click', deleteCard);
     elements.previewBtn?.addEventListener('click', showPreview);
     elements.previewClose?.addEventListener('click', hidePreview);
-
-    // Track changes
     document.addEventListener('input', () => { unsavedChanges = true; });
-
-    // Warn before leaving
     window.addEventListener('beforeunload', (e) => {
       if (unsavedChanges) {
         e.preventDefault();
@@ -89,8 +74,6 @@
       }
     });
   }
-
-  // === Auth ===
   function checkAuth() {
     isLoggedIn = sessionStorage.getItem('admin_auth') === 'true';
     if (isLoggedIn) {
@@ -126,8 +109,6 @@
 
     await loadData();
   }
-
-  // === Data Loading ===
   async function loadData() {
     try {
       const [categoriesData, cardsData] = await Promise.all([
@@ -157,8 +138,6 @@
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
   }
-
-  // === Render Cards List ===
   function renderCardsList() {
     if (!elements.cardsList) return;
 
@@ -184,8 +163,6 @@
         </div>
       `;
     }).join('');
-
-    // Bind clicks
     elements.cardsList.querySelectorAll('.card-list-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.dataset.id;
@@ -202,26 +179,18 @@
         <option value="${cat.id}">${cat.name?.ru || cat.slug}</option>
       `).join('');
   }
-
-  // === Language Tabs ===
   function handleLangTabClick(e) {
     const tab = e.target.closest('.editor-tab');
     if (!tab) return;
 
     currentLang = tab.dataset.lang;
-
-    // Update tabs
     elements.langTabs.querySelectorAll('.editor-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.lang === currentLang);
     });
-
-    // Update visible fields
     document.querySelectorAll('.lang-field').forEach(field => {
       field.style.display = field.dataset.lang === currentLang ? 'block' : 'none';
     });
   }
-
-  // === Create New Card ===
   function createNewCard() {
     if (unsavedChanges && !confirm('Есть несохранённые изменения. Продолжить?')) {
       return;
@@ -229,20 +198,14 @@
 
     currentCardId = null;
     unsavedChanges = false;
-
-    // Show editor
     if (elements.editorPlaceholder) elements.editorPlaceholder.style.display = 'none';
     if (elements.editorForm) elements.editorForm.style.display = 'flex';
     if (elements.deleteBtn) elements.deleteBtn.style.display = 'none';
 
-    // Clear form
     clearForm();
 
-    // Update sidebar
     renderCardsList();
   }
-
-  // === Load Card for Edit ===
   function loadCardForEdit(id) {
     if (unsavedChanges && !confirm('Есть несохранённые изменения. Продолжить?')) {
       return;
@@ -254,27 +217,20 @@
     currentCardId = id;
     unsavedChanges = false;
 
-    // Show editor
     if (elements.editorPlaceholder) elements.editorPlaceholder.style.display = 'none';
     if (elements.editorForm) elements.editorForm.style.display = 'flex';
     if (elements.deleteBtn) elements.deleteBtn.style.display = 'flex';
 
-    // Fill form
     fillForm(card);
 
-    // Update sidebar
     renderCardsList();
   }
 
-  // === Clear Form ===
   function clearForm() {
-    // Reset lang to RU
     currentLang = 'ru';
     elements.langTabs?.querySelectorAll('.editor-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.lang === 'ru');
     });
-
-    // Clear title & description
     document.querySelectorAll('[data-field="title"] .lang-field').forEach(f => {
       f.value = '';
       f.style.display = f.dataset.lang === 'ru' ? 'block' : 'none';
@@ -290,43 +246,32 @@
       f.style.display = f.dataset.lang === 'ru' ? 'block' : 'none';
     });
 
-    // Clear category & status
     if (elements.categorySelect) elements.categorySelect.value = '';
     if (elements.isPublished) elements.isPublished.checked = true;
 
-    // Clear hero images
     if (elements.heroImages) elements.heroImages.innerHTML = '';
 
-    // Clear sections
     if (elements.sectionsList) elements.sectionsList.innerHTML = '';
 
-    // Add one empty section
     addSection();
   }
 
-  // === Fill Form ===
   function fillForm(card) {
-    // Reset lang to RU
     currentLang = 'ru';
     elements.langTabs?.querySelectorAll('.editor-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.lang === 'ru');
     });
-
-    // Title
     document.querySelectorAll('[data-field="title"] .lang-field').forEach(f => {
       const lang = f.dataset.lang;
       f.value = card.title?.[lang] || '';
       f.style.display = lang === 'ru' ? 'block' : 'none';
     });
 
-    // Description
     document.querySelectorAll('[data-field="description"] .lang-field').forEach(f => {
       const lang = f.dataset.lang;
       f.value = card.description?.[lang] || '';
       f.style.display = lang === 'ru' ? 'block' : 'none';
     });
-
-    // Checklist
     document.querySelectorAll('[data-field="checklist"] .lang-field').forEach(f => {
       const lang = f.dataset.lang;
       const content = card.content?.[lang];
@@ -334,21 +279,14 @@
       f.value = checklist.map(item => '- ' + item).join('\n');
       f.style.display = lang === 'ru' ? 'block' : 'none';
     });
-
-    // Category
     if (elements.categorySelect) {
       elements.categorySelect.value = card.category_id || '';
     }
 
-    // Status
     if (elements.isPublished) {
       elements.isPublished.checked = card.is_published !== false;
     }
-
-    // Hero images
     renderHeroImages(card.images || []);
-
-    // Sections
     if (elements.sectionsList) {
       elements.sectionsList.innerHTML = '';
     }
@@ -364,8 +302,6 @@
       });
     }
   }
-
-  // === Hero Images ===
   function renderHeroImages(images) {
     if (!elements.heroImages) return;
 
@@ -379,8 +315,6 @@
         </button>
       </div>
     `).join('');
-
-    // Bind remove
     elements.heroImages.querySelectorAll('.image-item-remove').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -442,10 +376,6 @@
   }
 
   function handleHeroFiles(files) {
-    // В реальном проекте здесь был бы upload на сервер
-    // Пока используем URL.createObjectURL для демо
-    // Или просить URL
-
     alert('Для загрузки изображений используйте URL.\n\nВ будущем можно добавить загрузку файлов в Supabase Storage.');
   }
 
@@ -457,7 +387,6 @@
     }
   }
 
-  // === Sections ===
   function addSection(title = '', content = '', images = []) {
     if (!elements.sectionsList || !elements.sectionTemplate) return;
 
@@ -466,28 +395,21 @@
     const sectionId = 'section-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
     section.dataset.sectionId = sectionId;
-
-    // Fill data
     const titleInput = section.querySelector('.section-title-input');
     const editor = section.querySelector('.rich-editor');
 
     if (titleInput) titleInput.value = title;
     if (editor) editor.innerHTML = content;
 
-    // Render section images
     renderSectionImages(section, images);
 
-    // Bind toolbar
     bindEditorToolbar(section);
-
-    // Bind remove
     const removeBtn = section.querySelector('.section-remove');
     removeBtn?.addEventListener('click', () => {
       section.remove();
       unsavedChanges = true;
     });
 
-    // Bind image button
     const imageBtn = section.querySelector('.toolbar-image-btn');
     imageBtn?.addEventListener('click', () => {
       showImageModal(section);

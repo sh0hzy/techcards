@@ -1,29 +1,23 @@
 (function() {
   'use strict';
 
-  // === Получаем ID карточки из URL ===
   const urlParams = new URLSearchParams(window.location.search);
   const cardId = urlParams.get('id');
 
-  // Если нет ID — возврат на главную
   if (!cardId) {
     window.location.href = 'index.html';
     return;
   }
 
-  // === Элементы страницы ===
   let elements = {};
 
-  // === Данные карточки ===
   let cardData = null;
   let carouselIndex = 0;
   let carouselTimer = null;
 
-  // === Инициализация после загрузки DOM ===
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
-    // Кэшируем элементы
     elements = {
       title: document.getElementById('card-title'),
       category: document.getElementById('card-category'),
@@ -38,20 +32,14 @@
       checklistReset: document.getElementById('checklist-reset')
     };
 
-    // Загружаем карточку
     loadCard();
 
-    // Обработчик кнопки чек-листа
     if (elements.checklistBtn) {
       elements.checklistBtn.addEventListener('click', toggleChecklist);
     }
-
-    // Обработчик сброса чек-листа
     if (elements.checklistReset) {
       elements.checklistReset.addEventListener('click', resetChecklist);
     }
-
-    // Слушаем смену языка
     document.addEventListener('localeChanged', function() {
       if (cardData) {
         renderCard(cardData);
@@ -59,7 +47,6 @@
     });
   }
 
-  // === Загрузка карточки из Supabase ===
   async function loadCard() {
     try {
       const url = `${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${cardId}&select=*,category:categories(*)`;
@@ -95,25 +82,20 @@
     }
   }
 
-  // === Рендер карточки ===
   function renderCard(card) {
     const lang = localStorage.getItem('locale') || 'ru';
 
-    // Заголовок
     const title = getLocalized(card.title, lang) || 'Без названия';
     if (elements.title) {
       elements.title.textContent = title;
     }
     document.title = title + ' — KAZARBUILD';
 
-    // Категория
     const categoryName = card.category ? getLocalized(card.category.name, lang) : '';
     if (elements.category) {
       elements.category.textContent = categoryName;
       elements.category.style.display = categoryName ? 'inline-block' : 'none';
     }
-
-    // Описание
     const description = getLocalized(card.description, lang) || '';
     if (elements.description) {
       elements.description.textContent = description;
@@ -121,30 +103,18 @@
     if (elements.descriptionBlock) {
       elements.descriptionBlock.style.display = description ? 'block' : 'none';
     }
-
-    // Изображения
     renderCarousel(card.images || [], card.cover_image);
-
-    // Секции контента
     const content = getLocalized(card.content, lang) || {};
     renderSections(content.sections || []);
-
-    // Чек-лист
     renderChecklist(content.checklist || []);
   }
-
-  // === Получить локализованное значение ===
   function getLocalized(obj, lang) {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
     return obj[lang] || obj['ru'] || obj['en'] || obj['kk'] || '';
   }
-
-  // === Рендер карусели ===
   function renderCarousel(images, coverImage) {
     if (!elements.carousel) return;
-
-    // Останавливаем предыдущий таймер
     if (carouselTimer) {
       clearInterval(carouselTimer);
       carouselTimer = null;
@@ -162,8 +132,6 @@
       elements.carousel.innerHTML = slides.map(function(img) {
         return '<div class="card-slide" style="background-image: url(\'' + img + '\');"></div>';
       }).join('');
-
-      // Автопрокрутка если больше 1 слайда
       if (slides.length > 1) {
         carouselIndex = 0;
         carouselTimer = setInterval(function() {
@@ -172,12 +140,9 @@
         }, 4000);
       }
     } else {
-      // Заглушка
       elements.carousel.innerHTML = '<div class="card-slide card-slide-placeholder"></div>';
     }
   }
-
-  // === Рендер секций контента ===
   function renderSections(sections) {
     if (!elements.sections) return;
 
@@ -202,8 +167,6 @@
 
     elements.sections.innerHTML = html;
   }
-
-  // === Форматирование контента (поддержка списков) ===
   function formatContent(text) {
     if (!text) return '';
 
@@ -235,17 +198,12 @@
 
     return html;
   }
-
-  // === Экранирование HTML ===
   function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
-
-  // === Рендер чек-листа ===
   function renderChecklist(items) {
-    // Скрываем кнопку если нет пунктов
     if (!items || items.length === 0) {
       if (elements.checklistBtn) {
         elements.checklistBtn.style.display = 'none';
@@ -256,12 +214,9 @@
       return;
     }
 
-    // Показываем кнопку
     if (elements.checklistBtn) {
       elements.checklistBtn.style.display = 'flex';
     }
-
-    // Генерируем HTML пунктов
     let html = '';
 
     items.forEach(function(item, index) {
