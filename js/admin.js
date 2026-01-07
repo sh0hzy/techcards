@@ -142,7 +142,7 @@
     if (!elements.cardsList) return;
 
     if (cards.length === 0) {
-      elements.cardsList.innerHTML = '<p style="padding: 20px; text-align: center; color: #9ca3af;">Карточек пока нет</p>';
+      elements.cardsList.innerHTML = '<p style="padding: 20px; text-align: center; color: #9ca3af;">Пусто</p>';
       return;
     }
 
