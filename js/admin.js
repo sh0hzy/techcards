@@ -376,7 +376,7 @@
   }
 
   function handleHeroFiles(files) {
-    alert('Для загрузки изображений используйте URL.\n\nВ будущем можно добавить загрузку файлов в Supabase Storage.');
+    alert('Используйте URL.\n\n');
   }
 
   function handleHeroUrlAdd() {
