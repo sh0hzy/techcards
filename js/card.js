@@ -1,5 +1,3 @@
-
-
 (function() {
   // Получаем ID карточки из URL
   const params = new URLSearchParams(window.location.search);
@@ -90,16 +88,11 @@
     }
 
     carousel.innerHTML = images.map((img, idx) => `
-      <div class="slide" style="background-image: url('${img}');" data-index="${idx}"></div>
-    `).join('');
-
-    // Запускаем автопрокрутку если больше 1 слайда
+      <div class="slide" style="background-image: url('${img}');" data-index="${idx}"></div>`).join('');
     if (images.length > 1) {
       startCarousel(images.length);
     }
   }
-
-  // Автопрокрутка карусели
   function startCarousel(total) {
     if (carouselInterval) clearInterval(carouselInterval);
     
@@ -108,8 +101,6 @@
       carousel.style.transform = `translateX(-${carouselIndex * 100}%)`;
     }, 4000);
   }
-
-  // Рендер секций контента
   function renderSections(sections) {
     if (!sections || sections.length === 0) {
       contentSections.innerHTML = '';
@@ -124,10 +115,7 @@
     `).join('');
   }
 
-  // Форматирование контента (поддержка списков)
   function formatContent(content) {
-    // Простое преобразование переносов строк в параграфы
-    // И поддержка маркированных списков (строки начинающиеся с -)
     const lines = content.split('\n');
     let html = '';
     let inList = false;
@@ -156,8 +144,6 @@
     
     return html || `<p>${content}</p>`;
   }
-
-  // Рендер чек-листа
   function renderChecklist(items) {
     if (!items || items.length === 0) {
       checklistToggle.style.display = 'none';
@@ -182,7 +168,6 @@
       `;
     }).join('');
 
-    // Обработчики чекбоксов
     checklistUl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
       cb.addEventListener('change', () => {
         localStorage.setItem(cb.dataset.key, cb.checked);
@@ -193,17 +178,13 @@
     updateChecklistProgress();
   }
 
-  // Прогресс чек-листа
   function updateChecklistProgress() {
     const total = checklistUl.querySelectorAll('input[type="checkbox"]').length;
     const checked = checklistUl.querySelectorAll('input[type="checkbox"]:checked').length;
     
-    // Можно добавить прогресс-бар если нужно
     checklistToggle.querySelector('span').textContent = 
       `${i18n.t('card.checklist')} (${checked}/${total})`;
-  }
-
-  // Сброс чек-листа
+  } 
   checklistReset?.addEventListener('click', () => {
     checklistUl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
       cb.checked = false;
@@ -212,19 +193,16 @@
     updateChecklistProgress();
   });
 
-  // Toggle чек-листа
   checklistToggle?.addEventListener('click', () => {
     checklistWrapper.classList.toggle('open');
     checklistToggle.classList.toggle('open');
   });
 
-  // Обновление при смене языка
   document.addEventListener('localeChanged', () => {
     if (currentCard) {
       renderCard(currentCard);
     }
   });
 
-  // Запуск
   document.addEventListener('DOMContentLoaded', loadCard);
 })();

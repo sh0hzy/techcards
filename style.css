@@ -244,7 +244,7 @@ body {
   border-radius: 20px;
 }
 
-.astm-views {
+/* .astm-views {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -255,7 +255,7 @@ body {
 .astm-views svg {
   width: 14px;
   height: 14px;
-}
+} */
 
 /* Вертикальный разделитель */
 .astm-divider-vertical {
@@ -485,9 +485,8 @@ body {
 }
 
 
-/* ===== CARD PAGE ===== */
+/* ===== card page ===== */
 
-/* Hero для страницы карточки */
 .hero {
   position: relative;
   height: 50vh;

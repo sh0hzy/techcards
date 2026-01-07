@@ -9,9 +9,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body data-page="card">
-  <!-- HEADER -->
   <header class="header">
     <a href="index.html" class="logo">KAZARBUILD</a>
     <div class="burger" id="burger" aria-label="Открыть меню" role="button" tabindex="0">
@@ -20,8 +18,6 @@
       <span></span>
     </div>
   </header>
-
-  <!-- MENU -->
   <nav class="menu" id="menu">
     <div class="language-switcher">
       <button class="lang-btn active" data-lang="ru">RU</button>
@@ -32,8 +28,6 @@
     </div>
     <a href="index.html" data-i18n="nav.catalog">Тех.карты</a>
   </nav>
-
-  <!-- INSTALL BANNER -->
   <div class="install-banner" id="installBanner">
     <p data-i18n="common.install">Установить приложение для работы офлайн?</p>
     <div class="install-buttons">
@@ -41,8 +35,6 @@
       <button id="dismissBtn" data-i18n="common.later">Позже</button>
     </div>
   </div>
-
-  <!-- HERO с каруселью -->
   <section class="hero" id="hero">
     <div class="carousel" id="carousel">
       <div class="slide skeleton-slide"></div>
@@ -52,8 +44,6 @@
       <h1 class="hero-title" id="hero-title">Загрузка...</h1>
     </div>
   </section>
-
-  <!-- BACK BUTTON -->
   <div class="back-wrapper">
     <a href="index.html" class="back-btn">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -62,18 +52,12 @@
       <span data-i18n="card.back">Назад</span>
     </a>
   </div>
-
-  <!-- MAIN CONTENT -->
   <main class="container">
-    <!-- Описание -->
     <section class="card-section" id="description-section">
       <p class="card-description" id="card-description">Загрузка описания...</p>
     </section>
-
-    <!-- Секции контента (загружаются из БД) -->
     <div id="content-sections"></div>
 
-    <!-- Кнопка чек-листа -->
     <button class="checklist-toggle" id="checklist-toggle">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M9 11l3 3L22 4"/>
@@ -84,11 +68,8 @@
         <path d="M6 9l6 6 6-6"/>
       </svg>
     </button>
-
-    <!-- Чек-лист (скрыт по умолчанию) -->
     <div class="checklist-wrapper" id="checklist-wrapper">
       <ul class="checklist" id="checklist">
-        <!-- Загружается из БД -->
       </ul>
       <button class="checklist-reset" id="checklist-reset">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -98,8 +79,6 @@
         <span data-i18n="card.resetChecklist">Сбросить</span>
       </button>
     </div>
-
-    <!-- Мета-информация -->
     <div class="card-meta">
       <span class="meta-item">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -111,8 +90,6 @@
   </main>
 
   <footer class="footer"></footer>
-
-  <!-- SCRIPTS -->
   <script src="js/config.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/supabase.js"></script>
