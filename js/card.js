@@ -20,7 +20,7 @@
   const checklistToggle = document.getElementById('checklist-toggle');
   const checklistUl = document.getElementById('checklist');
   const checklistReset = document.getElementById('checklist-reset');
-  const viewsCount = document.getElementById('views-count');
+//   const viewsCount = document.getElementById('views-count');
 
   let currentCard = null;
   let carouselIndex = 0;
