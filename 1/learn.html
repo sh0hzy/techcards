@@ -10,48 +10,45 @@
   </head>
 
   <body>
-
-  <!-- HEADER -->
-  <header class="header">
-    <a href="../index.html" class="logo">KAZARBUILD</a>
-    <div class="burger" id="burger">
+<header class="header">
+    <a href="index.html" class="logo">KAZARBUILD</a>
+    <div class="burger" id="burger" aria-label="Открыть меню" role="button" tabindex="0">
       <span></span>
       <span></span>
       <span></span>
     </div>
   </header>
-
-  <!-- MENU -->
   <nav class="menu" id="menu">
     <div class="language-switcher">
       <button class="lang-btn active" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="kk">KK</button>
+      <button class="lang-btn" data-lang="uz">UZ</button>
       <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="tk">TK</button>
     </div>
-    <a href="../index.html">Тех.карты</a>
-  </nav>    
-
-  <div class="page-offset"></div>
-
-  <!-- HERO -->
+    <a href="index.html" data-i18n="nav.catalog">Тех.карты</a>
+  </nav>
+  <div class="install-banner" id="installBanner">
+    <p data-i18n="common.install">Установить приложение для работы офлайн?</p>
+    <div class="install-buttons">
+      <button id="installBtn" data-i18n="common.installBtn">Установить</button>
+      <button id="dismissBtn" data-i18n="common.later">Позже</button>
+    </div>
+  </div>
   <section class="hero">
     <div class="carousel" id="carousel">
       <div class="slide"></div>
       <div class="slide"></div>
       <div class="slide"></div>
     </div>
-
     <div class="hero-content">
       <h2>Демонтаж</h2>
     </div>
   </section>
-
-  <!-- BACK -->
   <div class="back-wrapper">
     <a href="../index.html" class="back-btn">← Назад</a>
   </div>
-
-  <!-- CONTENT -->
-  <main class="c                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ontainer">
+  <main class="c"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ontainer">
     <section class="section">
       <h3>О демонтажных работах</h3>
       <p>
@@ -78,11 +75,13 @@
       </ul>
     </div>
   </main>
-
-  <footer class="footer">
-  </footer>
-
+  <footer class="footer"></footer>
+  <script src="js/config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
   <script>
+
   const burger = document.getElementById("burger");
   const menu = document.getElementById("menu");
 
