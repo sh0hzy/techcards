@@ -810,3 +810,82 @@ body {
     border-radius: 12px;
   }
 }
+/* ===== CARD BLOCK IMAGES ===== */
+
+.card-block-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 16px 0;
+  display: block;
+}
+
+.card-block-content h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2933;
+  margin: 20px 0 10px;
+}
+
+.card-block-content h3:first-child {
+  margin-top: 0;
+}
+
+.card-block-content p {
+  margin: 0 0 12px;
+}
+
+.card-block-content p:last-child {
+  margin-bottom: 0;
+}
+
+.card-block-content ul,
+.card-block-content ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.card-block-content li {
+  margin-bottom: 8px;
+}
+
+.card-block-content b,
+.card-block-content strong {
+  font-weight: 700;
+}
+
+.card-block-content i,
+.card-block-content em {
+  font-style: italic;
+}
+
+.card-block-content u {
+  text-decoration: underline;
+}
+
+/* Отдельные изображения секции */
+.card-block-images {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.card-block-image {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* Галерея если несколько изображений */
+.card-block-images.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.card-block-images.gallery .card-block-image {
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}

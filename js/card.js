@@ -1,6 +1,7 @@
 (function() {
   'use strict';
 
+  // === Получаем ID карточки из URL ===
   const urlParams = new URLSearchParams(window.location.search);
   const cardId = urlParams.get('id');
 
@@ -9,12 +10,13 @@
     return;
   }
 
+  // === Элементы страницы ===
   let elements = {};
-
   let cardData = null;
   let carouselIndex = 0;
   let carouselTimer = null;
 
+  // === Инициализация ===
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
@@ -37,9 +39,11 @@
     if (elements.checklistBtn) {
       elements.checklistBtn.addEventListener('click', toggleChecklist);
     }
+
     if (elements.checklistReset) {
       elements.checklistReset.addEventListener('click', resetChecklist);
     }
+
     document.addEventListener('localeChanged', function() {
       if (cardData) {
         renderCard(cardData);
@@ -47,6 +51,7 @@
     });
   }
 
+  // === Загрузка карточки ===
   async function loadCard() {
     try {
       const url = `${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${cardId}&select=*,category:categories(*)`;
@@ -82,20 +87,25 @@
     }
   }
 
+  // === Рендер карточки ===
   function renderCard(card) {
     const lang = localStorage.getItem('locale') || 'ru';
 
+    // Заголовок
     const title = getLocalized(card.title, lang) || 'Без названия';
     if (elements.title) {
       elements.title.textContent = title;
     }
     document.title = title + ' — KAZARBUILD';
 
+    // Категория
     const categoryName = card.category ? getLocalized(card.category.name, lang) : '';
     if (elements.category) {
       elements.category.textContent = categoryName;
       elements.category.style.display = categoryName ? 'inline-block' : 'none';
     }
+
+    // Описание
     const description = getLocalized(card.description, lang) || '';
     if (elements.description) {
       elements.description.textContent = description;
@@ -103,18 +113,29 @@
     if (elements.descriptionBlock) {
       elements.descriptionBlock.style.display = description ? 'block' : 'none';
     }
+
+    // Карусель
     renderCarousel(card.images || [], card.cover_image);
+
+    // Секции контента
     const content = getLocalized(card.content, lang) || {};
     renderSections(content.sections || []);
+
+    // Чек-лист
     renderChecklist(content.checklist || []);
   }
+
+  // === Локализация ===
   function getLocalized(obj, lang) {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
     return obj[lang] || obj['ru'] || obj['en'] || obj['kk'] || '';
   }
+
+  // === Карусель ===
   function renderCarousel(images, coverImage) {
     if (!elements.carousel) return;
+
     if (carouselTimer) {
       clearInterval(carouselTimer);
       carouselTimer = null;
@@ -132,6 +153,7 @@
       elements.carousel.innerHTML = slides.map(function(img) {
         return '<div class="card-slide" style="background-image: url(\'' + img + '\');"></div>';
       }).join('');
+
       if (slides.length > 1) {
         carouselIndex = 0;
         carouselTimer = setInterval(function() {
@@ -143,6 +165,8 @@
       elements.carousel.innerHTML = '<div class="card-slide card-slide-placeholder"></div>';
     }
   }
+
+  // === ИСПРАВЛЕНО: Рендер секций с поддержкой HTML ===
   function renderSections(sections) {
     if (!elements.sections) return;
 
@@ -155,54 +179,154 @@
 
     sections.forEach(function(section) {
       const sectionTitle = section.title || '';
-      const sectionContent = formatContent(section.content || '');
+      const sectionContent = section.content || '';
+      const sectionImages = section.images || [];
 
       html += '<section class="card-block">';
+      
+      // Заголовок секции
       if (sectionTitle) {
         html += '<h3 class="card-block-title">' + escapeHtml(sectionTitle) + '</h3>';
       }
-      html += '<div class="card-block-content">' + sectionContent + '</div>';
+      
+      // Контент секции - рендерим HTML как есть (он уже отформатирован в админке)
+      if (sectionContent) {
+        html += '<div class="card-block-content">' + sanitizeHtml(sectionContent) + '</div>';
+      }
+      
+      // Изображения секции (если есть отдельно от контента)
+      if (sectionImages.length > 0) {
+        html += '<div class="card-block-images">';
+        sectionImages.forEach(function(imgUrl) {
+          html += '<img src="' + escapeAttr(imgUrl) + '" alt="" class="card-block-image" loading="lazy">';
+        });
+        html += '</div>';
+      }
+      
       html += '</section>';
     });
 
     elements.sections.innerHTML = html;
   }
-  function formatContent(text) {
-    if (!text) return '';
 
-    const lines = text.split('\n');
-    let html = '';
-    let inList = false;
+  // === Безопасная очистка HTML (разрешаем только безопасные теги) ===
+  function sanitizeHtml(html) {
+    if (!html) return '';
 
-    lines.forEach(function(line) {
-      const trimmed = line.trim();
+    // Создаём временный элемент для парсинга
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
 
-      if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
-        if (!inList) {
-          html += '<ul>';
-          inList = true;
-        }
-        html += '<li>' + escapeHtml(trimmed.substring(2)) + '</li>';
-      } else if (trimmed) {
-        if (inList) {
-          html += '</ul>';
-          inList = false;
-        }
-        html += '<p>' + escapeHtml(trimmed) + '</p>';
+    // Разрешённые теги
+    const allowedTags = [
+      'p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'ul', 'ol', 'li',
+      'a', 'img',
+      'blockquote', 'pre', 'code',
+      'div', 'span'
+    ];
+
+    // Разрешённые атрибуты
+    const allowedAttrs = {
+      'a': ['href', 'target', 'rel'],
+      'img': ['src', 'alt', 'width', 'height', 'style'],
+      '*': ['style', 'class']
+    };
+
+    // Рекурсивная очистка
+    function cleanNode(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent;
       }
-    });
 
-    if (inList) {
-      html += '</ul>';
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return '';
+      }
+
+      const tagName = node.tagName.toLowerCase();
+
+      // Если тег не разрешён, возвращаем только содержимое
+      if (!allowedTags.includes(tagName)) {
+        let content = '';
+        node.childNodes.forEach(function(child) {
+          content += cleanNode(child);
+        });
+        return content;
+      }
+
+      // Создаём чистый элемент
+      let result = '<' + tagName;
+
+      // Добавляем разрешённые атрибуты
+      const tagAttrs = allowedAttrs[tagName] || [];
+      const globalAttrs = allowedAttrs['*'] || [];
+      const allAllowedAttrs = [...tagAttrs, ...globalAttrs];
+
+      Array.from(node.attributes).forEach(function(attr) {
+        if (allAllowedAttrs.includes(attr.name)) {
+          // Дополнительная проверка для href (защита от javascript:)
+          if (attr.name === 'href') {
+            const href = attr.value.toLowerCase().trim();
+            if (href.startsWith('javascript:') || href.startsWith('data:')) {
+              return;
+            }
+          }
+          // Дополнительная проверка для src
+          if (attr.name === 'src') {
+            const src = attr.value.toLowerCase().trim();
+            if (src.startsWith('javascript:') || src.startsWith('data:text')) {
+              return;
+            }
+          }
+          result += ' ' + attr.name + '="' + escapeAttr(attr.value) + '"';
+        }
+      });
+
+      result += '>';
+
+      // Добавляем содержимое
+      node.childNodes.forEach(function(child) {
+        result += cleanNode(child);
+      });
+
+      // Закрывающий тег (кроме самозакрывающихся)
+      const selfClosing = ['img', 'br', 'hr', 'input'];
+      if (!selfClosing.includes(tagName)) {
+        result += '</' + tagName + '>';
+      }
+
+      return result;
     }
 
-    return html;
+    let cleaned = '';
+    temp.childNodes.forEach(function(child) {
+      cleaned += cleanNode(child);
+    });
+
+    return cleaned;
   }
+
+  // === Экранирование HTML для текста ===
   function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
+
+  // === Экранирование атрибутов ===
+  function escapeAttr(text) {
+    if (!text) return '';
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  // === Чек-лист ===
   function renderChecklist(items) {
     if (!items || items.length === 0) {
       if (elements.checklistBtn) {
@@ -217,6 +341,7 @@
     if (elements.checklistBtn) {
       elements.checklistBtn.style.display = 'flex';
     }
+
     let html = '';
 
     items.forEach(function(item, index) {
@@ -236,13 +361,15 @@
 
     if (elements.checklistItems) {
       elements.checklistItems.innerHTML = html;
+
       const checkboxes = elements.checklistItems.querySelectorAll('input[type="checkbox"]');
       checkboxes.forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
           const index = this.getAttribute('data-index');
           const storageKey = 'checklist_' + cardId + '_' + index;
           localStorage.setItem(storageKey, this.checked);
-        const li = this.closest('li');
+
+          const li = this.closest('li');
           if (li) {
             li.classList.toggle('checked', this.checked);
           }
@@ -254,12 +381,14 @@
       updateChecklistCounter(items.length);
     }
   }
-    function updateChecklistCounter(total) {
+
+  function updateChecklistCounter(total) {
     if (!elements.checklistItems || !elements.checklistBtnText) return;
 
     const checked = elements.checklistItems.querySelectorAll('input[type="checkbox"]:checked').length;
     elements.checklistBtnText.textContent = 'Чек-лист (' + checked + '/' + total + ')';
   }
+
   function toggleChecklist() {
     if (elements.checklistPanel) {
       elements.checklistPanel.classList.toggle('open');
