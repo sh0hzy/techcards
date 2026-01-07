@@ -15,10 +15,10 @@
   </header>
 
   <main class="admin-main">
-    <!-- Авторизация -->
+
     <div class="auth-screen" id="auth-screen">
       <div class="auth-box">
-        <h2>Вход в админ-панель</h2>
+        <h2>Админ</h2>
         <form id="auth-form">
           <input type="password" id="admin-password" placeholder="Пароль" autocomplete="current-password">
           <button type="submit">Войти</button>
@@ -26,14 +26,11 @@
         <p class="auth-error" id="auth-error"></p>
       </div>
     </div>
-
-    <!-- Админ-панель -->
     <div class="admin-panel" id="admin-panel" style="display: none;">
       
-      <!-- Sidebar - список карточек -->
       <aside class="admin-sidebar">
         <div class="sidebar-header">
-          <h3>Карточки</h3>
+          <h3>Карты</h3>
           <button class="btn-add" id="add-card-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -42,11 +39,9 @@
           </button>
         </div>
         <div class="cards-list" id="cards-list">
-          <!-- Загружается из JS -->
         </div>
       </aside>
 
-      <!-- Основная область редактирования -->
       <div class="admin-editor" id="admin-editor">
         <div class="editor-placeholder" id="editor-placeholder">
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
@@ -59,11 +54,9 @@
           <p>Выберите карточку для редактирования<br>или создайте новую</p>
         </div>
 
-        <!-- Форма редактирования -->
         <div class="editor-form" id="editor-form" style="display: none;">
           <input type="hidden" id="card-id">
           
-          <!-- Header формы -->
           <div class="editor-header">
             <div class="editor-tabs" id="lang-tabs">
               <button class="editor-tab active" data-lang="ru">RU</button>
@@ -98,13 +91,10 @@
             </div>
           </div>
 
-          <!-- Контент формы -->
           <div class="editor-content">
-            <!-- Hero изображения -->
             <div class="form-section">
               <label class="form-label">Изображения Hero (слайдер)</label>
               <div class="images-grid" id="hero-images">
-                <!-- Загружается из JS -->
               </div>
               <div class="image-upload-zone" id="hero-upload-zone">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -119,8 +109,6 @@
                 <button type="button" class="btn-small" id="hero-url-add">Добавить URL</button>
               </div>
             </div>
-
-            <!-- Категория и статус -->
             <div class="form-row">
               <div class="form-section flex-1">
                 <label class="form-label">Категория</label>
@@ -138,7 +126,6 @@
               </div>
             </div>
 
-            <!-- Заголовок -->
             <div class="form-section">
               <label class="form-label">Заголовок</label>
               <div class="lang-inputs" data-field="title">
@@ -149,8 +136,6 @@
                 <input type="text" class="input-large lang-field" data-lang="tk" placeholder="Заголовок (TK)" style="display:none;">
               </div>
             </div>
-
-            <!-- Описание -->
             <div class="form-section">
               <label class="form-label">Краткое описание</label>
               <div class="lang-inputs" data-field="description">
@@ -161,8 +146,6 @@
                 <textarea class="lang-field" data-lang="tk" placeholder="Описание (TK)" rows="3" style="display:none;"></textarea>
               </div>
             </div>
-
-            <!-- Секции контента -->
             <div class="form-section">
               <div class="section-header">
                 <label class="form-label">Секции контента</label>
@@ -175,11 +158,8 @@
                 </button>
               </div>
               <div class="sections-list" id="sections-list">
-                <!-- Секции добавляются из JS -->
               </div>
             </div>
-
-            <!-- Чек-лист -->
             <div class="form-section">
               <label class="form-label">Чек-лист</label>
               <div class="lang-inputs" data-field="checklist">
@@ -195,8 +175,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Модальное окно предпросмотра -->
     <div class="preview-modal" id="preview-modal">
       <div class="preview-header">
         <span>Предпросмотр</span>
@@ -208,8 +186,6 @@
     </div>
 
   </main>
-
-  <!-- Шаблон секции -->
   <template id="section-template">
     <div class="content-section" data-section-id="">
       <div class="section-drag-handle">
@@ -224,8 +200,6 @@
       </div>
       <div class="section-content">
         <input type="text" class="section-title-input" placeholder="Заголовок секции">
-        
-        <!-- Toolbar редактора -->
         <div class="editor-toolbar">
           <button type="button" data-command="bold" title="Жирный (Ctrl+B)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -290,13 +264,8 @@
             </svg>
           </button>
         </div>
-        
-        <!-- Редактируемая область -->
         <div class="rich-editor" contenteditable="true" data-placeholder="Введите текст секции..."></div>
-        
-        <!-- Изображения секции -->
         <div class="section-images">
-          <!-- Изображения добавляются из JS -->
         </div>
       </div>
       <button type="button" class="section-remove" title="Удалить секцию">
