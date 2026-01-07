@@ -36,6 +36,8 @@ body {
   color: #1b98fb;
   text-decoration: none;
 }
+
+/* ===== HAMBURGER ===== */
 .burger {
   width: 28px;
   height: 20px;
@@ -52,6 +54,16 @@ body {
   border-radius: 2px;
   transition: 0.3s;
 }
+
+.burger span:nth-child(1) { top: 0; }
+.burger span:nth-child(2) { top: 8px; }
+.burger span:nth-child(3) { top: 16px; }
+
+.burger.active span:nth-child(1) { transform: rotate(45deg); top: 8px; }
+.burger.active span:nth-child(2) { opacity: 0; }
+.burger.active span:nth-child(3) { transform: rotate(-45deg); top: 8px; }
+
+/* ===== MENU ===== */
 .menu {
   position: fixed;
   top: 64px;
