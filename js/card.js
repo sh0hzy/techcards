@@ -1,208 +1,336 @@
 (function() {
-  // Получаем ID карточки из URL
-  const params = new URLSearchParams(window.location.search);
-  const cardId = params.get('id');
+  'use strict';
 
+  // === Получаем ID карточки из URL ===
+  const urlParams = new URLSearchParams(window.location.search);
+  const cardId = urlParams.get('id');
+
+  // Если нет ID — возврат на главную
   if (!cardId) {
     window.location.href = 'index.html';
     return;
   }
 
-  // Элементы страницы
-  const heroTitle = document.getElementById('hero-title');
-  const heroCategory = document.getElementById('hero-category');
-  const carousel = document.getElementById('carousel');
-  const cardDescription = document.getElementById('card-description');
-  const contentSections = document.getElementById('content-sections');
-  const checklistWrapper = document.getElementById('checklist-wrapper');
-  const checklistToggle = document.getElementById('checklist-toggle');
-  const checklistUl = document.getElementById('checklist');
-  const checklistReset = document.getElementById('checklist-reset');
-//   const viewsCount = document.getElementById('views-count');
+  // === Элементы страницы ===
+  let elements = {};
 
-  let currentCard = null;
+  // === Данные карточки ===
+  let cardData = null;
   let carouselIndex = 0;
-  let carouselInterval = null;
+  let carouselTimer = null;
 
-  // Загрузка карточки
+  // === Инициализация после загрузки DOM ===
+  document.addEventListener('DOMContentLoaded', init);
+
+  function init() {
+    // Кэшируем элементы
+    elements = {
+      title: document.getElementById('card-title'),
+      category: document.getElementById('card-category'),
+      carousel: document.getElementById('card-carousel'),
+      description: document.getElementById('card-description'),
+      descriptionBlock: document.getElementById('description-block'),
+      sections: document.getElementById('card-sections'),
+      checklistBtn: document.getElementById('checklist-btn'),
+      checklistBtnText: document.getElementById('checklist-btn-text'),
+      checklistPanel: document.getElementById('checklist-panel'),
+      checklistItems: document.getElementById('checklist-items'),
+      checklistReset: document.getElementById('checklist-reset')
+    };
+
+    // Загружаем карточку
+    loadCard();
+
+    // Обработчик кнопки чек-листа
+    if (elements.checklistBtn) {
+      elements.checklistBtn.addEventListener('click', toggleChecklist);
+    }
+
+    // Обработчик сброса чек-листа
+    if (elements.checklistReset) {
+      elements.checklistReset.addEventListener('click', resetChecklist);
+    }
+
+    // Слушаем смену языка
+    document.addEventListener('localeChanged', function() {
+      if (cardData) {
+        renderCard(cardData);
+      }
+    });
+  }
+
+  // === Загрузка карточки из Supabase ===
   async function loadCard() {
     try {
-      const card = await DB.getCardById(cardId);
+      const url = `${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${cardId}&select=*,category:categories(*)`;
       
-      if (!card) {
+      const response = await fetch(url, {
+        headers: {
+          'apikey': CONFIG.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки');
+      }
+
+      const result = await response.json();
+
+      if (!result || result.length === 0) {
         window.location.href = 'index.html';
         return;
       }
 
-      currentCard = card;
-      renderCard(card);
-      
-      // Увеличиваем просмотры
-      DB.incrementViews(cardId);
+      cardData = result[0];
+      console.log('Card loaded:', cardData);
+
+      renderCard(cardData);
 
     } catch (error) {
-      console.error('Error loading card:', error);
-      heroTitle.textContent = i18n.t('common.error');
+      console.error('Load error:', error);
+      if (elements.title) {
+        elements.title.textContent = 'Ошибка загрузки';
+      }
     }
   }
 
-  // Рендер карточки
+  // === Рендер карточки ===
   function renderCard(card) {
-    const title = i18n.localize(card.title, 'Без названия');
-    const description = i18n.localize(card.description, '');
-    const content = i18n.localize(card.content, { sections: [], checklist: [] });
-    const images = card.images || [];
-    const categoryName = card.category ? i18n.localize(card.category.name, '') : '';
+    const lang = localStorage.getItem('locale') || 'ru';
 
-    // Заголовок страницы
-    document.title = `${title} — KAZARBUILD`;
+    // Заголовок
+    const title = getLocalized(card.title, lang) || 'Без названия';
+    if (elements.title) {
+      elements.title.textContent = title;
+    }
+    document.title = title + ' — KAZARBUILD';
 
-    // Hero
-    heroTitle.textContent = title;
-    heroCategory.textContent = categoryName;
-
-    // Карусель изображений
-    renderCarousel(images);
+    // Категория
+    const categoryName = card.category ? getLocalized(card.category.name, lang) : '';
+    if (elements.category) {
+      elements.category.textContent = categoryName;
+      elements.category.style.display = categoryName ? 'inline-block' : 'none';
+    }
 
     // Описание
-    cardDescription.textContent = description;
+    const description = getLocalized(card.description, lang) || '';
+    if (elements.description) {
+      elements.description.textContent = description;
+    }
+    if (elements.descriptionBlock) {
+      elements.descriptionBlock.style.display = description ? 'block' : 'none';
+    }
+
+    // Изображения
+    renderCarousel(card.images || [], card.cover_image);
 
     // Секции контента
+    const content = getLocalized(card.content, lang) || {};
     renderSections(content.sections || []);
 
     // Чек-лист
     renderChecklist(content.checklist || []);
-
-    // Просмотры
-    viewsCount.textContent = card.views_count || 0;
   }
 
-  // Рендер карусели
-  function renderCarousel(images) {
-    if (images.length === 0) {
-      // Placeholder если нет изображений
-      carousel.innerHTML = `
-        <div class="slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-      `;
-      return;
+  // === Получить локализованное значение ===
+  function getLocalized(obj, lang) {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[lang] || obj['ru'] || obj['en'] || obj['kk'] || '';
+  }
+
+  // === Рендер карусели ===
+  function renderCarousel(images, coverImage) {
+    if (!elements.carousel) return;
+
+    // Останавливаем предыдущий таймер
+    if (carouselTimer) {
+      clearInterval(carouselTimer);
+      carouselTimer = null;
     }
 
-    carousel.innerHTML = images.map((img, idx) => `
-      <div class="slide" style="background-image: url('${img}');" data-index="${idx}"></div>`).join('');
-    if (images.length > 1) {
-      startCarousel(images.length);
+    let slides = [];
+
+    if (images && images.length > 0) {
+      slides = images;
+    } else if (coverImage) {
+      slides = [coverImage];
+    }
+
+    if (slides.length > 0) {
+      elements.carousel.innerHTML = slides.map(function(img) {
+        return '<div class="card-slide" style="background-image: url(\'' + img + '\');"></div>';
+      }).join('');
+
+      // Автопрокрутка если больше 1 слайда
+      if (slides.length > 1) {
+        carouselIndex = 0;
+        carouselTimer = setInterval(function() {
+          carouselIndex = (carouselIndex + 1) % slides.length;
+          elements.carousel.style.transform = 'translateX(-' + (carouselIndex * 100) + '%)';
+        }, 4000);
+      }
+    } else {
+      // Заглушка
+      elements.carousel.innerHTML = '<div class="card-slide card-slide-placeholder"></div>';
     }
   }
-  function startCarousel(total) {
-    if (carouselInterval) clearInterval(carouselInterval);
-    
-    carouselInterval = setInterval(() => {
-      carouselIndex = (carouselIndex + 1) % total;
-      carousel.style.transform = `translateX(-${carouselIndex * 100}%)`;
-    }, 4000);
-  }
+
+  // === Рендер секций контента ===
   function renderSections(sections) {
+    if (!elements.sections) return;
+
     if (!sections || sections.length === 0) {
-      contentSections.innerHTML = '';
+      elements.sections.innerHTML = '';
       return;
     }
 
-    contentSections.innerHTML = sections.map(section => `
-      <section class="card-section">
-        <h3 class="section-title">${section.title || ''}</h3>
-        <div class="section-content">${formatContent(section.content || '')}</div>
-      </section>
-    `).join('');
+    let html = '';
+
+    sections.forEach(function(section) {
+      const sectionTitle = section.title || '';
+      const sectionContent = formatContent(section.content || '');
+
+      html += '<section class="card-block">';
+      if (sectionTitle) {
+        html += '<h3 class="card-block-title">' + escapeHtml(sectionTitle) + '</h3>';
+      }
+      html += '<div class="card-block-content">' + sectionContent + '</div>';
+      html += '</section>';
+    });
+
+    elements.sections.innerHTML = html;
   }
 
-  function formatContent(content) {
-    const lines = content.split('\n');
+  // === Форматирование контента (поддержка списков) ===
+  function formatContent(text) {
+    if (!text) return '';
+
+    const lines = text.split('\n');
     let html = '';
     let inList = false;
 
-    lines.forEach(line => {
+    lines.forEach(function(line) {
       const trimmed = line.trim();
-      
+
       if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
         if (!inList) {
           html += '<ul>';
           inList = true;
         }
-        html += `<li>${trimmed.substring(2)}</li>`;
-      } else {
+        html += '<li>' + escapeHtml(trimmed.substring(2)) + '</li>';
+      } else if (trimmed) {
         if (inList) {
           html += '</ul>';
           inList = false;
         }
-        if (trimmed) {
-          html += `<p>${trimmed}</p>`;
-        }
+        html += '<p>' + escapeHtml(trimmed) + '</p>';
       }
     });
 
-    if (inList) html += '</ul>';
-    
-    return html || `<p>${content}</p>`;
+    if (inList) {
+      html += '</ul>';
+    }
+
+    return html;
   }
+
+  // === Экранирование HTML ===
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // === Рендер чек-листа ===
   function renderChecklist(items) {
+    // Скрываем кнопку если нет пунктов
     if (!items || items.length === 0) {
-      checklistToggle.style.display = 'none';
-      checklistWrapper.style.display = 'none';
+      if (elements.checklistBtn) {
+        elements.checklistBtn.style.display = 'none';
+      }
+      if (elements.checklistPanel) {
+        elements.checklistPanel.style.display = 'none';
+      }
       return;
     }
 
-    checklistToggle.style.display = 'flex';
+    // Показываем кнопку
+    if (elements.checklistBtn) {
+      elements.checklistBtn.style.display = 'flex';
+    }
 
-    checklistUl.innerHTML = items.map((item, idx) => {
-      const key = `card_${cardId}_chk_${idx}`;
-      const checked = localStorage.getItem(key) === 'true';
-      
-      return `
-        <li>
-          <label>
-            <input type="checkbox" data-key="${key}" ${checked ? 'checked' : ''}>
-            <span class="checkbox-custom"></span>
-            <span class="checkbox-text">${item}</span>
-          </label>
-        </li>
-      `;
-    }).join('');
+    // Генерируем HTML пунктов
+    let html = '';
 
-    checklistUl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        localStorage.setItem(cb.dataset.key, cb.checked);
-        updateChecklistProgress();
-      });
+    items.forEach(function(item, index) {
+      const storageKey = 'checklist_' + cardId + '_' + index;
+      const isChecked = localStorage.getItem(storageKey) === 'true';
+      const checkedAttr = isChecked ? 'checked' : '';
+      const checkedClass = isChecked ? 'checked' : '';
+
+      html += '<li class="card-checklist-item ' + checkedClass + '">';
+      html += '<label>';
+      html += '<input type="checkbox" data-index="' + index + '" ' + checkedAttr + '>';
+      html += '<span class="card-checkbox"></span>';
+      html += '<span class="card-checkbox-text">' + escapeHtml(item) + '</span>';
+      html += '</label>';
+      html += '</li>';
     });
 
-    updateChecklistProgress();
+    if (elements.checklistItems) {
+      elements.checklistItems.innerHTML = html;
+      const checkboxes = elements.checklistItems.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+          const index = this.getAttribute('data-index');
+          const storageKey = 'checklist_' + cardId + '_' + index;
+          localStorage.setItem(storageKey, this.checked);
+        const li = this.closest('li');
+          if (li) {
+            li.classList.toggle('checked', this.checked);
+          }
+
+          updateChecklistCounter(items.length);
+        });
+      });
+
+      updateChecklistCounter(items.length);
+    }
+  }
+    function updateChecklistCounter(total) {
+    if (!elements.checklistItems || !elements.checklistBtnText) return;
+
+    const checked = elements.checklistItems.querySelectorAll('input[type="checkbox"]:checked').length;
+    elements.checklistBtnText.textContent = 'Чек-лист (' + checked + '/' + total + ')';
+  }
+  function toggleChecklist() {
+    if (elements.checklistPanel) {
+      elements.checklistPanel.classList.toggle('open');
+    }
+    if (elements.checklistBtn) {
+      elements.checklistBtn.classList.toggle('open');
+    }
   }
 
-  function updateChecklistProgress() {
-    const total = checklistUl.querySelectorAll('input[type="checkbox"]').length;
-    const checked = checklistUl.querySelectorAll('input[type="checkbox"]:checked').length;
-    
-    checklistToggle.querySelector('span').textContent = 
-      `${i18n.t('card.checklist')} (${checked}/${total})`;
-  } 
-  checklistReset?.addEventListener('click', () => {
-    checklistUl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      cb.checked = false;
-      localStorage.removeItem(cb.dataset.key);
+  function resetChecklist() {
+    if (!elements.checklistItems) return;
+
+    const checkboxes = elements.checklistItems.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(function(checkbox) {
+      checkbox.checked = false;
+      const index = checkbox.getAttribute('data-index');
+      const storageKey = 'checklist_' + cardId + '_' + index;
+      localStorage.removeItem(storageKey);
+
+      const li = checkbox.closest('li');
+      if (li) {
+        li.classList.remove('checked');
+      }
     });
-    updateChecklistProgress();
-  });
 
-  checklistToggle?.addEventListener('click', () => {
-    checklistWrapper.classList.toggle('open');
-    checklistToggle.classList.toggle('open');
-  });
+    updateChecklistCounter(checkboxes.length);
+  }
 
-  document.addEventListener('localeChanged', () => {
-    if (currentCard) {
-      renderCard(currentCard);
-    }
-  });
-
-  document.addEventListener('DOMContentLoaded', loadCard);
 })();

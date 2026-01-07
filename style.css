@@ -485,24 +485,25 @@ body {
 }
 
 
-/* ===== card page ===== */
+/* ===== CARD PAGE ===== */
 
-.hero {
+/* Hero */
+.card-hero {
   position: relative;
-  height: 50vh;
-  min-height: 300px;
+  height: 45vh;
+  min-height: 280px;
   max-height: 400px;
   overflow: hidden;
   margin-top: 64px;
 }
 
-.carousel {
+.card-carousel {
   display: flex;
   height: 100%;
   transition: transform 0.6s ease;
 }
 
-.slide {
+.card-slide {
   min-width: 100%;
   height: 100%;
   background-size: cover;
@@ -510,59 +511,56 @@ body {
   background-color: #e5e7eb;
 }
 
-.skeleton-slide {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s infinite;
+.card-slide-placeholder {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* Overlay на hero */
-.hero::after {
-  content: "";
+.card-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 100%);
   z-index: 1;
 }
 
-.hero-content {
+.card-hero-content {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 30px 20px;
+  padding: 24px 20px;
   z-index: 2;
 }
 
-.hero-category {
+.card-hero-category {
   display: inline-block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
   background: rgba(27, 152, 251, 0.9);
-  padding: 4px 12px;
+  padding: 5px 12px;
   border-radius: 20px;
   margin-bottom: 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.hero-title {
-  font-size: clamp(24px, 5vw, 36px);
+.card-hero-title {
+  font-size: 28px;
   font-weight: 800;
-  color: #ffffff;
+  color: #fff;
   line-height: 1.2;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 /* Back button */
-.back-wrapper {
+.card-back-wrapper {
   max-width: 600px;
-  margin: 20px auto 0;
+  margin: 16px auto 0;
   padding: 0 20px;
 }
 
-.back-btn {
+.card-back-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -570,258 +568,245 @@ body {
   font-weight: 600;
   color: #1b98fb;
   text-decoration: none;
-  padding: 8px 0;
-  transition: opacity 0.2s;
 }
 
-.back-btn:hover {
+.card-back-btn:hover {
   opacity: 0.7;
 }
 
 /* Container */
-.container {
+.card-container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px 20px 60px;
+  padding: 16px 20px 60px;
 }
 
-/* Card sections */
-.card-section {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+/* Block */
+.card-block {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
 }
 
 .card-description {
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.6;
   color: #4b5563;
+  margin: 0;
 }
 
-.section-title {
-  font-size: 18px;
+.card-block-title {
+  font-size: 17px;
   font-weight: 700;
   color: #1f2933;
-  margin-bottom: 12px;
+  margin: 0 0 12px 0;
 }
 
-.section-content {
+.card-block-content {
   font-size: 15px;
   line-height: 1.6;
   color: #4b5563;
 }
 
-.section-content p {
-  margin-bottom: 12px;
+.card-block-content p {
+  margin: 0 0 10px 0;
 }
 
-.section-content p:last-child {
+.card-block-content p:last-child {
   margin-bottom: 0;
 }
 
-.section-content ul {
-  margin: 12px 0;
+.card-block-content ul {
+  margin: 10px 0;
   padding-left: 20px;
 }
 
-.section-content li {
-  margin-bottom: 8px;
-  color: #4b5563;
+.card-block-content li {
+  margin-bottom: 6px;
 }
 
 /* ===== CHECKLIST ===== */
 
-.checklist-toggle {
+/* Кнопка открытия */
+.card-checklist-btn {
   display: flex;
   align-items: center;
   gap: 10px;
   width: 100%;
   padding: 16px 20px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
   font-size: 15px;
   font-weight: 600;
   color: #1f2933;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   margin-bottom: 0;
 }
 
-.checklist-toggle:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+.card-checklist-btn:hover {
+  border-color: #1b98fb;
 }
 
-.checklist-toggle .chevron {
+.card-checklist-btn svg:first-child {
+  color: #1b98fb;
+}
+
+.card-checklist-chevron {
   margin-left: auto;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s;
+  color: #9ca3af;
 }
 
-.checklist-toggle.open .chevron {
+.card-checklist-btn.open .card-checklist-chevron {
   transform: rotate(180deg);
 }
 
-.checklist-toggle.open {
-  border-radius: 12px 12px 0 0;
+.card-checklist-btn.open {
+  border-radius: 14px 14px 0 0;
   border-bottom-color: transparent;
 }
 
-/* Checklist wrapper */
-.checklist-wrapper {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+/* Панель чек-листа */
+.card-checklist-panel {
+  background: #fff;
+  border: 2px solid #e5e7eb;
   border-top: none;
-  border-radius: 0 0 12px 12px;
-  padding: 0;
+  border-radius: 0 0 14px 14px;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
+  transition: max-height 0.3s, padding 0.3s;
 }
 
-.checklist-wrapper.open {
-  max-height: 1000px;
+.card-checklist-panel.open {
+  max-height: 600px;
   padding: 16px 20px 20px;
 }
 
-/* Checklist items */
-.checklist {
+/* Список */
+.card-checklist {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.checklist li {
-  padding: 12px 0;
+.card-checklist-item {
+  padding: 14px 0;
   border-bottom: 1px solid #f3f4f6;
 }
 
-.checklist li:last-child {
+.card-checklist-item:last-child {
   border-bottom: none;
 }
 
-.checklist label {
+.card-checklist-item label {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   cursor: pointer;
-  font-size: 15px;
-  line-height: 1.4;
-  color: #374151;
 }
 
-.checklist input[type="checkbox"] {
+.card-checklist-item input[type="checkbox"] {
   display: none;
 }
 
-.checkbox-custom {
+/* Кастомный чекбокс */
+.card-checkbox {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border: 2px solid #d1d5db;
   border-radius: 6px;
-  background: #ffffff;
-  transition: all 0.2s ease;
+  background: #fff;
   position: relative;
+  transition: all 0.2s;
 }
 
-.checklist input[type="checkbox"]:checked + .checkbox-custom {
+.card-checklist-item input:checked + .card-checkbox {
   background: #1b98fb;
   border-color: #1b98fb;
 }
 
-.checkbox-custom::after {
+.card-checkbox::after {
   content: '';
   position: absolute;
   top: 4px;
-  left: 7px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
+  left: 8px;
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
   transform: rotate(45deg) scale(0);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s;
 }
 
-.checklist input[type="checkbox"]:checked + .checkbox-custom::after {
+.card-checklist-item input:checked + .card-checkbox::after {
   transform: rotate(45deg) scale(1);
 }
 
-.checkbox-text {
+/* Текст чекбокса */
+.card-checkbox-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #374151;
   padding-top: 2px;
+  transition: all 0.2s;
 }
 
-.checklist input[type="checkbox"]:checked ~ .checkbox-text {
+.card-checklist-item.checked .card-checkbox-text {
   color: #9ca3af;
   text-decoration: line-through;
 }
 
-/* Reset button */
-.checklist-reset {
+/* Кнопка сброса */
+.card-checklist-reset {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   margin-top: 16px;
   background: #f3f4f6;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: #6b7280;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
-.checklist-reset:hover {
+.card-checklist-reset:hover {
   background: #e5e7eb;
   color: #374151;
 }
 
-/* Card meta */
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 0;
-  margin-top: 20px;
-  border-top: 1px solid #e5e7eb;
-}
+/* ===== MOBILE ===== */
 
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #9ca3af;
-}
-
-.meta-item svg {
-  color: #d1d5db;
-}
-
-/* ===== RESPONSIVE ===== */
-
-@media (max-width: 640px) {
-  .hero {
+@media (max-width: 480px) {
+  .card-hero {
     height: 40vh;
-    min-height: 250px;
+    min-height: 240px;
   }
-  
-  .hero-content {
+
+  .card-hero-title {
+    font-size: 24px;
+  }
+
+  .card-hero-content {
     padding: 20px 16px;
   }
-  
-  .container {
-    padding: 16px 16px 40px;
+
+  .card-container {
+    padding: 12px 16px 40px;
   }
-  
-  .card-section {
-    padding: 20px;
+
+  .card-block {
+    padding: 16px;
     border-radius: 12px;
   }
 }
