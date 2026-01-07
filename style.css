@@ -493,7 +493,7 @@ body {
   min-height: 300px;
   max-height: 400px;
   overflow: hidden;
-  margin-top: 64px; /* высота header */
+  margin-top: 64px;
 }
 
 .carousel {
