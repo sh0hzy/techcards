@@ -1,7 +1,7 @@
 {
   "name": "KAZARBUILD — Технологические карты",
   "short_name": "KAZARBUILD",
-  "description": "База знаний по строительным процессам",
+  "description": "Технологические карты",
   "start_url": "/techcards/index.html",
   "scope": "/techcards/",
   "id": "/techcards/",
