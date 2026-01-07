@@ -5,14 +5,15 @@ const ASSETS = [
   '/techcards/',
   '/techcards/index.html',
   '/techcards/card.html',
+  '/techcards/admin.html',
   '/techcards/style.css',
-  '/techcards/manifest.json',
+  '/techcards/admin.css',
   '/techcards/js/config.js',
   '/techcards/js/i18n.js',
   '/techcards/js/supabase.js',
   '/techcards/js/app.js',
-  '/techcards/icons/icon-192.png',
-  '/techcards/icons/icon-512.png'
+  '/techcards/js/card.js',
+  '/techcards/js/admin.js',
 ];
 
 self.addEventListener('install', (event) => {

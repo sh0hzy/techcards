@@ -46,7 +46,7 @@ function renderCards(cards, container) {
             ${categoryName ? `<span class="astm-category">${categoryName}</span>` : ''}
           </div>
           <div class="astm-divider-vertical"></div>
-          <a href="1/learn.html" class="astm-button">
+          <a href="card.html?id=${card.id}" class="astm-button">
             <svg viewBox="0 0 24 24">
               <path d="M9 18l6-6-6-6"/>
             </svg>

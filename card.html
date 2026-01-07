@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Загрузка... — KAZARBUILD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1b98fb">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-page="card">
+  <!-- HEADER -->
+  <header class="header">
+    <a href="index.html" class="logo">KAZARBUILD</a>
+    <div class="burger" id="burger" aria-label="Открыть меню" role="button" tabindex="0">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
+
+  <!-- MENU -->
+  <nav class="menu" id="menu">
+    <div class="language-switcher">
+      <button class="lang-btn active" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="kk">KK</button>
+      <button class="lang-btn" data-lang="uz">UZ</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="tk">TK</button>
+    </div>
+    <a href="index.html" data-i18n="nav.catalog">Тех.карты</a>
+  </nav>
+
+  <!-- INSTALL BANNER -->
+  <div class="install-banner" id="installBanner">
+    <p data-i18n="common.install">Установить приложение для работы офлайн?</p>
+    <div class="install-buttons">
+      <button id="installBtn" data-i18n="common.installBtn">Установить</button>
+      <button id="dismissBtn" data-i18n="common.later">Позже</button>
+    </div>
+  </div>
+
+  <!-- HERO с каруселью -->
+  <section class="hero" id="hero">
+    <div class="carousel" id="carousel">
+      <div class="slide skeleton-slide"></div>
+    </div>
+    <div class="hero-content">
+      <span class="hero-category" id="hero-category"></span>
+      <h1 class="hero-title" id="hero-title">Загрузка...</h1>
+    </div>
+  </section>
+
+  <!-- BACK BUTTON -->
+  <div class="back-wrapper">
+    <a href="index.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      <span data-i18n="card.back">Назад</span>
+    </a>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="container">
+    <!-- Описание -->
+    <section class="card-section" id="description-section">
+      <p class="card-description" id="card-description">Загрузка описания...</p>
+    </section>
+
+    <!-- Секции контента (загружаются из БД) -->
+    <div id="content-sections"></div>
+
+    <!-- Кнопка чек-листа -->
+    <button class="checklist-toggle" id="checklist-toggle">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      <span data-i18n="card.checklist">Чек-лист</span>
+      <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </button>
+
+    <!-- Чек-лист (скрыт по умолчанию) -->
+    <div class="checklist-wrapper" id="checklist-wrapper">
+      <ul class="checklist" id="checklist">
+        <!-- Загружается из БД -->
+      </ul>
+      <button class="checklist-reset" id="checklist-reset">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+        </svg>
+        <span data-i18n="card.resetChecklist">Сбросить</span>
+      </button>
+    </div>
+
+    <!-- Мета-информация -->
+    <div class="card-meta">
+      <span class="meta-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span id="views-count">0</span>
+      </span>
+    </div>
+  </main>
+
+  <footer class="footer"></footer>
+
+  <!-- SCRIPTS -->
+  <script src="js/config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/card.js"></script>
+</body>
+</html>
