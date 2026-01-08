@@ -91,83 +91,84 @@
             </div>
           </div>
 
-          <div class="editor-content">          
-          <!-- Индикатор текущего языка -->
-          <div class="current-lang-indicator">
-            <span>Редактирование на языке:</span>
-            <strong id="current-lang-label">Русский</strong>
-          </div>
+<div class="editor-content">
+  
+  <!-- Индикатор текущего языка -->
+  <div class="current-lang-indicator">
+    <span>Редактирование на языке:</span>
+    <strong id="current-lang-label">Русский</strong>
+  </div>
 
-          <!-- Hero изображения -->
-          <div class="form-section">
-            <label class="form-label">Изображения Hero (слайдер)</label>
-            <div class="images-grid" id="hero-images"></div>
-            <div class="image-upload-zone" id="hero-upload-zone">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-              <p>Перетащите изображения или <span>выберите файл</span></p>
-              <p class="upload-hint">Или вставьте URL изображения</p>
-              <input type="file" id="hero-file-input" accept="image/*" multiple hidden>
-              <input type="url" id="hero-url-input" placeholder="https://example.com/image.jpg">
-              <button type="button" class="btn-small" id="hero-url-add">Добавить URL</button>
-            </div>
-          </div>
+  <!-- Hero изображения -->
+  <div class="form-section">
+    <label class="form-label">Изображения Hero (слайдер)</label>
+    <div class="images-grid" id="hero-images"></div>
+    <div class="image-upload-zone" id="hero-upload-zone">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+        <polyline points="21 15 16 10 5 21"></polyline>
+      </svg>
+      <p>Перетащите изображения или <span>выберите файл</span></p>
+      <p class="upload-hint">Или вставьте URL изображения</p>
+      <input type="file" id="hero-file-input" accept="image/*" multiple hidden>
+      <input type="url" id="hero-url-input" placeholder="https://example.com/image.jpg">
+      <button type="button" class="btn-small" id="hero-url-add">Добавить URL</button>
+    </div>
+  </div>
 
-          <!-- Категория и статус -->
-          <div class="form-row">
-            <div class="form-section flex-1">
-              <label class="form-label">Категория</label>
-              <select id="category-select">
-                <option value="">— Без категории —</option>
-              </select>
-            </div>
-            <div class="form-section">
-              <label class="form-label">Статус</label>
-              <label class="toggle-label">
-                <input type="checkbox" id="is-published" checked>
-                <span class="toggle"></span>
-                <span class="toggle-text">Опубликовано</span>
-              </label>
-            </div>
-          </div>
+  <!-- Категория и статус -->
+  <div class="form-row">
+    <div class="form-section flex-1">
+      <label class="form-label">Категория</label>
+      <select id="category-select">
+        <option value="">— Без категории —</option>
+      </select>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Статус</label>
+      <label class="toggle-label">
+        <input type="checkbox" id="is-published" checked>
+        <span class="toggle"></span>
+        <span class="toggle-text">Опубликовано</span>
+      </label>
+    </div>
+  </div>
 
-          <!-- Заголовок -->
-          <div class="form-section">
-            <label class="form-label">Заголовок</label>
-            <input type="text" id="title-input" class="input-large" placeholder="Заголовок карточки">
-          </div>
+  <!-- Заголовок -->
+  <div class="form-section">
+    <label class="form-label">Заголовок</label>
+    <input type="text" id="title-input" class="input-large" placeholder="Заголовок карточки">
+  </div>
 
-          <!-- Описание -->
-          <div class="form-section">
-            <label class="form-label">Краткое описание</label>
-            <textarea id="description-input" placeholder="Краткое описание для карточки" rows="3"></textarea>
-          </div>
+  <!-- Описание -->
+  <div class="form-section">
+    <label class="form-label">Краткое описание</label>
+    <textarea id="description-input" placeholder="Краткое описание для карточки" rows="3"></textarea>
+  </div>
 
-          <!-- Секции контента -->
-          <div class="form-section">
-            <div class="section-header">
-              <label class="form-label">Секции контента</label>
-              <button type="button" class="btn-small" id="add-section-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                Добавить секцию
-              </button>
-            </div>
-            <div class="sections-list" id="sections-list"></div>
-          </div>
+  <!-- Секции контента -->
+  <div class="form-section">
+    <div class="section-header">
+      <label class="form-label">Секции контента</label>
+      <button type="button" class="btn-small" id="add-section-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Добавить секцию
+      </button>
+    </div>
+    <div class="sections-list" id="sections-list"></div>
+  </div>
 
-          <!-- Чек-лист -->
-          <div class="form-section">
-            <label class="form-label">Чек-лист</label>
-            <textarea id="checklist-input" class="checklist-input" placeholder="Каждый пункт с новой строки:&#10;- Пункт 1&#10;- Пункт 2&#10;- Пункт 3" rows="6"></textarea>
-          </div>
+  <!-- Чек-лист -->
+  <div class="form-section">
+    <label class="form-label">Чек-лист</label>
+    <textarea id="checklist-input" class="checklist-input" placeholder="Каждый пункт с новой строки:&#10;- Пункт 1&#10;- Пункт 2&#10;- Пункт 3" rows="6"></textarea>
+  </div>
 
-        </div>
+</div>
           
         </div>
       </div>
