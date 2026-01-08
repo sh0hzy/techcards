@@ -1,16 +1,37 @@
 (function() {
   'use strict';
 
-  const ADMIN_PASSWORD = 'kz27';
+  // === Конфигурация ===
+  const ADMIN_PASSWORD = 'kazarbuild2024';
+  const LANGUAGES = ['ru', 'kk', 'uz', 'en', 'tk'];
+  const LANG_NAMES = {
+    ru: 'Русский',
+    kk: 'Қазақша',
+    uz: 'O\'zbekcha',
+    en: 'English',
+    tk: 'Türkmençe'
+  };
 
+  // === Состояние ===
   let isLoggedIn = false;
   let categories = [];
   let cards = [];
   let currentCardId = null;
   let currentLang = 'ru';
   let unsavedChanges = false;
+
+  // Хранилище данных формы для всех языков
+  let formData = {
+    title: {},
+    description: {},
+    checklist: {},
+    sections: {} // sections[lang] = [{title, content, images}, ...]
+  };
+
+  // === Элементы ===
   const elements = {};
 
+  // === Инициализация ===
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
@@ -32,6 +53,7 @@
     elements.editorForm = document.getElementById('editor-form');
     elements.cardId = document.getElementById('card-id');
     elements.langTabs = document.getElementById('lang-tabs');
+    elements.currentLangLabel = document.getElementById('current-lang-label');
     elements.categorySelect = document.getElementById('category-select');
     elements.isPublished = document.getElementById('is-published');
     elements.heroImages = document.getElementById('hero-images');
@@ -39,6 +61,9 @@
     elements.heroFileInput = document.getElementById('hero-file-input');
     elements.heroUrlInput = document.getElementById('hero-url-input');
     elements.heroUrlAdd = document.getElementById('hero-url-add');
+    elements.titleInput = document.getElementById('title-input');
+    elements.descriptionInput = document.getElementById('description-input');
+    elements.checklistInput = document.getElementById('checklist-input');
     elements.sectionsList = document.getElementById('sections-list');
     elements.addSectionBtn = document.getElementById('add-section-btn');
     elements.saveBtn = document.getElementById('save-btn');
@@ -55,18 +80,45 @@
     elements.logoutBtn?.addEventListener('click', handleLogout);
     elements.langTabs?.addEventListener('click', handleLangTabClick);
     elements.addCardBtn?.addEventListener('click', createNewCard);
-    elements.heroUploadZone?.addEventListener('click', () => elements.heroFileInput?.click());
+    
+    // Hero images
+    elements.heroUploadZone?.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+        elements.heroFileInput?.click();
+      }
+    });
     elements.heroUploadZone?.addEventListener('dragover', handleDragOver);
     elements.heroUploadZone?.addEventListener('dragleave', handleDragLeave);
     elements.heroUploadZone?.addEventListener('drop', handleHeroDrop);
     elements.heroFileInput?.addEventListener('change', handleHeroFileSelect);
     elements.heroUrlAdd?.addEventListener('click', handleHeroUrlAdd);
+
+    // Title, Description, Checklist - сохраняем при изменении
+    elements.titleInput?.addEventListener('input', () => {
+      formData.title[currentLang] = elements.titleInput.value;
+      unsavedChanges = true;
+    });
+    
+    elements.descriptionInput?.addEventListener('input', () => {
+      formData.description[currentLang] = elements.descriptionInput.value;
+      unsavedChanges = true;
+    });
+    
+    elements.checklistInput?.addEventListener('input', () => {
+      formData.checklist[currentLang] = elements.checklistInput.value;
+      unsavedChanges = true;
+    });
+
+    // Sections
     elements.addSectionBtn?.addEventListener('click', () => addSection());
+
+    // Actions
     elements.saveBtn?.addEventListener('click', saveCard);
     elements.deleteBtn?.addEventListener('click', deleteCard);
     elements.previewBtn?.addEventListener('click', showPreview);
     elements.previewClose?.addEventListener('click', hidePreview);
-    document.addEventListener('input', () => { unsavedChanges = true; });
+
+    // Warn before leaving
     window.addEventListener('beforeunload', (e) => {
       if (unsavedChanges) {
         e.preventDefault();
@@ -74,6 +126,8 @@
       }
     });
   }
+
+  // === Auth ===
   function checkAuth() {
     isLoggedIn = sessionStorage.getItem('admin_auth') === 'true';
     if (isLoggedIn) {
@@ -109,6 +163,8 @@
 
     await loadData();
   }
+
+  // === Data Loading ===
   async function loadData() {
     try {
       const [categoriesData, cardsData] = await Promise.all([
@@ -138,11 +194,13 @@
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
   }
+
+  // === Render Cards List ===
   function renderCardsList() {
     if (!elements.cardsList) return;
 
     if (cards.length === 0) {
-      elements.cardsList.innerHTML = '<p style="padding: 20px; text-align: center; color: #9ca3af;">Пусто</p>';
+      elements.cardsList.innerHTML = '<p style="padding: 20px; text-align: center; color: #9ca3af;">Карточек пока нет</p>';
       return;
     }
 
@@ -163,6 +221,7 @@
         </div>
       `;
     }).join('');
+
     elements.cardsList.querySelectorAll('.card-list-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.dataset.id;
@@ -179,18 +238,323 @@
         <option value="${cat.id}">${cat.name?.ru || cat.slug}</option>
       `).join('');
   }
+
+  // === Language Tabs ===
   function handleLangTabClick(e) {
     const tab = e.target.closest('.editor-tab');
     if (!tab) return;
 
-    currentLang = tab.dataset.lang;
-    elements.langTabs.querySelectorAll('.editor-tab').forEach(t => {
+    // Сохраняем текущие данные секций перед переключением
+    saveSectionsToFormData();
+
+    const newLang = tab.dataset.lang;
+    switchLanguage(newLang);
+  }
+
+  function switchLanguage(lang) {
+    currentLang = lang;
+
+    // Update tabs
+    elements.langTabs?.querySelectorAll('.editor-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.lang === currentLang);
     });
-    document.querySelectorAll('.lang-field').forEach(field => {
-      field.style.display = field.dataset.lang === currentLang ? 'block' : 'none';
+
+    // Update label
+    if (elements.currentLangLabel) {
+      elements.currentLangLabel.textContent = LANG_NAMES[currentLang] || currentLang.toUpperCase();
+    }
+
+    // Загружаем данные для нового языка
+    loadLanguageData();
+  }
+
+  function loadLanguageData() {
+    // Title
+    if (elements.titleInput) {
+      elements.titleInput.value = formData.title[currentLang] || '';
+      elements.titleInput.placeholder = `Заголовок (${LANG_NAMES[currentLang]})`;
+    }
+
+    // Description
+    if (elements.descriptionInput) {
+      elements.descriptionInput.value = formData.description[currentLang] || '';
+      elements.descriptionInput.placeholder = `Описание (${LANG_NAMES[currentLang]})`;
+    }
+
+    // Checklist
+    if (elements.checklistInput) {
+      elements.checklistInput.value = formData.checklist[currentLang] || '';
+      elements.checklistInput.placeholder = `Чек-лист (${LANG_NAMES[currentLang]})\nКаждый пункт с новой строки:\n- Пункт 1\n- Пункт 2`;
+    }
+
+    // Sections
+    renderSections();
+  }
+
+  // === Sections ===
+  function renderSections() {
+    if (!elements.sectionsList) return;
+
+    elements.sectionsList.innerHTML = '';
+
+    const sections = formData.sections[currentLang] || [];
+
+    if (sections.length === 0) {
+      // Добавляем пустую секцию
+      addSection();
+    } else {
+      sections.forEach((section, index) => {
+        addSectionElement(section.title, section.content, section.images, index);
+      });
+    }
+  }
+
+  function addSection(title = '', content = '', images = []) {
+    if (!formData.sections[currentLang]) {
+      formData.sections[currentLang] = [];
+    }
+
+    const index = formData.sections[currentLang].length;
+    formData.sections[currentLang].push({ title, content, images });
+
+    addSectionElement(title, content, images, index);
+    unsavedChanges = true;
+  }
+
+  function addSectionElement(title, content, images, index) {
+    if (!elements.sectionsList || !elements.sectionTemplate) return;
+
+    const template = elements.sectionTemplate.content.cloneNode(true);
+    const section = template.querySelector('.content-section');
+    section.dataset.index = index;
+
+    const titleInput = section.querySelector('.section-title-input');
+    const editor = section.querySelector('.rich-editor');
+
+    if (titleInput) {
+      titleInput.value = title;
+      titleInput.placeholder = `Заголовок секции (${LANG_NAMES[currentLang]})`;
+      titleInput.addEventListener('input', () => {
+        updateSectionData(index, 'title', titleInput.value);
+      });
+    }
+
+    if (editor) {
+      editor.innerHTML = content;
+      editor.dataset.placeholder = `Введите текст (${LANG_NAMES[currentLang]})...`;
+      editor.addEventListener('input', () => {
+        updateSectionData(index, 'content', editor.innerHTML);
+      });
+    }
+
+    // Toolbar
+    bindEditorToolbar(section, index);
+
+    // Remove button
+    const removeBtn = section.querySelector('.section-remove');
+    removeBtn?.addEventListener('click', () => {
+      removeSection(index);
+    });
+
+    // Image button
+    const imageBtn = section.querySelector('.toolbar-image-btn');
+    imageBtn?.addEventListener('click', () => {
+      showImageModal(index);
+    });
+
+    // Render section images
+    renderSectionImages(section, images, index);
+
+    elements.sectionsList.appendChild(section);
+  }
+
+  function updateSectionData(index, field, value) {
+    if (!formData.sections[currentLang]) {
+      formData.sections[currentLang] = [];
+    }
+    if (!formData.sections[currentLang][index]) {
+      formData.sections[currentLang][index] = { title: '', content: '', images: [] };
+    }
+    formData.sections[currentLang][index][field] = value;
+    unsavedChanges = true;
+  }
+
+  function removeSection(index) {
+    if (!formData.sections[currentLang]) return;
+
+    formData.sections[currentLang].splice(index, 1);
+    renderSections();
+    unsavedChanges = true;
+  }
+
+  function saveSectionsToFormData() {
+    if (!elements.sectionsList) return;
+
+    const sectionElements = elements.sectionsList.querySelectorAll('.content-section');
+    const sections = [];
+
+    sectionElements.forEach((section) => {
+      const titleInput = section.querySelector('.section-title-input');
+      const editor = section.querySelector('.rich-editor');
+      const imagesContainer = section.querySelector('.section-images');
+
+      const title = titleInput?.value || '';
+      const content = editor?.innerHTML || '';
+      const images = [];
+
+      if (imagesContainer) {
+        imagesContainer.querySelectorAll('.image-item').forEach(item => {
+          const style = item.style.backgroundImage;
+          const url = style.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
+          if (url) images.push(url);
+        });
+      }
+
+      sections.push({ title, content, images });
+    });
+
+    formData.sections[currentLang] = sections;
+  }
+
+  function bindEditorToolbar(section, index) {
+    const toolbar = section.querySelector('.editor-toolbar');
+    const editor = section.querySelector('.rich-editor');
+
+    if (!toolbar || !editor) return;
+
+    toolbar.querySelectorAll('button[data-command]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const command = btn.dataset.command;
+        const value = btn.dataset.value || null;
+
+        editor.focus();
+        document.execCommand(command, false, value);
+        
+        updateSectionData(index, 'content', editor.innerHTML);
+        updateToolbarState(toolbar);
+      });
+    });
+
+    editor.addEventListener('keyup', () => updateToolbarState(toolbar));
+    editor.addEventListener('mouseup', () => updateToolbarState(toolbar));
+  }
+
+  function updateToolbarState(toolbar) {
+    toolbar.querySelectorAll('button[data-command]').forEach(btn => {
+      const command = btn.dataset.command;
+      try {
+        const isActive = document.queryCommandState(command);
+        btn.classList.toggle('active', isActive);
+      } catch (e) {}
     });
   }
+
+  function renderSectionImages(section, images, sectionIndex) {
+    const container = section.querySelector('.section-images');
+    if (!container) return;
+
+    if (!images || images.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = images.map((url, idx) => `
+      <div class="image-item" style="background-image: url('${url}');" data-index="${idx}">
+        <button type="button" class="image-item-remove" data-index="${idx}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.image-item-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.index);
+        
+        if (formData.sections[currentLang]?.[sectionIndex]?.images) {
+          formData.sections[currentLang][sectionIndex].images.splice(idx, 1);
+          renderSectionImages(section, formData.sections[currentLang][sectionIndex].images, sectionIndex);
+          unsavedChanges = true;
+        }
+      });
+    });
+  }
+
+  function showImageModal(sectionIndex) {
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.innerHTML = `
+      <div class="image-modal-content">
+        <h3>Добавить изображение</h3>
+        <input type="url" id="section-image-url" placeholder="https://example.com/image.jpg">
+        <label style="display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer;">
+          <input type="checkbox" id="insert-in-editor" checked>
+          <span>Вставить в текст</span>
+        </label>
+        <div class="image-modal-actions">
+          <button class="btn-secondary" id="image-modal-cancel">Отмена</button>
+          <button class="btn-primary" id="image-modal-add">Добавить</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const urlInput = modal.querySelector('#section-image-url');
+    const insertCheckbox = modal.querySelector('#insert-in-editor');
+    const cancelBtn = modal.querySelector('#image-modal-cancel');
+    const addBtn = modal.querySelector('#image-modal-add');
+
+    cancelBtn.addEventListener('click', () => modal.remove());
+
+    addBtn.addEventListener('click', () => {
+      const url = urlInput.value.trim();
+      if (url && url.startsWith('http')) {
+        // Add to section images array
+        if (!formData.sections[currentLang]) {
+          formData.sections[currentLang] = [];
+        }
+        if (!formData.sections[currentLang][sectionIndex]) {
+          formData.sections[currentLang][sectionIndex] = { title: '', content: '', images: [] };
+        }
+        if (!formData.sections[currentLang][sectionIndex].images) {
+          formData.sections[currentLang][sectionIndex].images = [];
+        }
+        formData.sections[currentLang][sectionIndex].images.push(url);
+
+        // Re-render section images
+        const sectionEl = elements.sectionsList?.querySelector(`[data-index="${sectionIndex}"]`);
+        if (sectionEl) {
+          renderSectionImages(sectionEl, formData.sections[currentLang][sectionIndex].images, sectionIndex);
+        }
+
+        // Insert into editor if checked
+        if (insertCheckbox.checked) {
+          const editor = sectionEl?.querySelector('.rich-editor');
+          if (editor) {
+            editor.focus();
+            document.execCommand('insertImage', false, url);
+            updateSectionData(sectionIndex, 'content', editor.innerHTML);
+          }
+        }
+
+        unsavedChanges = true;
+      }
+      modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+
+    urlInput.focus();
+  }
+
+  // === Create New Card ===
   function createNewCard() {
     if (unsavedChanges && !confirm('Есть несохранённые изменения. Продолжить?')) {
       return;
@@ -198,14 +562,35 @@
 
     currentCardId = null;
     unsavedChanges = false;
+
+    // Reset form data
+    formData = {
+      title: {},
+      description: {},
+      checklist: {},
+      sections: {}
+    };
+
+    // Show editor
     if (elements.editorPlaceholder) elements.editorPlaceholder.style.display = 'none';
     if (elements.editorForm) elements.editorForm.style.display = 'flex';
     if (elements.deleteBtn) elements.deleteBtn.style.display = 'none';
 
-    clearForm();
+    // Clear hero images
+    if (elements.heroImages) elements.heroImages.innerHTML = '';
 
+    // Reset category & status
+    if (elements.categorySelect) elements.categorySelect.value = '';
+    if (elements.isPublished) elements.isPublished.checked = true;
+
+    // Switch to RU and load empty data
+    switchLanguage('ru');
+
+    // Update sidebar
     renderCardsList();
   }
+
+  // === Load Card for Edit ===
   function loadCardForEdit(id) {
     if (unsavedChanges && !confirm('Есть несохранённые изменения. Продолжить?')) {
       return;
@@ -217,91 +602,57 @@
     currentCardId = id;
     unsavedChanges = false;
 
+    // Show editor
     if (elements.editorPlaceholder) elements.editorPlaceholder.style.display = 'none';
     if (elements.editorForm) elements.editorForm.style.display = 'flex';
     if (elements.deleteBtn) elements.deleteBtn.style.display = 'flex';
 
-    fillForm(card);
+    // Load card data into formData
+    formData = {
+      title: { ...card.title } || {},
+      description: { ...card.description } || {},
+      checklist: {},
+      sections: {}
+    };
 
-    renderCardsList();
-  }
-
-  function clearForm() {
-    currentLang = 'ru';
-    elements.langTabs?.querySelectorAll('.editor-tab').forEach(t => {
-      t.classList.toggle('active', t.dataset.lang === 'ru');
-    });
-    document.querySelectorAll('[data-field="title"] .lang-field').forEach(f => {
-      f.value = '';
-      f.style.display = f.dataset.lang === 'ru' ? 'block' : 'none';
-    });
-
-    document.querySelectorAll('[data-field="description"] .lang-field').forEach(f => {
-      f.value = '';
-      f.style.display = f.dataset.lang === 'ru' ? 'block' : 'none';
-    });
-
-    document.querySelectorAll('[data-field="checklist"] .lang-field').forEach(f => {
-      f.value = '';
-      f.style.display = f.dataset.lang === 'ru' ? 'block' : 'none';
-    });
-
-    if (elements.categorySelect) elements.categorySelect.value = '';
-    if (elements.isPublished) elements.isPublished.checked = true;
-
-    if (elements.heroImages) elements.heroImages.innerHTML = '';
-
-    if (elements.sectionsList) elements.sectionsList.innerHTML = '';
-
-    addSection();
-  }
-
-  function fillForm(card) {
-    currentLang = 'ru';
-    elements.langTabs?.querySelectorAll('.editor-tab').forEach(t => {
-      t.classList.toggle('active', t.dataset.lang === 'ru');
-    });
-    document.querySelectorAll('[data-field="title"] .lang-field').forEach(f => {
-      const lang = f.dataset.lang;
-      f.value = card.title?.[lang] || '';
-      f.style.display = lang === 'ru' ? 'block' : 'none';
-    });
-
-    document.querySelectorAll('[data-field="description"] .lang-field').forEach(f => {
-      const lang = f.dataset.lang;
-      f.value = card.description?.[lang] || '';
-      f.style.display = lang === 'ru' ? 'block' : 'none';
-    });
-    document.querySelectorAll('[data-field="checklist"] .lang-field').forEach(f => {
-      const lang = f.dataset.lang;
+    // Load checklist and sections for each language
+    LANGUAGES.forEach(lang => {
       const content = card.content?.[lang];
-      const checklist = content?.checklist || [];
-      f.value = checklist.map(item => '- ' + item).join('\n');
-      f.style.display = lang === 'ru' ? 'block' : 'none';
+      if (content) {
+        // Checklist
+        const checklist = content.checklist || [];
+        formData.checklist[lang] = checklist.map(item => '- ' + item).join('\n');
+
+        // Sections
+        formData.sections[lang] = (content.sections || []).map(s => ({
+          title: s.title || '',
+          content: s.content || '',
+          images: s.images || []
+        }));
+      }
     });
+
+    // Hero images
+    renderHeroImages(card.images || []);
+
+    // Category
     if (elements.categorySelect) {
       elements.categorySelect.value = card.category_id || '';
     }
 
+    // Status
     if (elements.isPublished) {
       elements.isPublished.checked = card.is_published !== false;
     }
-    renderHeroImages(card.images || []);
-    if (elements.sectionsList) {
-      elements.sectionsList.innerHTML = '';
-    }
 
-    const ruContent = card.content?.ru;
-    const sections = ruContent?.sections || [];
+    // Switch to RU and load data
+    switchLanguage('ru');
 
-    if (sections.length === 0) {
-      addSection();
-    } else {
-      sections.forEach(section => {
-        addSection(section.title, section.content, section.images);
-      });
-    }
+    // Update sidebar
+    renderCardsList();
   }
+
+  // === Hero Images ===
   function renderHeroImages(images) {
     if (!elements.heroImages) return;
 
@@ -315,6 +666,7 @@
         </button>
       </div>
     `).join('');
+
     elements.heroImages.querySelectorAll('.image-item-remove').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -361,22 +713,10 @@
   function handleHeroDrop(e) {
     e.preventDefault();
     e.currentTarget.classList.remove('dragover');
-
-    const files = e.dataTransfer?.files;
-    if (files?.length) {
-      handleHeroFiles(files);
-    }
   }
 
   function handleHeroFileSelect(e) {
-    const files = e.target.files;
-    if (files?.length) {
-      handleHeroFiles(files);
-    }
-  }
-
-  function handleHeroFiles(files) {
-    alert('Используйте URL.\n\n');
+    alert('Для загрузки изображений используйте URL.');
   }
 
   function handleHeroUrlAdd() {
@@ -387,207 +727,52 @@
     }
   }
 
-  function addSection(title = '', content = '', images = []) {
-    if (!elements.sectionsList || !elements.sectionTemplate) return;
+  // === Collect Form Data for Save ===
+  function collectFormData() {
+    // Сохраняем текущие секции
+    saveSectionsToFormData();
 
-    const template = elements.sectionTemplate.content.cloneNode(true);
-    const section = template.querySelector('.content-section');
-    const sectionId = 'section-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-
-    section.dataset.sectionId = sectionId;
-    const titleInput = section.querySelector('.section-title-input');
-    const editor = section.querySelector('.rich-editor');
-
-    if (titleInput) titleInput.value = title;
-    if (editor) editor.innerHTML = content;
-
-    renderSectionImages(section, images);
-
-    bindEditorToolbar(section);
-    const removeBtn = section.querySelector('.section-remove');
-    removeBtn?.addEventListener('click', () => {
-      section.remove();
-      unsavedChanges = true;
-    });
-
-    const imageBtn = section.querySelector('.toolbar-image-btn');
-    imageBtn?.addEventListener('click', () => {
-      showImageModal(section);
-    });
-
-    elements.sectionsList.appendChild(section);
-  }
-
-  function bindEditorToolbar(section) {
-    const toolbar = section.querySelector('.editor-toolbar');
-    const editor = section.querySelector('.rich-editor');
-
-    if (!toolbar || !editor) return;
-
-    toolbar.querySelectorAll('button[data-command]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const command = btn.dataset.command;
-        const value = btn.dataset.value || null;
-
-        editor.focus();
-        document.execCommand(command, false, value);
-        unsavedChanges = true;
-
-        // Update button state
-        updateToolbarState(toolbar);
-      });
-    });
-
-    // Update toolbar state on selection change
-    editor.addEventListener('keyup', () => updateToolbarState(toolbar));
-    editor.addEventListener('mouseup', () => updateToolbarState(toolbar));
-  }
-
-  function updateToolbarState(toolbar) {
-    toolbar.querySelectorAll('button[data-command]').forEach(btn => {
-      const command = btn.dataset.command;
-      const isActive = document.queryCommandState(command);
-      btn.classList.toggle('active', isActive);
-    });
-  }
-
-  function renderSectionImages(section, images) {
-    const container = section.querySelector('.section-images');
-    if (!container) return;
-
-    if (!images || images.length === 0) {
-      container.innerHTML = '';
-      return;
+    // Сохраняем текущие поля
+    if (elements.titleInput) {
+      formData.title[currentLang] = elements.titleInput.value;
+    }
+    if (elements.descriptionInput) {
+      formData.description[currentLang] = elements.descriptionInput.value;
+    }
+    if (elements.checklistInput) {
+      formData.checklist[currentLang] = elements.checklistInput.value;
     }
 
-    container.innerHTML = images.map((url, idx) => `
-      <div class="image-item" style="background-image: url('${url}');" data-index="${idx}">
-        <button type="button" class="image-item-remove" data-index="${idx}">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-    `).join('');
-
-    container.querySelectorAll('.image-item-remove').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const idx = parseInt(btn.dataset.index);
-        const currentImages = getSectionImages(section);
-        currentImages.splice(idx, 1);
-        renderSectionImages(section, currentImages);
-        unsavedChanges = true;
-      });
-    });
-  }
-
-  function getSectionImages(section) {
-    const container = section.querySelector('.section-images');
-    if (!container) return [];
-
-    const items = container.querySelectorAll('.image-item');
-    return Array.from(items).map(item => {
-      const style = item.style.backgroundImage;
-      return style.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
-    });
-  }
-
-  function showImageModal(section) {
-    const modal = document.createElement('div');
-    modal.className = 'image-modal';
-    modal.innerHTML = `
-      <div class="image-modal-content">
-        <h3>Добавить изображение</h3>
-        <input type="url" id="section-image-url" placeholder="https://example.com/image.jpg">
-        <div class="image-modal-actions">
-          <button class="btn-secondary" id="image-modal-cancel">Отмена</button>
-          <button class="btn-primary" id="image-modal-add">Добавить</button>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    const urlInput = modal.querySelector('#section-image-url');
-    const cancelBtn = modal.querySelector('#image-modal-cancel');
-    const addBtn = modal.querySelector('#image-modal-add');
-
-    cancelBtn.addEventListener('click', () => modal.remove());
-
-    addBtn.addEventListener('click', () => {
-      const url = urlInput.value.trim();
-      if (url && url.startsWith('http')) {
-        const images = getSectionImages(section);
-        images.push(url);
-        renderSectionImages(section, images);
-
-        // Also insert into editor
-        const editor = section.querySelector('.rich-editor');
-        if (editor) {
-          editor.focus();
-          document.execCommand('insertImage', false, url);
-        }
-
-        unsavedChanges = true;
-      }
-      modal.remove();
-    });
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.remove();
-    });
-
-    urlInput.focus();
-  }
-
-  // === Collect Form Data ===
-  function collectFormData() {
+    // Собираем title и description
     const title = {};
     const description = {};
     const content = {};
 
-    // Collect multilingual fields
-    ['ru', 'kk', 'uz', 'en', 'tk'].forEach(lang => {
+    LANGUAGES.forEach(lang => {
       // Title
-      const titleField = document.querySelector(`[data-field="title"] .lang-field[data-lang="${lang}"]`);
-      if (titleField?.value?.trim()) {
-        title[lang] = titleField.value.trim();
+      if (formData.title[lang]?.trim()) {
+        title[lang] = formData.title[lang].trim();
       }
 
       // Description
-      const descField = document.querySelector(`[data-field="description"] .lang-field[data-lang="${lang}"]`);
-      if (descField?.value?.trim()) {
-        description[lang] = descField.value.trim();
+      if (formData.description[lang]?.trim()) {
+        description[lang] = formData.description[lang].trim();
       }
 
-      // Checklist
-      const checklistField = document.querySelector(`[data-field="checklist"] .lang-field[data-lang="${lang}"]`);
-      const checklistText = checklistField?.value || '';
+      // Content (sections + checklist)
+      const checklistText = formData.checklist[lang] || '';
       const checklist = checklistText
         .split('\n')
         .map(line => line.replace(/^[-•]\s*/, '').trim())
         .filter(line => line);
 
-      // Sections (currently only RU)
-      const sections = [];
-      if (lang === 'ru') {
-        elements.sectionsList?.querySelectorAll('.content-section').forEach(section => {
-          const sTitle = section.querySelector('.section-title-input')?.value?.trim() || '';
-          const sContent = section.querySelector('.rich-editor')?.innerHTML || '';
-          const sImages = getSectionImages(section);
-
-          if (sTitle || sContent) {
-            sections.push({
-              title: sTitle,
-              content: sContent,
-              images: sImages
-            });
-          }
-        });
-      }
+      const sections = (formData.sections[lang] || [])
+        .filter(s => s.title || s.content)
+        .map(s => ({
+          title: s.title || '',
+          content: s.content || '',
+          images: s.images || []
+        }));
 
       content[lang] = { sections, checklist };
     });
@@ -615,7 +800,7 @@
     const data = collectFormData();
 
     // Validate
-    if (!data.title.ru && !data.title.en) {
+    if (!data.title.ru && !data.title.en && !data.title.kk) {
       alert('Введите заголовок хотя бы на одном языке');
       return;
     }
@@ -624,8 +809,7 @@
     data.updated_at = new Date().toISOString();
 
     if (!currentCardId) {
-      // New card
-      data.slug = generateSlug(data.title.ru || data.title.en || 'card');
+      data.slug = generateSlug(data.title.ru || data.title.en || data.title.kk || 'card');
       data.views_count = 0;
       data.created_at = new Date().toISOString();
     }
@@ -636,7 +820,6 @@
       let response;
 
       if (currentCardId) {
-        // Update
         response = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${currentCardId}`, {
           method: 'PATCH',
           headers: {
@@ -648,7 +831,6 @@
           body: JSON.stringify(data)
         });
       } else {
-        // Create
         response = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards`, {
           method: 'POST',
           headers: {
@@ -668,14 +850,13 @@
 
       unsavedChanges = false;
 
-      // Reload data
       await loadData();
 
-      // If new card, select it
       if (!currentCardId && response.headers.get('content-type')?.includes('json')) {
         const created = await response.json();
         if (created?.[0]?.id) {
-          loadCardForEdit(created[0].id);
+          currentCardId = created[0].id;
+          renderCardsList();
         }
       }
 
@@ -711,11 +892,9 @@
       currentCardId = null;
       unsavedChanges = false;
 
-      // Hide editor
       if (elements.editorForm) elements.editorForm.style.display = 'none';
       if (elements.editorPlaceholder) elements.editorPlaceholder.style.display = 'flex';
 
-      // Reload
       await loadData();
 
       alert('Карточка удалена');
@@ -750,6 +929,8 @@
       elements.previewIframe.src = '';
     }
   }
+
+  // === Helpers ===
   function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
