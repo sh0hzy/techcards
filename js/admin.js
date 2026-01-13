@@ -4,7 +4,7 @@
   'use strict';
 
   // === Конфигурация ===
-  const ADMIN_PASSWORD = 'kazarbuild2024';
+  const ADMIN_PASSWORD = 'kz27';
   const LANGUAGES = ['ru', 'kk', 'uz', 'en', 'tk'];
   const LANG_NAMES = {
     ru: 'Русский',
@@ -22,7 +22,6 @@
   let currentLang = 'ru';
   let unsavedChanges = false;
 
-  // Хранилище данных формы для всех языков
   let formData = {
     title: {},
     description: {},
