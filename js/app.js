@@ -12,19 +12,20 @@ function debounce(func, wait) {
 
 // js/app.js
 
+// js/app.js
+
 (function() {
   'use strict';
 
   // === Состояние ===
   let categories = [];
   let cards = [];
-  let filteredCards = [];
   let currentCategory = 'all';
   let searchQuery = '';
   let searchTimeout = null;
 
   // === Элементы ===
-  const elements = {};
+  let elements = {};
 
   // === Инициализация ===
   document.addEventListener('DOMContentLoaded', init);
@@ -33,204 +34,314 @@ function debounce(func, wait) {
     cacheElements();
     bindEvents();
     loadData();
-    initBurgerMenu();
-    initLanguageSwitcher();
   }
 
   function cacheElements() {
-    elements.categoriesList = document.getElementById('categories-list');
-    elements.cardsGrid = document.getElementById('cards-grid');
-    elements.searchInput = document.getElementById('search-input');
-    elements.searchClear = document.getElementById('search-clear');
-    elements.searchResults = document.getElementById('search-results');
-    elements.sortSelect = document.getElementById('sort-select');
-    elements.burger = document.getElementById('burger');
-    elements.menu = document.getElementById('menu');
+    elements = {
+      categoriesList: document.getElementById('categories-list'),
+      cardsGrid: document.getElementById('cards-grid'),
+      searchInput: document.getElementById('search-input'),
+      searchClear: document.getElementById('search-clear'),
+      searchResults: document.getElementById('search-results')
+    };
   }
 
   function bindEvents() {
-    // Поиск с debounce
-    elements.searchInput?.addEventListener('input', (e) => {
-      searchQuery = e.target.value.trim();
-      
-      // Показываем/скрываем кнопку очистки
-      if (elements.searchClear) {
-        elements.searchClear.style.display = searchQuery ? 'flex' : 'none';
-      }
-
-      // Debounce поиска
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        filterAndRenderCards();
-      }, 300);
-    });
+    // Поиск
+    if (elements.searchInput) {
+      elements.searchInput.addEventListener('input', handleSearchInput);
+      elements.searchInput.addEventListener('keydown', handleSearchKeydown);
+    }
 
     // Очистка поиска
-    elements.searchClear?.addEventListener('click', () => {
-      if (elements.searchInput) {
-        elements.searchInput.value = '';
-        searchQuery = '';
-        elements.searchClear.style.display = 'none';
-        filterAndRenderCards();
-        elements.searchInput.focus();
-      }
-    });
-
-    // Поиск по Enter
-    elements.searchInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        clearTimeout(searchTimeout);
-        filterAndRenderCards();
-      }
-      if (e.key === 'Escape') {
-        elements.searchInput.value = '';
-        searchQuery = '';
-        elements.searchClear.style.display = 'none';
-        filterAndRenderCards();
-      }
-    });
-
-    // Сортировка
-    elements.sortSelect?.addEventListener('change', () => {
-      filterAndRenderCards();
-    });
+    if (elements.searchClear) {
+      elements.searchClear.addEventListener('click', clearSearch);
+    }
 
     // Смена языка
-    document.addEventListener('localeChanged', () => {
+    document.addEventListener('localeChanged', function() {
       renderCategories();
-      filterAndRenderCards();
+      renderFilteredCards();
     });
+  }
+
+  function handleSearchInput(e) {
+    searchQuery = e.target.value.trim().toLowerCase();
+    
+    // Показать/скрыть кнопку очистки
+    if (elements.searchClear) {
+      elements.searchClear.style.display = searchQuery ? 'flex' : 'none';
+    }
+
+    // Debounce - ждём 300мс после последнего ввода
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(function() {
+      renderFilteredCards();
+    }, 300);
+  }
+
+  function handleSearchKeydown(e) {
+    if (e.key === 'Enter') {
+      clearTimeout(searchTimeout);
+      renderFilteredCards();
+    }
+    if (e.key === 'Escape') {
+      clearSearch();
+    }
+  }
+
+  function clearSearch() {
+    searchQuery = '';
+    if (elements.searchInput) {
+      elements.searchInput.value = '';
+    }
+    if (elements.searchClear) {
+      elements.searchClear.style.display = 'none';
+    }
+    renderFilteredCards();
+    elements.searchInput?.focus();
   }
 
   // === Загрузка данных ===
   async function loadData() {
-    showLoadingState();
+    showLoading();
 
     try {
-      const [categoriesData, cardsData] = await Promise.all([
-        fetchFromSupabase('categories?order=sort_order.asc'),
-        fetchFromSupabase('cards?is_published=eq.true&select=*,category:categories(*)&order=created_at.desc')
-      ]);
+      // Загружаем категории
+      const categoriesResponse = await fetch(
+        CONFIG.SUPABASE_URL + '/rest/v1/categories?order=sort_order.asc',
+        {
+          headers: {
+            'apikey': CONFIG.SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
+          }
+        }
+      );
+      categories = await categoriesResponse.json();
 
-      categories = categoriesData || [];
-      cards = cardsData || [];
+      // Загружаем карточки
+      const cardsResponse = await fetch(
+        CONFIG.SUPABASE_URL + '/rest/v1/cards?is_published=eq.true&select=*,category:categories(*)&order=created_at.desc',
+        {
+          headers: {
+            'apikey': CONFIG.SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
+          }
+        }
+      );
+      cards = await cardsResponse.json();
+
+      console.log('Loaded cards:', cards.length);
+      console.log('Loaded categories:', categories.length);
 
       renderCategories();
-      filterAndRenderCards();
+      renderFilteredCards();
 
     } catch (error) {
-      console.error('Load error:', error);
-      showErrorState();
+      console.error('Ошибка загрузки:', error);
+      showError();
     }
   }
 
-  async function fetchFromSupabase(endpoint) {
-    const response = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${endpoint}`, {
-      headers: {
-        'apikey': CONFIG.SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
-      }
-    });
-
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return response.json();
-  }
-
-  // === Фильтрация и поиск ===
-  function filterAndRenderCards() {
+  // === Фильтрация карточек ===
+  function getFilteredCards() {
     const lang = localStorage.getItem('locale') || 'ru';
-    const sortBy = elements.sortSelect?.value || 'newest';
-
-    // Фильтрация по категории
     let result = cards;
-    
+
+    // Фильтр по категории
     if (currentCategory !== 'all') {
-      result = result.filter(card => card.category_id === currentCategory);
-    }
-
-    // Поиск
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const queryWords = query.split(/\s+/).filter(w => w.length > 0);
-
-      result = result.filter(card => {
-        const title = getLocalized(card.title, lang).toLowerCase();
-        const description = getLocalized(card.description, lang).toLowerCase();
-        const categoryName = card.category ? getLocalized(card.category.name, lang).toLowerCase() : '';
-        
-        // Поиск в контенте
-        const content = getLocalized(card.content, lang);
-        let contentText = '';
-        if (content?.sections) {
-          content.sections.forEach(section => {
-            contentText += ' ' + (section.title || '') + ' ' + stripHtml(section.content || '');
-          });
-        }
-        if (content?.checklist) {
-          contentText += ' ' + content.checklist.join(' ');
-        }
-        contentText = contentText.toLowerCase();
-
-        // Все слова должны найтись хотя бы в одном поле
-        return queryWords.every(word => 
-          title.includes(word) || 
-          description.includes(word) || 
-          categoryName.includes(word) ||
-          contentText.includes(word)
-        );
+      result = result.filter(function(card) {
+        return card.category_id === currentCategory;
       });
     }
 
-    // Сортировка
-    result = sortCards(result, sortBy, lang);
+    // Фильтр по поиску
+    if (searchQuery && searchQuery.length > 0) {
+      result = result.filter(function(card) {
+        // Получаем текст для поиска
+        var title = getText(card.title, lang).toLowerCase();
+        var description = getText(card.description, lang).toLowerCase();
+        var categoryName = '';
+        
+        if (card.category && card.category.name) {
+          categoryName = getText(card.category.name, lang).toLowerCase();
+        }
 
-    filteredCards = result;
+        // Получаем текст из контента
+        var contentText = '';
+        var content = card.content;
+        if (content && content[lang]) {
+          var langContent = content[lang];
+          // Секции
+          if (langContent.sections && langContent.sections.length > 0) {
+            langContent.sections.forEach(function(section) {
+              if (section.title) {
+                contentText += ' ' + section.title;
+              }
+              if (section.content) {
+                // Убираем HTML теги
+                contentText += ' ' + section.content.replace(/<[^>]*>/g, '');
+              }
+            });
+          }
+          // Чеклист
+          if (langContent.checklist && langContent.checklist.length > 0) {
+            contentText += ' ' + langContent.checklist.join(' ');
+          }
+        }
+        contentText = contentText.toLowerCase();
 
-    // Обновляем счётчик результатов
-    updateSearchResults();
-
-    // Рендерим
-    renderCards(result);
-  }
-
-  function sortCards(cards, sortBy, lang) {
-    const sorted = [...cards];
-
-    switch (sortBy) {
-      case 'newest':
-        sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        break;
-      case 'oldest':
-        sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        break;
-      case 'alphabetical':
-        sorted.sort((a, b) => {
-          const titleA = getLocalized(a.title, lang).toLowerCase();
-          const titleB = getLocalized(b.title, lang).toLowerCase();
-          return titleA.localeCompare(titleB, lang);
+        // Разбиваем запрос на слова
+        var words = searchQuery.split(/\s+/);
+        
+        // Каждое слово должно найтись хотя бы в одном поле
+        return words.every(function(word) {
+          if (word.length === 0) return true;
+          return title.indexOf(word) !== -1 || 
+                 description.indexOf(word) !== -1 || 
+                 categoryName.indexOf(word) !== -1 ||
+                 contentText.indexOf(word) !== -1;
         });
-        break;
-      case 'popular':
-        sorted.sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
-        break;
+      });
     }
 
-    return sorted;
+    return result;
   }
 
-  function updateSearchResults() {
+  function getText(obj, lang) {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[lang] || obj['ru'] || obj['en'] || '';
+  }
+
+  // === Рендер категорий ===
+  function renderCategories() {
+    if (!elements.categoriesList) return;
+
+    var lang = localStorage.getItem('locale') || 'ru';
+    var html = '';
+
+    // Кнопка "Все"
+    html += '<button class="category-btn ' + (currentCategory === 'all' ? 'active' : '') + '" data-id="all">';
+    html += '<span class="category-icon">📋</span>';
+    html += '<span class="category-name">' + getAllText(lang) + '</span>';
+    html += '<span class="category-count">' + cards.length + '</span>';
+    html += '</button>';
+
+    // Категории
+    categories.forEach(function(cat) {
+      var name = getText(cat.name, lang);
+      var count = cards.filter(function(c) { return c.category_id === cat.id; }).length;
+      var isActive = currentCategory === cat.id;
+
+      html += '<button class="category-btn ' + (isActive ? 'active' : '') + '" data-id="' + cat.id + '">';
+      html += '<span class="category-icon">' + (cat.icon || '📁') + '</span>';
+      html += '<span class="category-name">' + escapeHtml(name) + '</span>';
+      html += '<span class="category-count">' + count + '</span>';
+      html += '</button>';
+    });
+
+    elements.categoriesList.innerHTML = html;
+
+    // Обработчики кликов
+    elements.categoriesList.querySelectorAll('.category-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        currentCategory = id;
+
+        // Обновляем активную кнопку
+        elements.categoriesList.querySelectorAll('.category-btn').forEach(function(b) {
+          b.classList.remove('active');
+        });
+        this.classList.add('active');
+
+        renderFilteredCards();
+      });
+    });
+  }
+
+  function getAllText(lang) {
+    var texts = {
+      ru: 'Все',
+      kk: 'Барлығы',
+      uz: 'Hammasi',
+      en: 'All',
+      tk: 'Hemmesi'
+    };
+    return texts[lang] || texts.ru;
+  }
+
+  // === Рендер карточек ===
+  function renderFilteredCards() {
+    var filtered = getFilteredCards();
+    
+    // Обновляем счётчик результатов
+    updateSearchResults(filtered.length);
+    
+    // Рендерим карточки
+    renderCards(filtered);
+  }
+
+  function renderCards(cardsToRender) {
+    if (!elements.cardsGrid) return;
+
+    var lang = localStorage.getItem('locale') || 'ru';
+
+    if (cardsToRender.length === 0) {
+      elements.cardsGrid.innerHTML = '<div class="empty-state">' +
+        '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">' +
+        '<circle cx="11" cy="11" r="8"></circle>' +
+        '<path d="m21 21-4.35-4.35"></path>' +
+        '</svg>' +
+        '<p>' + getNotFoundText(lang) + '</p>' +
+        '</div>';
+      return;
+    }
+
+    var html = '';
+
+    cardsToRender.forEach(function(card) {
+      var title = getText(card.title, lang) || 'Без названия';
+      var description = getText(card.description, lang) || '';
+      var image = card.cover_image || (card.images && card.images[0]) || '';
+      var categoryName = card.category ? getText(card.category.name, lang) : '';
+
+      // Подсветка поискового запроса
+      var displayTitle = highlightText(title, searchQuery);
+      var displayDesc = highlightText(truncateText(description, 100), searchQuery);
+
+      html += '<a href="card.html?id=' + card.id + '" class="card-item">';
+      html += '<div class="card-image"' + (image ? ' style="background-image: url(\'' + image + '\');"' : '') + '>';
+      if (!image) {
+        html += '<div class="card-image-placeholder"></div>';
+      }
+      html += '</div>';
+      html += '<div class="card-content">';
+      if (categoryName) {
+        html += '<span class="card-category">' + escapeHtml(categoryName) + '</span>';
+      }
+      html += '<h3 class="card-title">' + displayTitle + '</h3>';
+      if (description) {
+        html += '<p class="card-description">' + displayDesc + '</p>';
+      }
+      html += '</div>';
+      html += '</a>';
+    });
+
+    elements.cardsGrid.innerHTML = html;
+  }
+
+  function updateSearchResults(count) {
     if (!elements.searchResults) return;
 
-    if (searchQuery) {
-      const count = filteredCards.length;
-      const lang = localStorage.getItem('locale') || 'ru';
+    if (searchQuery && searchQuery.length > 0) {
+      var lang = localStorage.getItem('locale') || 'ru';
+      var text = '';
       
-      let text = '';
       if (count === 0) {
-        text = getSearchText('noResults', lang);
+        text = getNotFoundText(lang);
       } else {
-        text = getSearchText('found', lang).replace('{count}', count);
+        text = getFoundText(lang, count);
       }
 
       elements.searchResults.textContent = text;
@@ -240,250 +351,83 @@ function debounce(func, wait) {
     }
   }
 
-  function getSearchText(key, lang) {
-    const texts = {
-      noResults: {
-        ru: 'Ничего не найдено',
-        kk: 'Ештеңе табылмады',
-        uz: 'Hech narsa topilmadi',
-        en: 'Nothing found',
-        tk: 'Hiç zat tapylmady'
-      },
-      found: {
-        ru: 'Найдено: {count}',
-        kk: 'Табылды: {count}',
-        uz: 'Topildi: {count}',
-        en: 'Found: {count}',
-        tk: 'Tapyldy: {count}'
-      }
-    };
-
-    return texts[key]?.[lang] || texts[key]?.ru || '';
-  }
-
-  function stripHtml(html) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
-  }
-
-  // === Рендер категорий ===
-  function renderCategories() {
-    if (!elements.categoriesList) return;
-
-    const lang = localStorage.getItem('locale') || 'ru';
-
-    // Считаем карточки в категориях
-    const categoryCounts = {};
-    cards.forEach(card => {
-      if (card.category_id) {
-        categoryCounts[card.category_id] = (categoryCounts[card.category_id] || 0) + 1;
-      }
-    });
-
-    let html = `
-      <button class="category-btn ${currentCategory === 'all' ? 'active' : ''}" data-category="all">
-        <span class="category-icon">📋</span>
-        <span class="category-name">${getCategoryAllText(lang)}</span>
-        <span class="category-count">${cards.length}</span>
-      </button>
-    `;
-
-    categories.forEach(cat => {
-      const name = getLocalized(cat.name, lang);
-      const count = categoryCounts[cat.id] || 0;
-      const isActive = currentCategory === cat.id;
-
-      html += `
-        <button class="category-btn ${isActive ? 'active' : ''}" data-category="${cat.id}">
-          <span class="category-icon">${cat.icon || '📁'}</span>
-          <span class="category-name">${escapeHtml(name)}</span>
-          <span class="category-count">${count}</span>
-        </button>
-      `;
-    });
-
-    elements.categoriesList.innerHTML = html;
-
-    // Обработчики
-    elements.categoriesList.querySelectorAll('.category-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentCategory = btn.dataset.category;
-        
-        // Обновляем активную категорию
-        elements.categoriesList.querySelectorAll('.category-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.category === currentCategory);
-        });
-
-        filterAndRenderCards();
-      });
-    });
-  }
-
-  function getCategoryAllText(lang) {
-    const texts = {
-      ru: 'Все карточки',
-      kk: 'Барлық карталар',
-      uz: 'Barcha kartalar',
-      en: 'All cards',
-      tk: 'Ähli kartalar'
+  function getNotFoundText(lang) {
+    var texts = {
+      ru: 'Ничего не найдено',
+      kk: 'Ештеңе табылмады',
+      uz: 'Hech narsa topilmadi',
+      en: 'Nothing found',
+      tk: 'Hiç zat tapylmady'
     };
     return texts[lang] || texts.ru;
   }
 
-  // === Рендер карточек ===
-  function renderCards(cardsToRender) {
-    if (!elements.cardsGrid) return;
-
-    if (cardsToRender.length === 0) {
-      elements.cardsGrid.innerHTML = `
-        <div class="empty-state">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          <p>${getEmptyText()}</p>
-        </div>
-      `;
-      return;
-    }
-
-    const lang = localStorage.getItem('locale') || 'ru';
-
-    elements.cardsGrid.innerHTML = cardsToRender.map(card => {
-      const title = getLocalized(card.title, lang);
-      const description = getLocalized(card.description, lang);
-      const image = card.cover_image || card.images?.[0] || '';
-      const categoryName = card.category ? getLocalized(card.category.name, lang) : '';
-
-      // Подсветка поискового запроса
-      const highlightedTitle = highlightSearch(title, searchQuery);
-      const highlightedDesc = highlightSearch(truncate(description, 100), searchQuery);
-
-      return `
-        <a href="card.html?id=${card.id}" class="card-item">
-          <div class="card-image" style="background-image: url('${image}');">
-            ${!image ? '<div class="card-image-placeholder"></div>' : ''}
-          </div>
-          <div class="card-content">
-            ${categoryName ? `<span class="card-category">${escapeHtml(categoryName)}</span>` : ''}
-            <h3 class="card-title">${highlightedTitle}</h3>
-            ${description ? `<p class="card-description">${highlightedDesc}</p>` : ''}
-          </div>
-        </a>
-      `;
-    }).join('');
+  function getFoundText(lang, count) {
+    var texts = {
+      ru: 'Найдено: ' + count,
+      kk: 'Табылды: ' + count,
+      uz: 'Topildi: ' + count,
+      en: 'Found: ' + count,
+      tk: 'Tapyldy: ' + count
+    };
+    return texts[lang] || texts.ru;
   }
 
-  function highlightSearch(text, query) {
+  // === Подсветка текста ===
+  function highlightText(text, query) {
     if (!query || !text) return escapeHtml(text);
 
-    const escaped = escapeHtml(text);
-    const words = query.split(/\s+/).filter(w => w.length > 0);
+    var escaped = escapeHtml(text);
+    var words = query.split(/\s+/);
 
-    let result = escaped;
-    words.forEach(word => {
-      const regex = new RegExp(`(${escapeRegex(word)})`, 'gi');
-      result = result.replace(regex, '<mark>$1</mark>');
+    words.forEach(function(word) {
+      if (word.length > 0) {
+        var regex = new RegExp('(' + escapeRegex(word) + ')', 'gi');
+        escaped = escaped.replace(regex, '<mark>$1</mark>');
+      }
     });
 
-    return result;
+    return escaped;
   }
 
-  function escapeRegex(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  function getEmptyText() {
-    const lang = localStorage.getItem('locale') || 'ru';
-    const texts = {
-      ru: 'Карточки не найдены',
-      kk: 'Карталар табылмады',
-      uz: 'Kartalar topilmadi',
-      en: 'No cards found',
-      tk: 'Kartalar tapylmady'
-    };
-    return texts[lang] || texts.ru;
-  }
-
-  // === Состояния загрузки ===
-  function showLoadingState() {
+  // === Состояния ===
+  function showLoading() {
     if (!elements.cardsGrid) return;
 
-    elements.cardsGrid.innerHTML = `
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-    `;
+    elements.cardsGrid.innerHTML = 
+      '<div class="skeleton-card"></div>' +
+      '<div class="skeleton-card"></div>' +
+      '<div class="skeleton-card"></div>' +
+      '<div class="skeleton-card"></div>' +
+      '<div class="skeleton-card"></div>' +
+      '<div class="skeleton-card"></div>';
   }
 
-  function showErrorState() {
+  function showError() {
     if (!elements.cardsGrid) return;
 
-    elements.cardsGrid.innerHTML = `
-      <div class="empty-state error">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <p>Ошибка загрузки данных</p>
-        <button class="btn-retry" onclick="location.reload()">Повторить</button>
-      </div>
-    `;
+    elements.cardsGrid.innerHTML = '<div class="empty-state">' +
+      '<p>Ошибка загрузки данных</p>' +
+      '<button onclick="location.reload()" style="margin-top:12px;padding:10px 20px;background:#1b98fb;color:#fff;border:none;border-radius:8px;cursor:pointer;">Повторить</button>' +
+      '</div>';
   }
 
   // === Helpers ===
-  function getLocalized(obj, lang) {
-    if (!obj) return '';
-    if (typeof obj === 'string') return obj;
-    return obj[lang] || obj['ru'] || obj['en'] || '';
-  }
-
   function escapeHtml(text) {
     if (!text) return '';
-    const div = document.createElement('div');
+    var div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
 
-  function truncate(text, length) {
+  function truncateText(text, length) {
     if (!text) return '';
     if (text.length <= length) return text;
     return text.substring(0, length) + '...';
-  }
-
-  // === Burger Menu ===
-  function initBurgerMenu() {
-    elements.burger?.addEventListener('click', () => {
-      elements.burger.classList.toggle('active');
-      elements.menu?.classList.toggle('open');
-    });
-  }
-
-  // === Language Switcher ===
-  function initLanguageSwitcher() {
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const lang = btn.dataset.lang;
-        localStorage.setItem('locale', lang);
-
-        document.querySelectorAll('.lang-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.lang === lang);
-        });
-
-        document.dispatchEvent(new CustomEvent('localeChanged', { detail: { lang } }));
-      });
-    });
-
-    // Установить активный язык
-    const currentLang = localStorage.getItem('locale') || 'ru';
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.lang === currentLang);
-    });
   }
 
 })();
