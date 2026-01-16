@@ -761,7 +761,6 @@ body {
   text-decoration: line-through;
 }
 
-/* Кнопка сброса */
 .card-checklist-reset {
   display: flex;
   align-items: center;
@@ -785,7 +784,6 @@ body {
   color: #374151;
 }
 
-/* ===== MOBILE ===== */
 
 @media (max-width: 480px) {
   .card-hero {
@@ -810,7 +808,6 @@ body {
     border-radius: 12px;
   }
 }
-/* ===== CARD BLOCK IMAGES ===== */
 
 .card-block-content img {
   max-width: 100%;
@@ -863,7 +860,6 @@ body {
   text-decoration: underline;
 }
 
-/* Отдельные изображения секции */
 .card-block-images {
   display: flex;
   flex-direction: column;
@@ -878,7 +874,6 @@ body {
   object-fit: cover;
 }
 
-/* Галерея если несколько изображений */
 .card-block-images.gallery {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
