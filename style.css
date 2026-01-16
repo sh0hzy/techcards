@@ -894,6 +894,7 @@ body {
 }
 
 .search-box {
+  top: 48px;
   position: relative;
   display: flex;
   align-items: center;
