@@ -417,29 +417,182 @@
     formData.sections[currentLang] = sections;
   }
 
-  function bindEditorToolbar(section, index) {
-    const toolbar = section.querySelector('.editor-toolbar');
-    const editor = section.querySelector('.rich-editor');
+function bindEditorToolbar(section, index) {
+  const toolbar = section.querySelector('.editor-toolbar');
+  const editor = section.querySelector('.rich-editor');
 
-    if (!toolbar || !editor) return;
+  if (!toolbar || !editor) return;
 
-    toolbar.querySelectorAll('button[data-command]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const command = btn.dataset.command;
-        const value = btn.dataset.value || null;
+  // Команды форматирования
+  toolbar.querySelectorAll('button[data-command]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const command = btn.dataset.command;
+      const value = btn.dataset.value || null;
 
-        editor.focus();
-        document.execCommand(command, false, value);
-        
-        updateSectionData(index, 'content', editor.innerHTML);
-        updateToolbarState(toolbar);
-      });
+      editor.focus();
+      document.execCommand(command, false, value);
+      
+      updateSectionData(index, 'content', editor.innerHTML);
+      updateToolbarState(toolbar);
     });
+  });
 
-    editor.addEventListener('keyup', () => updateToolbarState(toolbar));
-    editor.addEventListener('mouseup', () => updateToolbarState(toolbar));
+  // Select для заголовков
+  const formatSelect = toolbar.querySelector('.toolbar-select[data-command="formatBlock"]');
+  if (formatSelect) {
+    formatSelect.addEventListener('change', (e) => {
+      const value = e.target.value;
+      editor.focus();
+      
+      if (value) {
+        document.execCommand('formatBlock', false, value);
+      } else {
+        document.execCommand('formatBlock', false, 'p');
+      }
+      
+      updateSectionData(index, 'content', editor.innerHTML);
+      e.target.value = ''; // Reset select
+    });
   }
+
+  // Кнопка ссылки
+  const linkBtn = toolbar.querySelector('.toolbar-link-btn');
+  if (linkBtn) {
+    linkBtn.addEventListener('click', () => {
+      const selection = window.getSelection();
+      const selectedText = selection.toString();
+      
+      const url = prompt('Введите URL ссылки:', 'https://');
+      if (url) {
+        editor.focus();
+        if (selectedText) {
+          document.execCommand('createLink', false, url);
+        } else {
+          const linkText = prompt('Текст ссылки:', url);
+          const link = `<a href="${url}" target="_blank">${linkText || url}</a>`;
+          document.execCommand('insertHTML', false, link);
+        }
+        updateSectionData(index, 'content', editor.innerHTML);
+      }
+    });
+  }
+
+  // Кнопка изображения
+  const imageBtn = toolbar.querySelector('.toolbar-image-btn');
+  if (imageBtn) {
+    imageBtn.addEventListener('click', () => {
+      showImageModal(index);
+    });
+  }
+
+  // Кнопка видео
+  const videoBtn = toolbar.querySelector('.toolbar-video-btn');
+  if (videoBtn) {
+    videoBtn.addEventListener('click', () => {
+      const url = prompt('Вставьте ссылку на YouTube видео:', 'https://www.youtube.com/watch?v=');
+      if (url) {
+        const videoId = extractYouTubeId(url);
+        if (videoId) {
+          const iframe = `<div class="video-wrapper"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+          editor.focus();
+          document.execCommand('insertHTML', false, iframe);
+          updateSectionData(index, 'content', editor.innerHTML);
+        } else {
+          alert('Неверная ссылка на YouTube');
+        }
+      }
+    });
+  }
+
+  // Кнопка таблицы
+  const tableBtn = toolbar.querySelector('.toolbar-table-btn');
+  if (tableBtn) {
+    tableBtn.addEventListener('click', () => {
+      const rows = prompt('Количество строк:', '3');
+      const cols = prompt('Количество столбцов:', '3');
+      
+      if (rows && cols) {
+        const r = parseInt(rows) || 3;
+        const c = parseInt(cols) || 3;
+        
+        let table = '<table><thead><tr>';
+        for (let i = 0; i < c; i++) {
+          table += '<th>Заголовок</th>';
+        }
+        table += '</tr></thead><tbody>';
+        
+        for (let i = 0; i < r - 1; i++) {
+          table += '<tr>';
+          for (let j = 0; j < c; j++) {
+            table += '<td>Ячейка</td>';
+          }
+          table += '</tr>';
+        }
+        table += '</tbody></table>';
+        
+        editor.focus();
+        document.execCommand('insertHTML', false, table);
+        updateSectionData(index, 'content', editor.innerHTML);
+      }
+    });
+  }
+
+  // Горячие клавиши
+  editor.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'b':
+          e.preventDefault();
+          document.execCommand('bold', false, null);
+          break;
+        case 'i':
+          e.preventDefault();
+          document.execCommand('italic', false, null);
+          break;
+        case 'u':
+          e.preventDefault();
+          document.execCommand('underline', false, null);
+          break;
+        case 'z':
+          if (e.shiftKey) {
+            e.preventDefault();
+            document.execCommand('redo', false, null);
+          }
+          break;
+      }
+      updateSectionData(index, 'content', editor.innerHTML);
+      updateToolbarState(toolbar);
+    }
+  });
+
+  // Обновление состояния toolbar при изменении выделения
+  editor.addEventListener('keyup', () => updateToolbarState(toolbar));
+  editor.addEventListener('mouseup', () => updateToolbarState(toolbar));
+  
+  // Сохранение при вводе
+  editor.addEventListener('input', () => {
+    updateSectionData(index, 'content', editor.innerHTML);
+  });
+}
+
+function updateToolbarState(toolbar) {
+  toolbar.querySelectorAll('button[data-command]').forEach(btn => {
+    const command = btn.dataset.command;
+    try {
+      const isActive = document.queryCommandState(command);
+      btn.classList.toggle('active', isActive);
+    } catch (e) {
+      // Некоторые команды не поддерживают queryCommandState
+    }
+  });
+}
+
+function extractYouTubeId(url) {
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+}
 
   function updateToolbarState(toolbar) {
     toolbar.querySelectorAll('button[data-command]').forEach(btn => {
