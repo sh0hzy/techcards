@@ -85,7 +85,7 @@
   <script src="js/card.js"></script>
   <script>
     function sendToWhatsApp() {
-    const text = document.getElementById("checklist-panel").innerText;
+    const text = document.getElementById("checklist-items").innerText;
     const encodedText = encodeURIComponent(text);
     window.open(`https://wa.me/?text=${encodedText}`, "_blank");
     }
