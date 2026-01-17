@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kazarbuild-v33';
+const CACHE_NAME = 'kazarbuild-v34';
 const DATA_CACHE_NAME = 'kazarbuild-data-v1';
 
 const ASSETS = [
@@ -18,7 +18,7 @@ const ASSETS = [
 
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing ...',);
-  
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
