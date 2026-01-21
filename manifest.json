@@ -1,7 +1,7 @@
 {
-  "name": "KAZARBUILD — Технологические карты",
+  "name": "KAZARBUILD — Technological cards",
   "short_name": "KAZARBUILD",
-  "description": "Технологические карты",
+  "description": "Technological cards",
   "start_url": "/techcards/index.html",
   "scope": "/techcards/",
   "id": "/techcards/",

@@ -1,7 +1,6 @@
 (function() {
   'use strict';
 
-  // === Получаем ID карточки из URL ===
   const urlParams = new URLSearchParams(window.location.search);
   const cardId = urlParams.get('id');
 
@@ -10,13 +9,11 @@
     return;
   }
 
-  // === Элементы страницы ===
   let elements = {};
   let cardData = null;
   let carouselIndex = 0;
   let carouselTimer = null;
 
-  // === Инициализация ===
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
@@ -51,7 +48,6 @@
     });
   }
 
-  // === Загрузка карточки ===
   async function loadCard() {
     try {
       const url = `${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${cardId}&select=*,category:categories(*)`;
@@ -87,25 +83,21 @@
     }
   }
 
-  // === Рендер карточки ===
   function renderCard(card) {
     const lang = localStorage.getItem('locale') || 'ru';
 
-    // Заголовок
     const title = getLocalized(card.title, lang) || 'Без названия';
     if (elements.title) {
       elements.title.textContent = title;
     }
     document.title = title + ' — KAZARBUILD';
 
-    // Категория
     const categoryName = card.category ? getLocalized(card.category.name, lang) : '';
     if (elements.category) {
       elements.category.textContent = categoryName;
       elements.category.style.display = categoryName ? 'inline-block' : 'none';
     }
 
-    // Описание
     const description = getLocalized(card.description, lang) || '';
     if (elements.description) {
       elements.description.textContent = description;
@@ -114,25 +106,20 @@
       elements.descriptionBlock.style.display = description ? 'block' : 'none';
     }
 
-    // Карусель
     renderCarousel(card.images || [], card.cover_image);
 
-    // Секции контента
     const content = getLocalized(card.content, lang) || {};
     renderSections(content.sections || []);
 
-    // Чек-лист
     renderChecklist(content.checklist || []);
   }
 
-  // === Локализация ===
   function getLocalized(obj, lang) {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
     return obj[lang] || obj['ru'] || obj['en'] || obj['kk'] || '';
   }
 
-  // === Карусель ===
   function renderCarousel(images, coverImage) {
     if (!elements.carousel) return;
 
@@ -166,7 +153,7 @@
     }
   }
 
-  // === ИСПРАВЛЕНО: Рендер секций с поддержкой HTML ===
+
   function renderSections(sections) {
     if (!elements.sections) return;
 
@@ -184,17 +171,14 @@
 
       html += '<section class="card-block">';
       
-      // Заголовок секции
       if (sectionTitle) {
         html += '<h3 class="card-block-title">' + escapeHtml(sectionTitle) + '</h3>';
       }
       
-      // Контент секции - рендерим HTML как есть (он уже отформатирован в админке)
       if (sectionContent) {
         html += '<div class="card-block-content">' + sanitizeHtml(sectionContent) + '</div>';
       }
       
-      // Изображения секции (если есть отдельно от контента)
       if (sectionImages.length > 0) {
         html += '<div class="card-block-images">';
         sectionImages.forEach(function(imgUrl) {
@@ -209,15 +193,12 @@
     elements.sections.innerHTML = html;
   }
 
-  // === Безопасная очистка HTML (разрешаем только безопасные теги) ===
   function sanitizeHtml(html) {
     if (!html) return '';
 
-    // Создаём временный элемент для парсинга
     const temp = document.createElement('div');
     temp.innerHTML = html;
 
-    // Разрешённые теги
     const allowedTags = [
       'p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike',
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -227,14 +208,12 @@
       'div', 'span'
     ];
 
-    // Разрешённые атрибуты
     const allowedAttrs = {
       'a': ['href', 'target', 'rel'],
       'img': ['src', 'alt', 'width', 'height', 'style'],
       '*': ['style', 'class']
     };
 
-    // Рекурсивная очистка
     function cleanNode(node) {
       if (node.nodeType === Node.TEXT_NODE) {
         return node.textContent;
@@ -246,7 +225,6 @@
 
       const tagName = node.tagName.toLowerCase();
 
-      // Если тег не разрешён, возвращаем только содержимое
       if (!allowedTags.includes(tagName)) {
         let content = '';
         node.childNodes.forEach(function(child) {
@@ -255,24 +233,21 @@
         return content;
       }
 
-      // Создаём чистый элемент
       let result = '<' + tagName;
 
-      // Добавляем разрешённые атрибуты
       const tagAttrs = allowedAttrs[tagName] || [];
       const globalAttrs = allowedAttrs['*'] || [];
       const allAllowedAttrs = [...tagAttrs, ...globalAttrs];
 
       Array.from(node.attributes).forEach(function(attr) {
         if (allAllowedAttrs.includes(attr.name)) {
-          // Дополнительная проверка для href (защита от javascript:)
           if (attr.name === 'href') {
             const href = attr.value.toLowerCase().trim();
             if (href.startsWith('javascript:') || href.startsWith('data:')) {
               return;
             }
           }
-          // Дополнительная проверка для src
+
           if (attr.name === 'src') {
             const src = attr.value.toLowerCase().trim();
             if (src.startsWith('javascript:') || src.startsWith('data:text')) {
@@ -285,12 +260,10 @@
 
       result += '>';
 
-      // Добавляем содержимое
       node.childNodes.forEach(function(child) {
         result += cleanNode(child);
       });
 
-      // Закрывающий тег (кроме самозакрывающихся)
       const selfClosing = ['img', 'br', 'hr', 'input'];
       if (!selfClosing.includes(tagName)) {
         result += '</' + tagName + '>';
@@ -307,7 +280,6 @@
     return cleaned;
   }
 
-  // === Экранирование HTML для текста ===
   function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -315,7 +287,6 @@
     return div.innerHTML;
   }
 
-  // === Экранирование атрибутов ===
   function escapeAttr(text) {
     if (!text) return '';
     return text
@@ -326,7 +297,6 @@
       .replace(/>/g, '&gt;');
   }
 
-  // === Чек-лист ===
   function renderChecklist(items) {
     if (!items || items.length === 0) {
       if (elements.checklistBtn) {

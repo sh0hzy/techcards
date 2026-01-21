@@ -81,8 +81,7 @@
     elements.logoutBtn?.addEventListener('click', handleLogout);
     elements.langTabs?.addEventListener('click', handleLangTabClick);
     elements.addCardBtn?.addEventListener('click', createNewCard);
-    
-    // Hero images
+
     elements.heroUploadZone?.addEventListener('click', (e) => {
       if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
         elements.heroFileInput?.click();
@@ -94,7 +93,6 @@
     elements.heroFileInput?.addEventListener('change', handleHeroFileSelect);
     elements.heroUrlAdd?.addEventListener('click', handleHeroUrlAdd);
 
-    // Title, Description, Checklist - сохраняем при изменении
     elements.titleInput?.addEventListener('input', () => {
       formData.title[currentLang] = elements.titleInput.value;
       unsavedChanges = true;
@@ -110,16 +108,13 @@
       unsavedChanges = true;
     });
 
-    // Sections
     elements.addSectionBtn?.addEventListener('click', () => addSection());
 
-    // Actions
     elements.saveBtn?.addEventListener('click', saveCard);
     elements.deleteBtn?.addEventListener('click', deleteCard);
     elements.previewBtn?.addEventListener('click', showPreview);
     elements.previewClose?.addEventListener('click', hidePreview);
 
-    // Warn before leaving
     window.addEventListener('beforeunload', (e) => {
       if (unsavedChanges) {
         e.preventDefault();
@@ -127,8 +122,6 @@
       }
     });
   }
-
-  // === Auth ===
   function checkAuth() {
     isLoggedIn = sessionStorage.getItem('admin_auth') === 'true';
     if (isLoggedIn) {
@@ -165,7 +158,6 @@
     await loadData();
   }
 
-  // === Data Loading ===
   async function loadData() {
     try {
       const [categoriesData, cardsData] = await Promise.all([
@@ -196,7 +188,6 @@
     return response.json();
   }
 
-  // === Render Cards List ===
   function renderCardsList() {
     if (!elements.cardsList) return;
 
@@ -240,12 +231,10 @@
       `).join('');
   }
 
-  // === Language Tabs ===
   function handleLangTabClick(e) {
     const tab = e.target.closest('.editor-tab');
     if (!tab) return;
 
-    // Сохраняем текущие данные секций перед переключением
     saveSectionsToFormData();
 
     const newLang = tab.dataset.lang;
@@ -255,44 +244,37 @@
   function switchLanguage(lang) {
     currentLang = lang;
 
-    // Update tabs
     elements.langTabs?.querySelectorAll('.editor-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.lang === currentLang);
     });
 
-    // Update label
     if (elements.currentLangLabel) {
       elements.currentLangLabel.textContent = LANG_NAMES[currentLang] || currentLang.toUpperCase();
     }
 
-    // Загружаем данные для нового языка
     loadLanguageData();
   }
 
   function loadLanguageData() {
-    // Title
+
     if (elements.titleInput) {
       elements.titleInput.value = formData.title[currentLang] || '';
       elements.titleInput.placeholder = `Заголовок (${LANG_NAMES[currentLang]})`;
     }
 
-    // Description
     if (elements.descriptionInput) {
       elements.descriptionInput.value = formData.description[currentLang] || '';
       elements.descriptionInput.placeholder = `Описание (${LANG_NAMES[currentLang]})`;
     }
 
-    // Checklist
     if (elements.checklistInput) {
       elements.checklistInput.value = formData.checklist[currentLang] || '';
       elements.checklistInput.placeholder = `Чек-лист (${LANG_NAMES[currentLang]})\nКаждый пункт с новой строки:\n- Пункт 1\n- Пункт 2`;
     }
 
-    // Sections
     renderSections();
   }
 
-  // === Sections ===
   function renderSections() {
     if (!elements.sectionsList) return;
 
@@ -301,7 +283,6 @@
     const sections = formData.sections[currentLang] || [];
 
     if (sections.length === 0) {
-      // Добавляем пустую секцию
       addSection();
     } else {
       sections.forEach((section, index) => {
@@ -348,22 +329,18 @@
       });
     }
 
-    // Toolbar
     bindEditorToolbar(section, index);
 
-    // Remove button
     const removeBtn = section.querySelector('.section-remove');
     removeBtn?.addEventListener('click', () => {
       removeSection(index);
     });
 
-    // Image button
     const imageBtn = section.querySelector('.toolbar-image-btn');
     imageBtn?.addEventListener('click', () => {
       showImageModal(index);
     });
 
-    // Render section images
     renderSectionImages(section, images, index);
 
     elements.sectionsList.appendChild(section);
@@ -452,11 +429,10 @@ function bindEditorToolbar(section, index) {
       }
       
       updateSectionData(index, 'content', editor.innerHTML);
-      e.target.value = ''; // Reset select
+      e.target.value = '';
     });
   }
 
-  // Кнопка ссылки
   const linkBtn = toolbar.querySelector('.toolbar-link-btn');
   if (linkBtn) {
     linkBtn.addEventListener('click', () => {
@@ -478,7 +454,6 @@ function bindEditorToolbar(section, index) {
     });
   }
 
-  // Кнопка изображения
   const imageBtn = toolbar.querySelector('.toolbar-image-btn');
   if (imageBtn) {
     imageBtn.addEventListener('click', () => {
@@ -486,7 +461,6 @@ function bindEditorToolbar(section, index) {
     });
   }
 
-  // Кнопка видео
   const videoBtn = toolbar.querySelector('.toolbar-video-btn');
   if (videoBtn) {
     videoBtn.addEventListener('click', () => {
@@ -505,7 +479,6 @@ function bindEditorToolbar(section, index) {
     });
   }
 
-  // Кнопка таблицы
   const tableBtn = toolbar.querySelector('.toolbar-table-btn');
   if (tableBtn) {
     tableBtn.addEventListener('click', () => {
@@ -538,7 +511,6 @@ function bindEditorToolbar(section, index) {
     });
   }
 
-  // Горячие клавиши
   editor.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey) {
       switch (e.key.toLowerCase()) {
@@ -566,11 +538,9 @@ function bindEditorToolbar(section, index) {
     }
   });
 
-  // Обновление состояния toolbar при изменении выделения
   editor.addEventListener('keyup', () => updateToolbarState(toolbar));
   editor.addEventListener('mouseup', () => updateToolbarState(toolbar));
-  
-  // Сохранение при вводе
+
   editor.addEventListener('input', () => {
     updateSectionData(index, 'content', editor.innerHTML);
   });
@@ -583,7 +553,7 @@ function updateToolbarState(toolbar) {
       const isActive = document.queryCommandState(command);
       btn.classList.toggle('active', isActive);
     } catch (e) {
-      // Некоторые команды не поддерживают queryCommandState
+
     }
   });
 }
@@ -668,7 +638,6 @@ function extractYouTubeId(url) {
     addBtn.addEventListener('click', () => {
       const url = urlInput.value.trim();
       if (url && url.startsWith('http')) {
-        // Add to section images array
         if (!formData.sections[currentLang]) {
           formData.sections[currentLang] = [];
         }
@@ -680,13 +649,11 @@ function extractYouTubeId(url) {
         }
         formData.sections[currentLang][sectionIndex].images.push(url);
 
-        // Re-render section images
         const sectionEl = elements.sectionsList?.querySelector(`[data-index="${sectionIndex}"]`);
         if (sectionEl) {
           renderSectionImages(sectionEl, formData.sections[currentLang][sectionIndex].images, sectionIndex);
         }
 
-        // Insert into editor if checked
         if (insertCheckbox.checked) {
           const editor = sectionEl?.querySelector('.rich-editor');
           if (editor) {
@@ -708,7 +675,6 @@ function extractYouTubeId(url) {
     urlInput.focus();
   }
 
-  // === Create New Card ===
   function createNewCard() {
     if (unsavedChanges && !confirm('Есть несохранённые изменения. Продолжить?')) {
       return;
@@ -717,7 +683,6 @@ function extractYouTubeId(url) {
     currentCardId = null;
     unsavedChanges = false;
 
-    // Reset form data
     formData = {
       title: {},
       description: {},
@@ -725,26 +690,20 @@ function extractYouTubeId(url) {
       sections: {}
     };
 
-    // Show editor
     if (elements.editorPlaceholder) elements.editorPlaceholder.style.display = 'none';
     if (elements.editorForm) elements.editorForm.style.display = 'flex';
     if (elements.deleteBtn) elements.deleteBtn.style.display = 'none';
 
-    // Clear hero images
     if (elements.heroImages) elements.heroImages.innerHTML = '';
 
-    // Reset category & status
     if (elements.categorySelect) elements.categorySelect.value = '';
     if (elements.isPublished) elements.isPublished.checked = true;
 
-    // Switch to RU and load empty data
     switchLanguage('ru');
 
-    // Update sidebar
     renderCardsList();
   }
 
-  // === Load Card for Edit ===
   function loadCardForEdit(id) {
     if (unsavedChanges && !confirm('Есть несохранённые изменения. Продолжить?')) {
       return;
@@ -756,12 +715,10 @@ function extractYouTubeId(url) {
     currentCardId = id;
     unsavedChanges = false;
 
-    // Show editor
     if (elements.editorPlaceholder) elements.editorPlaceholder.style.display = 'none';
     if (elements.editorForm) elements.editorForm.style.display = 'flex';
     if (elements.deleteBtn) elements.deleteBtn.style.display = 'flex';
 
-    // Load card data into formData
     formData = {
       title: { ...card.title } || {},
       description: { ...card.description } || {},
@@ -769,15 +726,12 @@ function extractYouTubeId(url) {
       sections: {}
     };
 
-    // Load checklist and sections for each language
     LANGUAGES.forEach(lang => {
       const content = card.content?.[lang];
       if (content) {
-        // Checklist
         const checklist = content.checklist || [];
         formData.checklist[lang] = checklist.map(item => '- ' + item).join('\n');
 
-        // Sections
         formData.sections[lang] = (content.sections || []).map(s => ({
           title: s.title || '',
           content: s.content || '',
@@ -786,27 +740,21 @@ function extractYouTubeId(url) {
       }
     });
 
-    // Hero images
     renderHeroImages(card.images || []);
 
-    // Category
     if (elements.categorySelect) {
       elements.categorySelect.value = card.category_id || '';
     }
 
-    // Status
     if (elements.isPublished) {
       elements.isPublished.checked = card.is_published !== false;
     }
 
-    // Switch to RU and load data
     switchLanguage('ru');
 
-    // Update sidebar
     renderCardsList();
   }
 
-  // === Hero Images ===
   function renderHeroImages(images) {
     if (!elements.heroImages) return;
 
@@ -881,12 +829,8 @@ function extractYouTubeId(url) {
     }
   }
 
-  // === Collect Form Data for Save ===
   function collectFormData() {
-    // Сохраняем текущие секции
     saveSectionsToFormData();
-
-    // Сохраняем текущие поля
     if (elements.titleInput) {
       formData.title[currentLang] = elements.titleInput.value;
     }
@@ -897,23 +841,19 @@ function extractYouTubeId(url) {
       formData.checklist[currentLang] = elements.checklistInput.value;
     }
 
-    // Собираем title и description
     const title = {};
     const description = {};
     const content = {};
 
     LANGUAGES.forEach(lang => {
-      // Title
       if (formData.title[lang]?.trim()) {
         title[lang] = formData.title[lang].trim();
       }
 
-      // Description
       if (formData.description[lang]?.trim()) {
         description[lang] = formData.description[lang].trim();
       }
 
-      // Content (sections + checklist)
       const checklistText = formData.checklist[lang] || '';
       const checklist = checklistText
         .split('\n')
@@ -931,10 +871,8 @@ function extractYouTubeId(url) {
       content[lang] = { sections, checklist };
     });
 
-    // Images
     const images = getHeroImages();
 
-    // Category & status
     const categoryId = elements.categorySelect?.value || null;
     const isPublished = elements.isPublished?.checked ?? true;
 
@@ -949,17 +887,14 @@ function extractYouTubeId(url) {
     };
   }
 
-  // === Save Card ===
   async function saveCard() {
     const data = collectFormData();
 
-    // Validate
     if (!data.title.ru && !data.title.en && !data.title.kk) {
       alert('Введите заголовок хотя бы на одном языке');
       return;
     }
 
-    // Add metadata
     data.updated_at = new Date().toISOString();
 
     if (!currentCardId) {
@@ -1022,7 +957,6 @@ function extractYouTubeId(url) {
     }
   }
 
-  // === Delete Card ===
   async function deleteCard() {
     if (!currentCardId) return;
 
@@ -1059,7 +993,6 @@ function extractYouTubeId(url) {
     }
   }
 
-  // === Preview ===
   function showPreview() {
     if (!currentCardId) {
       alert('Сначала сохраните карточку');
@@ -1084,7 +1017,6 @@ function extractYouTubeId(url) {
     }
   }
 
-  // === Helpers ===
   function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;

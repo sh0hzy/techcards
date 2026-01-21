@@ -1,12 +1,10 @@
 const translations = {
   ru: {
-    // Навигация
     nav: {
       home: 'Главная',
       catalog: 'Тех.карты',
       about: 'О проекте'
     },
-    // Главная страница
     home: {
       title: 'Технологические карты',
       subtitle: 'База знаний по строительным процессам',
@@ -15,7 +13,6 @@ const translations = {
       categories: 'Категории',
       viewAll: 'Смотреть все'
     },
-    // Каталог
     catalog: {
       title: 'Каталог',
       filters: 'Фильтры',
@@ -25,7 +22,6 @@ const translations = {
       noResults: 'Ничего не найдено',
       found: 'Найдено: {count}'
     },
-    // Карточка
     card: {
       back: 'Назад',
       views: 'просмотров',
@@ -39,7 +35,6 @@ const translations = {
       },
       checklist: 'Чек-лист'
     },
-    // Общее
     common: {
       loading: 'Загрузка...',
       error: 'Ошибка загрузки',
@@ -230,7 +225,6 @@ const translations = {
   }
 };
 
-// Языки с метаданными
 const languages = [
   { code: 'ru', name: 'Русский', shortName: 'RU', flag: '🇷🇺' },
   { code: 'kk', name: 'Қазақша', shortName: 'KK', flag: '🇰🇿' },
@@ -238,12 +232,9 @@ const languages = [
   { code: 'en', name: 'English', shortName: 'EN', flag: '🇬🇧' },
   { code: 'tk', name: 'Türkmençe', shortName: 'TK', flag: '🇹🇲' }
 ];
-
-// Модуль i18n
 const i18n = {
   currentLocale: 'ru',
 
-  // Инициализация
   init() {
     const saved = localStorage.getItem('locale');
     if (saved && CONFIG.LOCALES.includes(saved)) {
@@ -256,7 +247,6 @@ const i18n = {
     return this;
   },
 
-  // Установить язык
   setLocale(locale) {
     if (CONFIG.LOCALES.includes(locale)) {
       this.currentLocale = locale;
@@ -264,17 +254,14 @@ const i18n = {
       this.updatePageTranslations();
       this.updateLanguageSwitcher();
       
-      // Событие для компонентов
       document.dispatchEvent(new CustomEvent('localeChanged', { detail: locale }));
     }
   },
 
-  // Получить текущий язык
   getLocale() {
     return this.currentLocale;
   },
 
-  // Получить перевод по ключу: i18n.t('nav.home')
   t(key, params = {}) {
     const keys = key.split('.');
     let result = translations[this.currentLocale];
@@ -283,20 +270,18 @@ const i18n = {
       if (result && result[k] !== undefined) {
         result = result[k];
       } else {
-        // Fallback на русский
         result = translations['ru'];
         for (const fallbackKey of keys) {
           if (result && result[fallbackKey] !== undefined) {
             result = result[fallbackKey];
           } else {
-            return key; // Если нет перевода, вернуть ключ
+            return key; 
           }
         }
         break;
       }
     }
 
-    // Подстановка параметров {count}, {name} и т.д.
     if (typeof result === 'string') {
       Object.keys(params).forEach(param => {
         result = result.replace(`{${param}}`, params[param]);
@@ -306,8 +291,6 @@ const i18n = {
     return result;
   },
 
-  // Получить локализованное значение из JSON объекта (для данных из БД)
-  // Пример: i18n.localize(card.title) 
   localize(jsonObj, fallback = '') {
     if (!jsonObj) return fallback;
     if (typeof jsonObj === 'string') return jsonObj;
@@ -315,31 +298,25 @@ const i18n = {
     return jsonObj[this.currentLocale] || jsonObj['ru'] || fallback;
   },
 
-  // Обновить все элементы с data-i18n атрибутом
   updatePageTranslations() {
-    // Текстовые элементы: data-i18n="nav.home"
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       el.textContent = this.t(key);
     });
 
-    // Placeholder: data-i18n-placeholder="home.searchPlaceholder"
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.getAttribute('data-i18n-placeholder');
       el.placeholder = this.t(key);
     });
 
-    // Title: data-i18n-title="card.download"
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
       const key = el.getAttribute('data-i18n-title');
       el.title = this.t(key);
     });
 
-    // Обновить <html lang="">
     document.documentElement.lang = this.currentLocale;
   },
 
-  // Обновить переключатель языка
   updateLanguageSwitcher() {
     const switcher = document.querySelector('.language-switcher');
     if (!switcher) return;
@@ -351,7 +328,6 @@ const i18n = {
     });
   },
 
-  // Инициализировать переключатель языка
   initLanguageSwitcher() {
     const buttons = document.querySelectorAll('.lang-btn');
     buttons.forEach(btn => {

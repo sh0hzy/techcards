@@ -10,24 +10,16 @@ function debounce(func, wait) {
   };
 }
 
-// js/app.js
-
-// js/app.js
-
 (function() {
   'use strict';
-
-  // === Состояние ===
   let categories = [];
   let cards = [];
   let currentCategory = 'all';
   let searchQuery = '';
   let searchTimeout = null;
 
-  // === Элементы ===
   let elements = {};
 
-  // === Инициализация ===
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
@@ -47,18 +39,15 @@ function debounce(func, wait) {
   }
 
   function bindEvents() {
-    // Поиск
     if (elements.searchInput) {
       elements.searchInput.addEventListener('input', handleSearchInput);
       elements.searchInput.addEventListener('keydown', handleSearchKeydown);
     }
 
-    // Очистка поиска
     if (elements.searchClear) {
       elements.searchClear.addEventListener('click', clearSearch);
     }
 
-    // Смена языка
     document.addEventListener('localeChanged', function() {
       renderCategories();
       renderFilteredCards();
@@ -67,13 +56,11 @@ function debounce(func, wait) {
 
   function handleSearchInput(e) {
     searchQuery = e.target.value.trim().toLowerCase();
-    
-    // Показать/скрыть кнопку очистки
+
     if (elements.searchClear) {
       elements.searchClear.style.display = searchQuery ? 'flex' : 'none';
     }
 
-    // Debounce - ждём 300мс после последнего ввода
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(function() {
       renderFilteredCards();
@@ -102,12 +89,11 @@ function debounce(func, wait) {
     elements.searchInput?.focus();
   }
 
-  // === Загрузка данных ===
   async function loadData() {
     showLoading();
 
     try {
-      // Загружаем категории
+
       const categoriesResponse = await fetch(
         CONFIG.SUPABASE_URL + '/rest/v1/categories?order=sort_order.asc',
         {
@@ -119,7 +105,6 @@ function debounce(func, wait) {
       );
       categories = await categoriesResponse.json();
 
-      // Загружаем карточки
       const cardsResponse = await fetch(
         CONFIG.SUPABASE_URL + '/rest/v1/cards?is_published=eq.true&select=*,category:categories(*)&order=created_at.desc',
         {
@@ -143,22 +128,18 @@ function debounce(func, wait) {
     }
   }
 
-  // === Фильтрация карточек ===
   function getFilteredCards() {
     const lang = localStorage.getItem('locale') || 'ru';
     let result = cards;
 
-    // Фильтр по категории
     if (currentCategory !== 'all') {
       result = result.filter(function(card) {
         return card.category_id === currentCategory;
       });
     }
 
-    // Фильтр по поиску
     if (searchQuery && searchQuery.length > 0) {
       result = result.filter(function(card) {
-        // Получаем текст для поиска
         var title = getText(card.title, lang).toLowerCase();
         var description = getText(card.description, lang).toLowerCase();
         var categoryName = '';
@@ -167,34 +148,28 @@ function debounce(func, wait) {
           categoryName = getText(card.category.name, lang).toLowerCase();
         }
 
-        // Получаем текст из контента
         var contentText = '';
         var content = card.content;
         if (content && content[lang]) {
           var langContent = content[lang];
-          // Секции
           if (langContent.sections && langContent.sections.length > 0) {
             langContent.sections.forEach(function(section) {
               if (section.title) {
                 contentText += ' ' + section.title;
               }
               if (section.content) {
-                // Убираем HTML теги
                 contentText += ' ' + section.content.replace(/<[^>]*>/g, '');
               }
             });
           }
-          // Чеклист
           if (langContent.checklist && langContent.checklist.length > 0) {
             contentText += ' ' + langContent.checklist.join(' ');
           }
         }
         contentText = contentText.toLowerCase();
 
-        // Разбиваем запрос на слова
         var words = searchQuery.split(/\s+/);
         
-        // Каждое слово должно найтись хотя бы в одном поле
         return words.every(function(word) {
           if (word.length === 0) return true;
           return title.indexOf(word) !== -1 || 
@@ -214,21 +189,18 @@ function debounce(func, wait) {
     return obj[lang] || obj['ru'] || obj['en'] || '';
   }
 
-  // === Рендер категорий ===
   function renderCategories() {
     if (!elements.categoriesList) return;
 
     var lang = localStorage.getItem('locale') || 'ru';
     var html = '';
 
-    // Кнопка "Все"
     html += '<button class="category-btn ' + (currentCategory === 'all' ? 'active' : '') + '" data-id="all">';
     html += '<span class="category-icon">📋</span>';
     html += '<span class="category-name">' + getAllText(lang) + '</span>';
     html += '<span class="category-count">' + cards.length + '</span>';
     html += '</button>';
 
-    // Категории
     categories.forEach(function(cat) {
       var name = getText(cat.name, lang);
       var count = cards.filter(function(c) { return c.category_id === cat.id; }).length;
@@ -243,13 +215,11 @@ function debounce(func, wait) {
 
     elements.categoriesList.innerHTML = html;
 
-    // Обработчики кликов
     elements.categoriesList.querySelectorAll('.category-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var id = this.getAttribute('data-id');
         currentCategory = id;
 
-        // Обновляем активную кнопку
         elements.categoriesList.querySelectorAll('.category-btn').forEach(function(b) {
           b.classList.remove('active');
         });
@@ -271,14 +241,11 @@ function debounce(func, wait) {
     return texts[lang] || texts.ru;
   }
 
-  // === Рендер карточек ===
   function renderFilteredCards() {
     var filtered = getFilteredCards();
     
-    // Обновляем счётчик результатов
     updateSearchResults(filtered.length);
     
-    // Рендерим карточки
     renderCards(filtered);
   }
 
@@ -306,7 +273,6 @@ function debounce(func, wait) {
       var image = card.cover_image || (card.images && card.images[0]) || '';
       var categoryName = card.category ? getText(card.category.name, lang) : '';
 
-      // Подсветка поискового запроса
       var displayTitle = highlightText(title, searchQuery);
       var displayDesc = highlightText(truncateText(description, 100), searchQuery);
 
@@ -373,7 +339,6 @@ function debounce(func, wait) {
     return texts[lang] || texts.ru;
   }
 
-  // === Подсветка текста ===
   function highlightText(text, query) {
     if (!query || !text) return escapeHtml(text);
 
@@ -394,7 +359,6 @@ function debounce(func, wait) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  // === Состояния ===
   function showLoading() {
     if (!elements.cardsGrid) return;
 
@@ -416,7 +380,6 @@ function debounce(func, wait) {
       '</div>';
   }
 
-  // === Helpers ===
   function escapeHtml(text) {
     if (!text) return '';
     var div = document.createElement('div');
@@ -770,6 +733,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+
 
 // ============ OFFLINE ============
 

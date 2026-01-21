@@ -93,13 +93,12 @@
 
 <div class="editor-content">
   
-  <!-- Индикатор текущего языка -->
+
   <div class="current-lang-indicator">
     <span>Редактирование на языке:</span>
     <strong id="current-lang-label">Русский</strong>
   </div>
 
-  <!-- Hero изображения -->
   <div class="form-section">
     <label class="form-label">Изображения Hero (слайдер)</label>
     <div class="images-grid" id="hero-images"></div>
@@ -117,7 +116,6 @@
     </div>
   </div>
 
-  <!-- Категория и статус -->
   <div class="form-row">
     <div class="form-section flex-1">
       <label class="form-label">Категория</label>
@@ -135,19 +133,15 @@
     </div>
   </div>
 
-  <!-- Заголовок -->
   <div class="form-section">
     <label class="form-label">Заголовок</label>
     <input type="text" id="title-input" class="input-large" placeholder="Заголовок карточки">
   </div>
 
-  <!-- Описание -->
   <div class="form-section">
     <label class="form-label">Краткое описание</label>
     <textarea id="description-input" placeholder="Краткое описание для карточки" rows="3"></textarea>
   </div>
-
-  <!-- Секции контента -->
   <div class="form-section">
     <div class="section-header">
       <label class="form-label">Секции контента</label>
@@ -161,8 +155,6 @@
     </div>
     <div class="sections-list" id="sections-list"></div>
   </div>
-
-  <!-- Чек-лист -->
   <div  class="form-section">
     <label class="form-label">Чек-лист</label>
     <textarea id="checklist-input" class="checklist-input" placeholder="Каждый пункт с новой строки:&#10;- Пункт 1&#10;- Пункт 2&#10;- Пункт 3" rows="6"></textarea>
@@ -184,7 +176,6 @@
     </div>
 
   </main>
-<!-- Шаблон секции (замени существующий) -->
 <template id="section-template">
   <div class="content-section" data-index="">
     <div class="section-drag-handle">
@@ -199,10 +190,7 @@
     </div>
     <div class="section-content">
       <input type="text" class="section-title-input" placeholder="Заголовок секции">
-      
-      <!-- Улучшенный Toolbar -->
       <div class="editor-toolbar">
-        <!-- Форматирование текста -->
         <div class="toolbar-group">
           <button type="button" data-command="bold" title="Жирный (Ctrl+B)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -234,7 +222,6 @@
 
         <span class="toolbar-divider"></span>
 
-        <!-- Заголовки -->
         <div class="toolbar-group">
           <select class="toolbar-select" data-command="formatBlock" title="Формат">
             <option value="">Обычный текст</option>
@@ -248,7 +235,6 @@
 
         <span class="toolbar-divider"></span>
 
-        <!-- Списки -->
         <div class="toolbar-group">
           <button type="button" data-command="insertUnorderedList" title="Маркированный список">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -274,7 +260,6 @@
 
         <span class="toolbar-divider"></span>
 
-        <!-- Выравнивание -->
         <div class="toolbar-group">
           <button type="button" data-command="justifyLeft" title="По левому краю">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -301,7 +286,7 @@
 
         <span class="toolbar-divider"></span>
 
-        <!-- Вставки -->
+
         <div class="toolbar-group">
           <button type="button" class="toolbar-link-btn" title="Ссылка">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -333,8 +318,6 @@
         </div>
 
         <span class="toolbar-divider"></span>
-
-        <!-- Отступы -->
         <div class="toolbar-group">
           <button type="button" data-command="outdent" title="Уменьшить отступ">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -355,8 +338,6 @@
         </div>
 
         <span class="toolbar-divider"></span>
-
-        <!-- Очистка и отмена -->
         <div class="toolbar-group">
           <button type="button" data-command="removeFormat" title="Очистить форматирование">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -380,11 +361,7 @@
           </button>
         </div>
       </div>
-      
-      <!-- Редактируемая область -->
       <div class="rich-editor" contenteditable="true" data-placeholder="Введите текст секции..."></div>
-      
-      <!-- Изображения секции -->
       <div class="section-images"></div>
     </div>
     <button type="button" class="section-remove" title="Удалить секцию">
