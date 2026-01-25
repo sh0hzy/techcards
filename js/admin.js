@@ -1,5 +1,4 @@
-(function() {
-  'use strict';
+(function() {  'use strict';
 
   // === Конфигурация ===
   const ADMIN_PASSWORD = 'kz27';
@@ -24,7 +23,7 @@
     title: {},
     description: {},
     checklist: {},
-    sections: {} // sections[lang] = [{title, content, images, nestedSections: []}, ...]
+    sections: {}
   };
 
   // === Элементы ===
@@ -121,6 +120,7 @@
       }
     });
   }
+
   function checkAuth() {
     isLoggedIn = sessionStorage.getItem('admin_auth') === 'true';
     if (isLoggedIn) {
@@ -255,7 +255,6 @@
   }
 
   function loadLanguageData() {
-
     if (elements.titleInput) {
       elements.titleInput.value = formData.title[currentLang] || '';
       elements.titleInput.placeholder = `Заголовок (${LANG_NAMES[currentLang]})`;
@@ -285,12 +284,11 @@
       addSection();
     } else {
       sections.forEach((section, index) => {
-        addSectionElement(section.title, section.content, section.images, index);
+        addSectionElement(section.title, section.content, section.images, section.nestedSections || [], index);
       });
     }
   }
 
-  // Helper to escape HTML in nested section inputs
   function escapeHtmlAttr(text) {
     if (!text) return '';
     return text
@@ -309,11 +307,11 @@
     const index = formData.sections[currentLang].length;
     formData.sections[currentLang].push({ title, content, images, nestedSections });
 
-    addSectionElement(title, content, images, index);
+    addSectionElement(title, content, images, nestedSections, index);
     unsavedChanges = true;
   }
 
-  function addSectionElement(title, content, images, index) {
+  function addSectionElement(title, content, images, nestedSections, index) {
     if (!elements.sectionsList || !elements.sectionTemplate) return;
 
     const template = elements.sectionTemplate.content.cloneNode(true);
@@ -346,31 +344,26 @@
       removeSection(index);
     });
 
-    const imageBtn = section.querySelector('.toolbar-image-btn');
-    imageBtn?.addEventListener('click', () => {
-      showImageModal(index);
-    });
-
     renderSectionImages(section, images, index);
 
     // Nested sections
-    const nestedContainer = section.querySelector('.nested-sections-list');
     const addNestedBtn = section.querySelector('.btn-add-nested');
-
     if (addNestedBtn) {
       addNestedBtn.addEventListener('click', () => {
         addNestedSection(index);
       });
     }
 
-    // Render existing nested sections
-    const nestedSections = formData.sections[currentLang]?.[index]?.nestedSections || [];
-    renderNestedSections(section, index, nestedSections);
-
     elements.sectionsList.appendChild(section);
+
+    // Render existing nested sections after adding to DOM
+    if (nestedSections && nestedSections.length > 0) {
+      renderNestedSections(section, index, nestedSections);
+    }
   }
 
-  // === Nested Sections ===
+  // === NESTED SECTIONS ===
+
   function addNestedSection(parentIndex, title = '', content = '') {
     if (!formData.sections[currentLang]) {
       formData.sections[currentLang] = [];
@@ -382,369 +375,482 @@
       formData.sections[currentLang][parentIndex].nestedSections = [];
     }
 
+    const nestedIndex = formData.sections[currentLang][parentIndex].nestedSections.length;
     formData.sections[currentLang][parentIndex].nestedSections.push({ title, content, images: [] });
 
     const parentSection = elements.sectionsList?.querySelector(`[data-index="${parentIndex}"]`);
     if (parentSection) {
-      renderNestedSections(parentSection, parentIndex, formData.sections[currentLang][parentIndex].nestedSections);
+      const container = parentSection.querySelector('.nested-sections-list');
+      if (container) {
+        addNestedSectionElement(container, parentIndex, nestedIndex, { title, content, images: [] });
+      }
     }
     unsavedChanges = true;
   }
 
   function renderNestedSections(parentSection, parentIndex, nestedSections) {
-  const container = parentSection.querySelector('.nested-sections-list');
-  if (!container) return;
+    const container = parentSection.querySelector('.nested-sections-list');
+    if (!container) return;
 
-  container.innerHTML = '';
+    container.innerHTML = '';
 
-  if (!nestedSections || nestedSections.length === 0) {
-    return;
+    if (!nestedSections || nestedSections.length === 0) {
+      return;
+    }
+
+    nestedSections.forEach((nested, nestedIndex) => {
+      addNestedSectionElement(container, parentIndex, nestedIndex, nested);
+    });
   }
 
-  nestedSections.forEach((nested, nestedIndex) => {
-    addNestedSectionElement(container, parentIndex, nestedIndex, nested);
-  });
-}
-function addNestedSectionElement(container, parentIndex, nestedIndex, data = {}) {
-  if (!elements.nestedSectionTemplate) return;
+  function addNestedSectionElement(container, parentIndex, nestedIndex, data = {}) {
+    const nestedEl = document.createElement('div');
+    nestedEl.className = 'nested-section-item';
+    nestedEl.dataset.nestedIndex = nestedIndex;
+    nestedEl.dataset.parentIndex = parentIndex;
 
-  const template = elements.nestedSectionTemplate.content.cloneNode(true);
-  const nestedEl = template.querySelector('.nested-section-item');
-  nestedEl.dataset.nestedIndex = nestedIndex;
-  nestedEl.dataset.parentIndex = parentIndex;
+    nestedEl.innerHTML = `
+      <div class="nested-section-header">
+        <div class="nested-drag-handle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="5" r="1"></circle>
+            <circle cx="9" cy="12" r="1"></circle>
+            <circle cx="9" cy="19" r="1"></circle>
+            <circle cx="15" cy="5" r="1"></circle>
+            <circle cx="15" cy="12" r="1"></circle>
+            <circle cx="15" cy="19" r="1"></circle>
+          </svg>
+        </div>
+        <input type="text" class="nested-section-title" placeholder="Заголовок подраздела (${LANG_NAMES[currentLang]})" value="${escapeHtmlAttr(data.title || '')}">
+        <button type="button" class="nested-section-remove" title="Удалить">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="nested-editor-toolbar">
+        <div class="toolbar-group">
+          <button type="button" data-command="bold" title="Жирный">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
+              <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
+            </svg>
+          </button>
+          <button type="button" data-command="italic" title="Курсив">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="4" x2="10" y2="4"></line>
+              <line x1="14" y1="20" x2="5" y2="20"></line>
+              <line x1="15" y1="4" x2="9" y2="20"></line>
+            </svg>
+          </button>
+          <button type="button" data-command="underline" title="Подчёркнутый">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path>
+              <line x1="4" y1="21" x2="20" y2="21"></line>
+            </svg>
+          </button>
+          <button type="button" data-command="strikeThrough" title="Зачёркнутый">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 12h16"></path>
+              <path d="M17.3 4.9c-1.5-1.4-3.5-1.9-5.4-1.9-3.2 0-5.9 1.9-5.9 5.3 0 1.6.6 2.8 1.6 3.7"></path>
+              <path d="M6.7 19.1c1.5 1.4 3.5 1.9 5.4 1.9 3.2 0 5.9-1.9 5.9-5.3 0-1.6-.6-2.8-1.6-3.7"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <span class="toolbar-divider"></span>
+        
+        <div class="toolbar-group">
+          <select class="toolbar-select toolbar-format-nested" title="Формат">
+            <option value="">Текст</option>
+            <option value="h3">Заголовок 3</option>
+            <option value="h4">Заголовок 4</option>
+            <option value="blockquote">Цитата</option>
+            <option value="pre">Код</option>
+          </select>
+        </div>
+        
+        <span class="toolbar-divider"></span>
+        
+        <div class="toolbar-group">
+          <select class="toolbar-select toolbar-fontsize-nested" title="Размер">
+            <option value="">Размер</option>
+            <option value="1">Мелкий</option>
+            <option value="2">Маленький</option>
+            <option value="3">Обычный</option>
+            <option value="4">Средний</option>
+            <option value="5">Большой</option>
+            <option value="6">Крупный</option>
+            <option value="7">Огромный</option>
+          </select>
+        </div>
+        
+        <span class="toolbar-divider"></span>
+        
+        <div class="toolbar-group">
+          <button type="button" data-command="insertUnorderedList" title="Маркированный список">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <circle cx="4" cy="6" r="1" fill="currentColor"></circle>
+              <circle cx="4" cy="12" r="1" fill="currentColor"></circle>
+              <circle cx="4" cy="18" r="1" fill="currentColor"></circle>
+            </svg>
+          </button>
+          <button type="button" data-command="insertOrderedList" title="Нумерованный список">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="10" y1="6" x2="21" y2="6"></line>
+              <line x1="10" y1="12" x2="21" y2="12"></line>
+              <line x1="10" y1="18" x2="21" y2="18"></line>
+              <text x="2" y="8" font-size="7" fill="currentColor" stroke="none">1</text>
+              <text x="2" y="14" font-size="7" fill="currentColor" stroke="none">2</text>
+              <text x="2" y="20" font-size="7" fill="currentColor" stroke="none">3</text>
+            </svg>
+          </button>
+        </div>
+        
+        <span class="toolbar-divider"></span>
+        
+        <div class="toolbar-group">
+          <button type="button" class="nested-link-btn" title="Ссылка">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+          </button>
+          <button type="button" class="nested-image-btn" title="Изображение">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </button>
+          <button type="button" class="nested-video-btn" title="YouTube">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+          <button type="button" class="nested-table-btn" title="Таблица">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="3" y1="15" x2="21" y2="15"></line>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <span class="toolbar-divider"></span>
+        
+        <div class="toolbar-group">
+          <button type="button" data-command="removeFormat" title="Очистить форматирование">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 7V4h16v3"></path>
+              <path d="M9 20h6"></path>
+              <path d="M12 4v16"></path>
+              <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="2"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="nested-rich-editor" contenteditable="true" data-placeholder="Содержимое подраздела (${LANG_NAMES[currentLang]})...">${data.content || ''}</div>
+      <div class="nested-section-images"></div>
+    `;
 
-  const titleInput = nestedEl.querySelector('.nested-section-title');
-  const editor = nestedEl.querySelector('.nested-rich-editor');
-  const toolbar = nestedEl.querySelector('.nested-editor-toolbar');
-
-  if (titleInput) {
-    titleInput.value = data.title || '';
-    titleInput.placeholder = `Заголовок подраздела (${LANG_NAMES[currentLang]})`;
+    // Title input
+    const titleInput = nestedEl.querySelector('.nested-section-title');
     titleInput.addEventListener('input', () => {
       updateNestedSectionData(parentIndex, nestedIndex, 'title', titleInput.value);
     });
-  }
 
-  if (editor) {
-    editor.innerHTML = data.content || '';
-    editor.dataset.placeholder = `Содержимое (${LANG_NAMES[currentLang]})...`;
+    // Content editor
+    const editor = nestedEl.querySelector('.nested-rich-editor');
     editor.addEventListener('input', () => {
       updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
     });
-  }
 
-  // Привязка toolbar
-  bindNestedEditorToolbar(nestedEl, parentIndex, nestedIndex);
-
-  // Удаление
-  const removeBtn = nestedEl.querySelector('.nested-section-remove');
-  if (removeBtn) {
+    // Remove button
+    const removeBtn = nestedEl.querySelector('.nested-section-remove');
     removeBtn.addEventListener('click', () => {
       removeNestedSection(parentIndex, nestedIndex);
     });
+
+    // Bind toolbar
+    bindNestedEditorToolbar(nestedEl, parentIndex, nestedIndex);
+
+    // Render images
+    renderNestedSectionImages(nestedEl, data.images || [], parentIndex, nestedIndex);
+
+    container.appendChild(nestedEl);
   }
 
-  // Изображения
-  renderNestedSectionImages(nestedEl, data.images || [], parentIndex, nestedIndex);
+  function bindNestedEditorToolbar(nestedEl, parentIndex, nestedIndex) {
+    const toolbar = nestedEl.querySelector('.nested-editor-toolbar');
+    const editor = nestedEl.querySelector('.nested-rich-editor');
 
-  container.appendChild(nestedEl);
-}
+    if (!toolbar || !editor) return;
 
-// Добавь функцию привязки toolbar для вложенных секций:
-function bindNestedEditorToolbar(nestedEl, parentIndex, nestedIndex) {
-  const toolbar = nestedEl.querySelector('.nested-editor-toolbar');
-  const editor = nestedEl.querySelector('.nested-rich-editor');
+    // Command buttons
+    toolbar.querySelectorAll('button[data-command]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const command = btn.dataset.command;
+        editor.focus();
+        document.execCommand(command, false, null);
+        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        updateNestedToolbarState(toolbar);
+      });
+    });
 
-  if (!toolbar || !editor) return;
+    // Format select
+    const formatSelect = toolbar.querySelector('.toolbar-format-nested');
+    if (formatSelect) {
+      formatSelect.addEventListener('change', (e) => {
+        const value = e.target.value;
+        editor.focus();
+        if (value) {
+          document.execCommand('formatBlock', false, value);
+        } else {
+          document.execCommand('formatBlock', false, 'p');
+        }
+        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        e.target.value = '';
+      });
+    }
 
-  // Команды форматирования
-  toolbar.querySelectorAll('button[data-command]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
+    // Font size select
+    const fontSizeSelect = toolbar.querySelector('.toolbar-fontsize-nested');
+    if (fontSizeSelect) {
+      fontSizeSelect.addEventListener('change', (e) => {
+        const value = e.target.value;
+        if (value) {
+          editor.focus();
+          document.execCommand('fontSize', false, value);
+          updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        }
+        e.target.value = '';
+      });
+    }
+
+    // Link button
+    const linkBtn = toolbar.querySelector('.nested-link-btn');
+    if (linkBtn) {
+      linkBtn.addEventListener('click', () => {
+        const url = prompt('Введите URL ссылки:', 'https://');
+        if (url) {
+          editor.focus();
+          const selection = window.getSelection();
+          const selectedText = selection.toString();
+          if (selectedText) {
+            document.execCommand('createLink', false, url);
+          } else {
+            const linkText = prompt('Текст ссылки:', url);
+            document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${linkText || url}</a>`);
+          }
+          updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        }
+      });
+    }
+
+    // Image button
+    const imageBtn = toolbar.querySelector('.nested-image-btn');
+    if (imageBtn) {
+      imageBtn.addEventListener('click', () => {
+        showNestedImageModal(nestedEl, parentIndex, nestedIndex);
+      });
+    }
+
+    // Video button
+    const videoBtn = toolbar.querySelector('.nested-video-btn');
+    if (videoBtn) {
+      videoBtn.addEventListener('click', () => {
+        const url = prompt('Вставьте ссылку на YouTube:', 'https://www.youtube.com/watch?v=');
+        if (url) {
+          const videoId = extractYouTubeId(url);
+          if (videoId) {
+            const iframe = `<div class="video-wrapper"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+            editor.focus();
+            document.execCommand('insertHTML', false, iframe);
+            updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+          } else {
+            alert('Неверная ссылка на YouTube');
+          }
+        }
+      });
+    }
+
+    // Table button
+    const tableBtn = toolbar.querySelector('.nested-table-btn');
+    if (tableBtn) {
+      tableBtn.addEventListener('click', () => {
+        const rows = prompt('Количество строк:', '3');
+        const cols = prompt('Количество столбцов:', '3');
+        if (rows && cols) {
+          const r = parseInt(rows) || 3;
+          const c = parseInt(cols) || 3;
+          let table = '<table><thead><tr>';
+          for (let i = 0; i < c; i++) table += '<th>Заголовок</th>';
+          table += '</tr></thead><tbody>';
+          for (let i = 0; i < r - 1; i++) {
+            table += '<tr>';
+            for (let j = 0; j < c; j++) table += '<td>Ячейка</td>';
+            table += '</tr>';
+          }
+          table += '</tbody></table>';
+          editor.focus();
+          document.execCommand('insertHTML', false, table);
+          updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        }
+      });
+    }
+
+    // Hotkeys
+    editor.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+          case 'b':
+            e.preventDefault();
+            document.execCommand('bold', false, null);
+            break;
+          case 'i':
+            e.preventDefault();
+            document.execCommand('italic', false, null);
+            break;
+          case 'u':
+            e.preventDefault();
+            document.execCommand('underline', false, null);
+            break;
+        }
+        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        updateNestedToolbarState(toolbar);
+      }
+    });
+
+    editor.addEventListener('keyup', () => updateNestedToolbarState(toolbar));
+    editor.addEventListener('mouseup', () => updateNestedToolbarState(toolbar));
+  }
+
+  function updateNestedToolbarState(toolbar) {
+    toolbar.querySelectorAll('button[data-command]').forEach(btn => {
       const command = btn.dataset.command;
-      editor.focus();
-      document.execCommand(command, false, null);
-      updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
-      updateNestedToolbarState(toolbar);
-    });
-  });
-
-  // Select для формата
-  const formatSelect = toolbar.querySelector('.toolbar-format-nested');
-  if (formatSelect) {
-    formatSelect.addEventListener('change', (e) => {
-      const value = e.target.value;
-      editor.focus();
-      if (value) {
-        document.execCommand('formatBlock', false, value);
-      } else {
-        document.execCommand('formatBlock', false, 'p');
-      }
-      updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
-      e.target.value = '';
+      try {
+        const isActive = document.queryCommandState(command);
+        btn.classList.toggle('active', isActive);
+      } catch (e) {}
     });
   }
 
-  // Кнопка ссылки
-  const linkBtn = toolbar.querySelector('.nested-link-btn');
-  if (linkBtn) {
-    linkBtn.addEventListener('click', () => {
-      const url = prompt('Введите URL ссылки:', 'https://');
-      if (url) {
-        editor.focus();
-        const selection = window.getSelection();
-        const selectedText = selection.toString();
-        if (selectedText) {
-          document.execCommand('createLink', false, url);
-        } else {
-          const linkText = prompt('Текст ссылки:', url);
-          document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${linkText || url}</a>`);
-        }
-        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
-      }
-    });
-  }
-
-  // Кнопка изображения
-  const imageBtn = toolbar.querySelector('.nested-image-btn');
-  if (imageBtn) {
-    imageBtn.addEventListener('click', () => {
-      showNestedImageModal(nestedEl, parentIndex, nestedIndex);
-    });
-  }
-
-  // Кнопка видео
-  const videoBtn = toolbar.querySelector('.nested-video-btn');
-  if (videoBtn) {
-    videoBtn.addEventListener('click', () => {
-      const url = prompt('Вставьте ссылку на YouTube:', 'https://www.youtube.com/watch?v=');
-      if (url) {
-        const videoId = extractYouTubeId(url);
-        if (videoId) {
-          const iframe = `<div class="video-wrapper"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-          editor.focus();
-          document.execCommand('insertHTML', false, iframe);
-          updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
-        } else {
-          alert('Неверная ссылка на YouTube');
-        }
-      }
-    });
-  }
-
-  // Кнопка таблицы
-  const tableBtn = toolbar.querySelector('.nested-table-btn');
-  if (tableBtn) {
-    tableBtn.addEventListener('click', () => {
-      const rows = prompt('Количество строк:', '3');
-      const cols = prompt('Количество столбцов:', '3');
-      if (rows && cols) {
-        const r = parseInt(rows) || 3;
-        const c = parseInt(cols) || 3;
-        let table = '<table><thead><tr>';
-        for (let i = 0; i < c; i++) table += '<th>Заголовок</th>';
-        table += '</tr></thead><tbody>';
-        for (let i = 0; i < r - 1; i++) {
-          table += '<tr>';
-          for (let j = 0; j < c; j++) table += '<td>Ячейка</td>';
-          table += '</tr>';
-        }
-        table += '</tbody></table>';
-        editor.focus();
-        document.execCommand('insertHTML', false, table);
-        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
-      }
-    });
-  }
-
-  // Горячие клавиши
-  editor.addEventListener('keydown', (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      switch (e.key.toLowerCase()) {
-        case 'b':
-          e.preventDefault();
-          document.execCommand('bold', false, null);
-          break;
-        case 'i':
-          e.preventDefault();
-          document.execCommand('italic', false, null);
-          break;
-        case 'u':
-          e.preventDefault();
-          document.execCommand('underline', false, null);
-          break;
-      }
-      updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
-      updateNestedToolbarState(toolbar);
-    }
-  });
-
-  editor.addEventListener('keyup', () => updateNestedToolbarState(toolbar));
-  editor.addEventListener('mouseup', () => updateNestedToolbarState(toolbar));
-}
-
-function updateNestedToolbarState(toolbar) {
-  toolbar.querySelectorAll('button[data-command]').forEach(btn => {
-    const command = btn.dataset.command;
-    try {
-      const isActive = document.queryCommandState(command);
-      btn.classList.toggle('active', isActive);
-    } catch (e) {}
-  });
-}
-
-// Модальное окно для изображений в подразделах
-function showNestedImageModal(nestedEl, parentIndex, nestedIndex) {
-  const modal = document.createElement('div');
-  modal.className = 'image-modal';
-  modal.innerHTML = `
-    <div class="image-modal-content">
-      <h3>Добавить изображение</h3>
-      <input type="url" id="nested-image-url" placeholder="https://example.com/image.jpg">
-      <label style="display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer;">
-        <input type="checkbox" id="nested-insert-in-editor" checked>
-        <span>Вставить в текст</span>
-      </label>
-      <div class="image-modal-actions">
-        <button class="btn-secondary" id="nested-image-cancel">Отмена</button>
-        <button class="btn-primary" id="nested-image-add">Добавить</button>
+  function showNestedImageModal(nestedEl, parentIndex, nestedIndex) {
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.innerHTML = `
+      <div class="image-modal-content">
+        <h3>Добавить изображение</h3>
+        <input type="url" id="nested-image-url" placeholder="https://example.com/image.jpg">
+        <label style="display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer;">
+          <input type="checkbox" id="nested-insert-in-editor" checked>
+          <span>Вставить в текст</span>
+        </label>
+        <div class="image-modal-actions">
+          <button class="btn-secondary" id="nested-image-cancel">Отмена</button>
+          <button class="btn-primary" id="nested-image-add">Добавить</button>
+        </div>
       </div>
-    </div>
-  `;
+    `;
 
-  document.body.appendChild(modal);
+    document.body.appendChild(modal);
 
-  const urlInput = modal.querySelector('#nested-image-url');
-  const insertCheckbox = modal.querySelector('#nested-insert-in-editor');
-  const cancelBtn = modal.querySelector('#nested-image-cancel');
-  const addBtn = modal.querySelector('#nested-image-add');
+    const urlInput = modal.querySelector('#nested-image-url');
+    const insertCheckbox = modal.querySelector('#nested-insert-in-editor');
+    const cancelBtn = modal.querySelector('#nested-image-cancel');
+    const addBtn = modal.querySelector('#nested-image-add');
 
-  cancelBtn.addEventListener('click', () => modal.remove());
+    cancelBtn.addEventListener('click', () => modal.remove());
 
-  addBtn.addEventListener('click', () => {
-    const url = urlInput.value.trim();
-    if (url && url.startsWith('http')) {
-      // Добавляем в массив изображений
-      if (!formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]) return;
-      
-      if (!formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images) {
-        formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images = [];
-      }
-      formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images.push(url);
-
-      renderNestedSectionImages(
-        nestedEl,
-        formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images,
-        parentIndex,
-        nestedIndex
-      );
-
-      if (insertCheckbox.checked) {
-        const editor = nestedEl.querySelector('.nested-rich-editor');
-        if (editor) {
-          editor.focus();
-          document.execCommand('insertImage', false, url);
-          updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+    addBtn.addEventListener('click', () => {
+      const url = urlInput.value.trim();
+      if (url && url.startsWith('http')) {
+        if (!formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]) {
+          modal.remove();
+          return;
         }
-      }
+        
+        if (!formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images) {
+          formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images = [];
+        }
+        formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images.push(url);
 
-      unsavedChanges = true;
-    }
-    modal.remove();
-  });
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
-  });
-
-  urlInput.focus();
-}
-
-// Рендер изображений для вложенных секций
-function renderNestedSectionImages(nestedEl, images, parentIndex, nestedIndex) {
-  const container = nestedEl.querySelector('.nested-section-images');
-  if (!container) return;
-
-  if (!images || images.length === 0) {
-    container.innerHTML = '';
-    return;
-  }
-
-  container.innerHTML = images.map((url, idx) => `
-    <div class="image-item" style="background-image: url('${url}');" data-index="${idx}">
-      <button type="button" class="image-item-remove" data-index="${idx}">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-  `).join('');
-
-  container.querySelectorAll('.image-item-remove').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.index);
-      
-      if (formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]?.images) {
-        formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images.splice(idx, 1);
         renderNestedSectionImages(
           nestedEl,
           formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images,
           parentIndex,
           nestedIndex
         );
+
+        if (insertCheckbox.checked) {
+          const editor = nestedEl.querySelector('.nested-rich-editor');
+          if (editor) {
+            editor.focus();
+            document.execCommand('insertImage', false, url);
+            updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+          }
+        }
+
         unsavedChanges = true;
       }
+      modal.remove();
     });
-  });
-}
 
-// Обнови addNestedSection чтобы использовать новый рендер:
-function addNestedSection(parentIndex, title = '', content = '') {
-  if (!formData.sections[currentLang]) {
-    formData.sections[currentLang] = [];
-  }
-  if (!formData.sections[currentLang][parentIndex]) {
-    formData.sections[currentLang][parentIndex] = { title: '', content: '', images: [], nestedSections: [] };
-  }
-  if (!formData.sections[currentLang][parentIndex].nestedSections) {
-    formData.sections[currentLang][parentIndex].nestedSections = [];
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+
+    urlInput.focus();
   }
 
-  const nestedIndex = formData.sections[currentLang][parentIndex].nestedSections.length;
-  formData.sections[currentLang][parentIndex].nestedSections.push({ title, content, images: [] });
+  function renderNestedSectionImages(nestedEl, images, parentIndex, nestedIndex) {
+    const container = nestedEl.querySelector('.nested-section-images');
+    if (!container) return;
 
-  const parentSection = elements.sectionsList?.querySelector(`[data-index="${parentIndex}"]`);
-  if (parentSection) {
-    const container = parentSection.querySelector('.nested-sections-list');
-    if (container) {
-      addNestedSectionElement(container, parentIndex, nestedIndex, { title, content, images: [] });
+    if (!images || images.length === 0) {
+      container.innerHTML = '';
+      return;
     }
-  }
-  unsavedChanges = true;
-}
-      // Title input
-      const titleInput = nestedEl.querySelector('.nested-section-title');
-      titleInput.addEventListener('input', () => {
-        updateNestedSectionData(parentIndex, nestedIndex, 'title', titleInput.value);
-      });
 
-      // Content editor
-      const editor = nestedEl.querySelector('.nested-section-editor');
-      editor.addEventListener('input', () => {
-        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
-      });
+    container.innerHTML = images.map((url, idx) => `
+      <div class="image-item" style="background-image: url('${url}');" data-index="${idx}">
+        <button type="button" class="image-item-remove" data-index="${idx}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    `).join('');
 
-      // Remove button
-      const removeBtn = nestedEl.querySelector('.nested-section-remove');
-      removeBtn.addEventListener('click', () => {
-        removeNestedSection(parentIndex, nestedIndex);
+    container.querySelectorAll('.image-item-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.index);
+        
+        if (formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]?.images) {
+          formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images.splice(idx, 1);
+          renderNestedSectionImages(
+            nestedEl,
+            formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images,
+            parentIndex,
+            nestedIndex
+          );
+          unsavedChanges = true;
+        }
       });
-
-      container.appendChild(nestedEl);
     });
-  
+  }
 
   function updateNestedSectionData(parentIndex, nestedIndex, field, value) {
     if (!formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]) return;
@@ -762,6 +868,8 @@ function addNestedSection(parentIndex, title = '', content = '') {
     }
     unsavedChanges = true;
   }
+
+  // === MAIN SECTION FUNCTIONS ===
 
   function updateSectionData(index, field, value) {
     if (!formData.sections[currentLang]) {
@@ -811,8 +919,19 @@ function addNestedSection(parentIndex, title = '', content = '') {
       if (nestedContainer) {
         nestedContainer.querySelectorAll('.nested-section-item').forEach(nestedEl => {
           const nestedTitle = nestedEl.querySelector('.nested-section-title')?.value || '';
-          const nestedContent = nestedEl.querySelector('.nested-section-editor')?.innerHTML || '';
-          nestedSections.push({ title: nestedTitle, content: nestedContent, images: [] });
+          const nestedContent = nestedEl.querySelector('.nested-rich-editor')?.innerHTML || '';
+          
+          const nestedImages = [];
+          const nestedImagesContainer = nestedEl.querySelector('.nested-section-images');
+          if (nestedImagesContainer) {
+            nestedImagesContainer.querySelectorAll('.image-item').forEach(item => {
+              const style = item.style.backgroundImage;
+              const url = style.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
+              if (url) nestedImages.push(url);
+            });
+          }
+          
+          nestedSections.push({ title: nestedTitle, content: nestedContent, images: nestedImages });
         });
       }
 
@@ -822,202 +941,175 @@ function addNestedSection(parentIndex, title = '', content = '') {
     formData.sections[currentLang] = sections;
   }
 
-function bindEditorToolbar(section, index) {
-  const toolbar = section.querySelector('.editor-toolbar');
-  const editor = section.querySelector('.rich-editor');
+  function bindEditorToolbar(section, index) {
+    const toolbar = section.querySelector('.editor-toolbar');
+    const editor = section.querySelector('.rich-editor');
 
-  if (!toolbar || !editor) return;
+    if (!toolbar || !editor) return;
 
-  // Команды форматирования
-  toolbar.querySelectorAll('button[data-command]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const command = btn.dataset.command;
-      const value = btn.dataset.value || null;
+    toolbar.querySelectorAll('button[data-command]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const command = btn.dataset.command;
+        const value = btn.dataset.value || null;
 
-      editor.focus();
-      document.execCommand(command, false, value);
-      
-      updateSectionData(index, 'content', editor.innerHTML);
-      updateToolbarState(toolbar);
-    });
-  });
-
-  // Select для заголовков
-  const formatSelect = toolbar.querySelector('.toolbar-select[data-command="formatBlock"]');
-  if (formatSelect) {
-    formatSelect.addEventListener('change', (e) => {
-      const value = e.target.value;
-      editor.focus();
-
-      if (value) {
-        document.execCommand('formatBlock', false, value);
-      } else {
-        document.execCommand('formatBlock', false, 'p');
-      }
-
-      updateSectionData(index, 'content', editor.innerHTML);
-      e.target.value = '';
-    });
-  }
-
-
-  // Select для размера шрифта
-  const fontSizeSelect = toolbar.querySelector('.toolbar-fontsize');
-  if (fontSizeSelect) {
-    fontSizeSelect.addEventListener('change', (e) => {
-      const value = e.target.value;
-      if (value) {
         editor.focus();
-        document.execCommand('fontSize', false, value);
+        document.execCommand(command, false, value);
+        
         updateSectionData(index, 'content', editor.innerHTML);
-      }
-      e.target.value = ''; // Reset select
+        updateToolbarState(toolbar);
+      });
     });
-  }
 
-  // Кнопка ссылки
-  const linkBtn = toolbar.querySelector('.toolbar-link-btn');
-  if (linkBtn) {
-    linkBtn.addEventListener('click', () => {
-      const selection = window.getSelection();
-      const selectedText = selection.toString();
-      
-      const url = prompt('Введите URL ссылки:', 'https://');
-      if (url) {
+    const formatSelect = toolbar.querySelector('.toolbar-select[data-command="formatBlock"]');
+    if (formatSelect) {
+      formatSelect.addEventListener('change', (e) => {
+        const value = e.target.value;
         editor.focus();
-        if (selectedText) {
-          document.execCommand('createLink', false, url);
+
+        if (value) {
+          document.execCommand('formatBlock', false, value);
         } else {
-          const linkText = prompt('Текст ссылки:', url);
-          const link = `<a href="${url}" target="_blank">${linkText || url}</a>`;
-          document.execCommand('insertHTML', false, link);
+          document.execCommand('formatBlock', false, 'p');
         }
+
         updateSectionData(index, 'content', editor.innerHTML);
-      }
-    });
-  }
+        e.target.value = '';
+      });
+    }
 
-  const imageBtn = toolbar.querySelector('.toolbar-image-btn');
-  if (imageBtn) {
-    imageBtn.addEventListener('click', () => {
-      showImageModal(index);
-    });
-  }
-
-  const videoBtn = toolbar.querySelector('.toolbar-video-btn');
-  if (videoBtn) {
-    videoBtn.addEventListener('click', () => {
-      const url = prompt('Вставьте ссылку на YouTube видео:', 'https://www.youtube.com/watch?v=');
-      if (url) {
-        const videoId = extractYouTubeId(url);
-        if (videoId) {
-          const iframe = `<div class="video-wrapper"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+    const fontSizeSelect = toolbar.querySelector('.toolbar-fontsize');
+    if (fontSizeSelect) {
+      fontSizeSelect.addEventListener('change', (e) => {
+        const value = e.target.value;
+        if (value) {
           editor.focus();
-          document.execCommand('insertHTML', false, iframe);
+          document.execCommand('fontSize', false, value);
           updateSectionData(index, 'content', editor.innerHTML);
-        } else {
-          alert('Неверная ссылка на YouTube');
         }
-      }
-    });
-  }
+        e.target.value = '';
+      });
+    }
 
-  const tableBtn = toolbar.querySelector('.toolbar-table-btn');
-  if (tableBtn) {
-    tableBtn.addEventListener('click', () => {
-      const rows = prompt('Количество строк:', '3');
-      const cols = prompt('Количество столбцов:', '3');
-
-      if (rows && cols) {
-        const r = parseInt(rows) || 3;
-        const c = parseInt(cols) || 3;
-
-        let table = '<table><thead><tr>';
-        for (let i = 0; i < c; i++) {
-          table += '<th>Заголовок</th>';
-        }
-        table += '</tr></thead><tbody>';
-
-        for (let i = 0; i < r - 1; i++) {
-          table += '<tr>';
-          for (let j = 0; j < c; j++) {
-            table += '<td>Ячейка</td>';
+    const linkBtn = toolbar.querySelector('.toolbar-link-btn');
+    if (linkBtn) {
+      linkBtn.addEventListener('click', () => {
+        const selection = window.getSelection();
+        const selectedText = selection.toString();
+        
+        const url = prompt('Введите URL ссылки:', 'https://');
+        if (url) {
+          editor.focus();
+          if (selectedText) {
+            document.execCommand('createLink', false, url);
+          } else {
+            const linkText = prompt('Текст ссылки:', url);
+            const link = `<a href="${url}" target="_blank">${linkText || url}</a>`;
+            document.execCommand('insertHTML', false, link);
           }
-          table += '</tr>';
+          updateSectionData(index, 'content', editor.innerHTML);
         }
-        table += '</tbody></table>';
+      });
+    }
 
-        editor.focus();
-        document.execCommand('insertHTML', false, table);
-        updateSectionData(index, 'content', editor.innerHTML);
-      }
-    });
-  }
+    const imageBtn = toolbar.querySelector('.toolbar-image-btn');
+    if (imageBtn) {
+      imageBtn.addEventListener('click', () => {
+        showImageModal(index);
+      });
+    }
 
+    const videoBtn = toolbar.querySelector('.toolbar-video-btn');
+    if (videoBtn) {
+      videoBtn.addEventListener('click', () => {
+        const url = prompt('Вставьте ссылку на YouTube видео:', 'https://www.youtube.com/watch?v=');
+        if (url) {
+          const videoId = extractYouTubeId(url);
+          if (videoId) {
+            const iframe = `<div class="video-wrapper"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+            editor.focus();
+            document.execCommand('insertHTML', false, iframe);
+            updateSectionData(index, 'content', editor.innerHTML);
+          } else {
+            alert('Неверная ссылка на YouTube');
+          }
+        }
+      });
+    }
 
-  // Кнопка карусели
-  const carouselBtn = toolbar.querySelector('.toolbar-carousel-btn');
-  if (carouselBtn) {
-    carouselBtn.addEventListener('click', () => {
-      showCarouselModal(index, editor);
-    });
-  }
+    const tableBtn = toolbar.querySelector('.toolbar-table-btn');
+    if (tableBtn) {
+      tableBtn.addEventListener('click', () => {
+        const rows = prompt('Количество строк:', '3');
+        const cols = prompt('Количество столбцов:', '3');
 
-  // Горячие клавиши
+        if (rows && cols) {
+          const r = parseInt(rows) || 3;
+          const c = parseInt(cols) || 3;
 
-  editor.addEventListener('keydown', (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      switch (e.key.toLowerCase()) {
-        case 'b':
-          e.preventDefault();
-          document.execCommand('bold', false, null);
-          break;
-        case 'i':
-          e.preventDefault();
-          document.execCommand('italic', false, null);
-          break;
-        case 'u':
-          e.preventDefault();
-          document.execCommand('underline', false, null);
-          break;
-        case 'z':
-          if (e.shiftKey) {
+          let table = '<table><thead><tr>';
+          for (let i = 0; i < c; i++) {
+            table += '<th>Заголовок</th>';
+          }
+          table += '</tr></thead><tbody>';
+
+          for (let i = 0; i < r - 1; i++) {
+            table += '<tr>';
+            for (let j = 0; j < c; j++) {
+              table += '<td>Ячейка</td>';
+            }
+            table += '</tr>';
+          }
+          table += '</tbody></table>';
+
+          editor.focus();
+          document.execCommand('insertHTML', false, table);
+          updateSectionData(index, 'content', editor.innerHTML);
+        }
+      });
+    }
+
+    const carouselBtn = toolbar.querySelector('.toolbar-carousel-btn');
+    if (carouselBtn) {
+      carouselBtn.addEventListener('click', () => {
+        showCarouselModal(index, editor);
+      });
+    }
+
+    editor.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+          case 'b':
             e.preventDefault();
-            document.execCommand('redo', false, null);
-          }
-          break;
+            document.execCommand('bold', false, null);
+            break;
+          case 'i':
+            e.preventDefault();
+            document.execCommand('italic', false, null);
+            break;
+          case 'u':
+            e.preventDefault();
+            document.execCommand('underline', false, null);
+            break;
+          case 'z':
+            if (e.shiftKey) {
+              e.preventDefault();
+              document.execCommand('redo', false, null);
+            }
+            break;
+        }
+        updateSectionData(index, 'content', editor.innerHTML);
+        updateToolbarState(toolbar);
       }
+    });
+
+    editor.addEventListener('keyup', () => updateToolbarState(toolbar));
+    editor.addEventListener('mouseup', () => updateToolbarState(toolbar));
+
+    editor.addEventListener('input', () => {
       updateSectionData(index, 'content', editor.innerHTML);
-      updateToolbarState(toolbar);
-    }
-  });
-
-  editor.addEventListener('keyup', () => updateToolbarState(toolbar));
-  editor.addEventListener('mouseup', () => updateToolbarState(toolbar));
-
-  editor.addEventListener('input', () => {
-    updateSectionData(index, 'content', editor.innerHTML);
-  });
-}
-
-function updateToolbarState(toolbar) {
-  toolbar.querySelectorAll('button[data-command]').forEach(btn => {
-    const command = btn.dataset.command;
-    try {
-      const isActive = document.queryCommandState(command);
-      btn.classList.toggle('active', isActive);
-    } catch (e) {
-
-    }
-  });
-}
-
-function extractYouTubeId(url) {
-  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-  const match = url.match(regex);
-  return match ? match[1] : null;
-}
+    });
+  }
 
   function updateToolbarState(toolbar) {
     toolbar.querySelectorAll('button[data-command]').forEach(btn => {
@@ -1027,6 +1119,12 @@ function extractYouTubeId(url) {
         btn.classList.toggle('active', isActive);
       } catch (e) {}
     });
+  }
+
+  function extractYouTubeId(url) {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
   }
 
   function renderSectionImages(section, images, sectionIndex) {
@@ -1097,7 +1195,7 @@ function extractYouTubeId(url) {
           formData.sections[currentLang] = [];
         }
         if (!formData.sections[currentLang][sectionIndex]) {
-          formData.sections[currentLang][sectionIndex] = { title: '', content: '', images: [] };
+          formData.sections[currentLang][sectionIndex] = { title: '', content: '', images: [], nestedSections: [] };
         }
         if (!formData.sections[currentLang][sectionIndex].images) {
           formData.sections[currentLang][sectionIndex].images = [];
@@ -1130,8 +1228,6 @@ function extractYouTubeId(url) {
     urlInput.focus();
   }
 
-
-  // === Carousel Modal ===
   function showCarouselModal(sectionIndex, editor) {
     const modal = document.createElement('div');
     modal.className = 'image-modal';
@@ -1162,7 +1258,6 @@ function extractYouTubeId(url) {
         .filter(url => url && url.startsWith('http'));
 
       if (urls.length > 0) {
-        // Создаём HTML для карусели
         let carouselHtml = '<div class="content-carousel-preview" data-carousel="' + urls.join(',') + '" contenteditable="false" style="background: #f3f4f6; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">';
         carouselHtml += '<p style="margin: 0 0 8px; font-weight: 600; color: #1f2933;">Карусель (' + urls.length + ' изобр.)</p>';
         carouselHtml += '<div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">';
@@ -1190,7 +1285,7 @@ function extractYouTubeId(url) {
     urlsInput.focus();
   }
 
-  // === Create New Card ===
+  // === CARD OPERATIONS ===
 
   function createNewCard() {
     if (unsavedChanges && !confirm('Есть несохранённые изменения. Продолжить?')) {
@@ -1569,3 +1664,4 @@ function extractYouTubeId(url) {
       .substring(0, 50) + '-' + Date.now();
   }
 
+})();
