@@ -199,7 +199,7 @@
       html += '<div class="card-section-btn-divider"></div>';
       html += '<div class="card-section-btn-bottom">';
       html += '<div class="card-section-btn-meta">';
-      html += '<span class="card-section-btn-category">Раздел ' + (index + 1) + '</span>';
+      html += '<span class="card-section-btn-category"> ' + (index + 1) + '</span>';
       html += '</div>';
       html += '<div class="card-section-btn-divider-vertical"></div>';
       html += '<div class="card-section-btn-arrow">';

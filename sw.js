@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kazarbuild-v46';
+const CACHE_NAME = 'kazarbuild-v47';
 const DATA_CACHE_NAME = 'kazarbuild-data-v1';
 
 const ASSETS = [
@@ -9,7 +9,7 @@ const ASSETS = [
   '/techcards/style.css',
   '/techcards/admin.css',
   '/techcards/js/config.js',
-  '/techcards/js/i18n.js',
+  '/techcards/js/i18n.js',  
   '/techcards/js/supabase.js',
   '/techcards/js/app.js',
   '/techcards/js/card.js',
