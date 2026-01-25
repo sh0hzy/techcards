@@ -826,6 +826,7 @@ function extractYouTubeId(url) {
     urlInput.focus();
   }
 
+
   // === Carousel Modal ===
   function showCarouselModal(sectionIndex, editor) {
     const modal = document.createElement('div');

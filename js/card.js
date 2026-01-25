@@ -220,20 +220,34 @@
     return text.length > 60 ? text.substring(0, 60) + '...' : text;
   }
 
-  // === Модальное окно секции ===
+  // === Открытие секции в полноэкранном режиме ===
+  var sectionHistory = []; // История навигации для кнопки "Назад"
+
+  // Поддержка кнопки "Назад" браузера
+  window.addEventListener('popstate', function(e) {
+    if (e.state && e.state.sectionOpen) {
+      // Не делаем ничего - пользователь нажал вперёд
+    } else {
+      closeSectionPage();
+    }
+  });
+
   function openSectionModal(index) {
     var section = sectionsData[index];
     if (!section) return;
 
-    var modal = document.getElementById('section-modal');
-    var modalTitle = document.getElementById('section-modal-title');
-    var modalContent = document.getElementById('section-modal-content');
-    var modalClose = document.getElementById('section-modal-close');
+    var page = document.getElementById('section-page');
+    var pageTitle = document.getElementById('section-page-title');
+    var pageContent = document.getElementById('section-page-content');
+    var pageBack = document.getElementById('section-page-back');
 
-    if (!modal || !modalTitle || !modalContent) return;
+    if (!page || !pageTitle || !pageContent) return;
+
+    // Сохраняем в историю
+    sectionHistory = [{ type: 'section', index: index }];
 
     // Заполняем контент
-    modalTitle.textContent = section.title || 'Секция ' + (index + 1);
+    pageTitle.textContent = section.title || 'Секция ' + (index + 1);
 
     var contentHtml = '';
 
@@ -269,49 +283,59 @@
       });
     }
 
-    modalContent.innerHTML = contentHtml;
+    pageContent.innerHTML = contentHtml;
 
     // Инициализируем карусели в контенте
-    initContentCarousels(modalContent);
+    initContentCarousels(pageContent);
 
     // Привязываем обработчики для вложенных секций
-    modalContent.querySelectorAll('.nested-section-btn').forEach(function(btn) {
+    pageContent.querySelectorAll('.nested-section-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var parentIdx = parseInt(this.dataset.parentIndex);
         var nestedIdx = parseInt(this.dataset.nestedIndex);
-        openNestedSectionModal(parentIdx, nestedIdx);
+        openNestedSection(parentIdx, nestedIdx);
       });
     });
 
-    // Открываем модальное окно
-    modal.classList.add('open');
+    // Открываем страницу секции
+    page.classList.add('open');
     document.body.style.overflow = 'hidden';
 
-    // Закрытие
-    modalClose.onclick = closeSectionModal;
-    modal.onclick = function(e) {
-      if (e.target === modal) {
-        closeSectionModal();
-      }
+    // Добавляем запись в историю браузера
+    if (!history.state || !history.state.sectionOpen) {
+      history.pushState({ sectionOpen: true, index: index }, '', '');
+    }
+
+    // Кнопка назад
+    pageBack.onclick = function() {
+      history.back();
     };
 
     // Закрытие по Escape
     document.addEventListener('keydown', handleEscapeKey);
+
+    // Скроллим контент наверх
+    var pageBody = page.querySelector('.section-page-body');
+    if (pageBody) pageBody.scrollTop = 0;
   }
 
-  function openNestedSectionModal(parentIndex, nestedIndex) {
+  function openNestedSection(parentIndex, nestedIndex) {
     var parentSection = sectionsData[parentIndex];
     if (!parentSection || !parentSection.nestedSections) return;
 
     var nested = parentSection.nestedSections[nestedIndex];
     if (!nested) return;
 
-    var modalTitle = document.getElementById('section-modal-title');
-    var modalContent = document.getElementById('section-modal-content');
+    var pageTitle = document.getElementById('section-page-title');
+    var pageContent = document.getElementById('section-page-content');
+    var pageBack = document.getElementById('section-page-back');
 
-    if (!modalTitle || !modalContent) return;
+    if (!pageTitle || !pageContent) return;
 
-    modalTitle.textContent = nested.title || 'Подраздел ' + (nestedIndex + 1);
+    // Добавляем в историю
+    sectionHistory.push({ type: 'nested', parentIndex: parentIndex, nestedIndex: nestedIndex });
+
+    pageTitle.textContent = nested.title || 'Подраздел ' + (nestedIndex + 1);
 
     var contentHtml = '';
     if (nested.content) {
@@ -327,30 +351,34 @@
       contentHtml += '</div>';
     }
 
-    // Кнопка "Назад"
-    contentHtml = '<button class="nested-section-btn" onclick="openSectionModal(' + parentIndex + ')" style="margin-bottom: 16px;">' +
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-      '<polyline points="15 18 9 12 15 6"></polyline>' +
-      '</svg>' +
-      '<span>Назад к ' + escapeHtml(parentSection.title || 'секции') + '</span>' +
-      '</button>' + contentHtml;
+    pageContent.innerHTML = contentHtml;
+    initContentCarousels(pageContent);
 
-    modalContent.innerHTML = contentHtml;
-    initContentCarousels(modalContent);
+    // Обновляем кнопку назад для возврата к родительской секции
+    pageBack.onclick = function() {
+      sectionHistory.pop();
+      openSectionModal(parentIndex);
+    };
+
+    // Скроллим наверх
+    var page = document.getElementById('section-page');
+    var pageBody = page.querySelector('.section-page-body');
+    if (pageBody) pageBody.scrollTop = 0;
   }
 
-  function closeSectionModal() {
-    var modal = document.getElementById('section-modal');
-    if (modal) {
-      modal.classList.remove('open');
+  function closeSectionPage() {
+    var page = document.getElementById('section-page');
+    if (page) {
+      page.classList.remove('open');
       document.body.style.overflow = '';
     }
+    sectionHistory = [];
     document.removeEventListener('keydown', handleEscapeKey);
   }
 
   function handleEscapeKey(e) {
     if (e.key === 'Escape') {
-      closeSectionModal();
+      closeSectionPage();
     }
   }
 
@@ -449,8 +477,9 @@
     });
   }
 
-  // Делаем функцию openSectionModal глобальной для кнопки "Назад"
+  // Делаем функции глобальными
   window.openSectionModal = openSectionModal;
+  window.closeSectionPage = closeSectionPage;
 
   function sanitizeHtml(html) {
     if (!html) return '';
