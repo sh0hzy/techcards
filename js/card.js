@@ -13,6 +13,7 @@
   let cardData = null;
   let carouselIndex = 0;
   let carouselTimer = null;
+  let sectionsData = [];
 
   document.addEventListener('DOMContentLoaded', init);
 
@@ -28,7 +29,12 @@
       checklistBtnText: document.getElementById('checklist-btn-text'),
       checklistPanel: document.getElementById('checklist-panel'),
       checklistItems: document.getElementById('checklist-items'),
-      checklistReset: document.getElementById('checklist-reset')
+      checklistReset: document.getElementById('checklist-reset'),
+      // Section page elements
+      sectionPage: document.getElementById('section-page'),
+      sectionPageTitle: document.getElementById('section-page-title'),
+      sectionPageContent: document.getElementById('section-page-content'),
+      sectionPageBack: document.getElementById('section-page-back')
     };
 
     loadCard();
@@ -41,9 +47,21 @@
       elements.checklistReset.addEventListener('click', resetChecklist);
     }
 
+    // Кнопка назад на странице секции
+    if (elements.sectionPageBack) {
+      elements.sectionPageBack.addEventListener('click', closeSectionPage);
+    }
+
     document.addEventListener('localeChanged', function() {
       if (cardData) {
         renderCard(cardData);
+      }
+    });
+
+    // Закрытие по Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeSectionPage();
       }
     });
   }
@@ -153,267 +171,185 @@
     }
   }
 
-  // === Хранение данных секций для модального окна ===
-  let sectionsData = [];
+  // === Рендер секций как кнопок ===
+  function renderSections(sections) {
+    if (!elements.sections) return;
 
-// === Рендер секций как кнопок ===
-function renderSections(sections) {
-  if (!elements.sections) return;
-
-  if (!sections || sections.length === 0) {
-    elements.sections.innerHTML = '';
-    sectionsData = [];
-    return;
-  }
-
-  sectionsData = sections;
-  let html = '';
-
-  sections.forEach(function(section, index) {
-    const sectionTitle = section.title || 'Секция ' + (index + 1);
-    const sectionContent = section.content || '';
-
-    // Получаем превью текста (убираем HTML и обрезаем)
-    const previewText = getPreviewText(sectionContent);
-
-    html += '<button class="card-section-btn" data-section-index="' + index + '">';
-    
-    // Контент (заголовок + превью)
-    html += '<div class="card-section-btn-content">';
-    html += '<div class="card-section-btn-title">' + escapeHtml(sectionTitle) + '</div>';
-    if (previewText) {
-      html += '<div class="card-section-btn-preview">' + escapeHtml(previewText) + '</div>';
+    if (!sections || sections.length === 0) {
+      elements.sections.innerHTML = '';
+      sectionsData = [];
+      return;
     }
-    html += '</div>';
-    
-    // Разделитель
-    html += '<div class="card-section-btn-divider"></div>';
-    
-    // Нижняя часть (как в карточках index.html)
-    html += '<div class="card-section-btn-bottom">';
-    
-    // Мета-информация
-    html += '<div class="card-section-btn-meta">';
-    html += '<span class="card-section-btn-category">Раздел ' + (index + 1) + '</span>';
-    html += '</div>';
-    
-    // Вертикальный разделитель
-    html += '<div class="card-section-btn-divider-vertical"></div>';
-    
-    // Кнопка-стрелка
-    html += '<div class="card-section-btn-arrow">';
-    html += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
-    html += '<path d="M5 12h14M12 5l7 7-7 7"/>';
-    html += '</svg>';
-    html += '</div>';
-    
-    html += '</div>'; // card-section-btn-bottom
-    html += '</button>';
-  });
 
-  elements.sections.innerHTML = html;
+    sectionsData = sections;
+    let html = '';
 
-  // Привязываем обработчики кликов
-  elements.sections.querySelectorAll('.card-section-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var index = parseInt(this.dataset.sectionIndex);
-      openSectionModal(index);
+    sections.forEach(function(section, index) {
+      const sectionTitle = section.title || 'Секция ' + (index + 1);
+      const sectionContent = section.content || '';
+      const previewText = getPreviewText(sectionContent);
+
+      html += '<button class="card-section-btn" data-section-index="' + index + '">';
+      html += '<div class="card-section-btn-content">';
+      html += '<div class="card-section-btn-title">' + escapeHtml(sectionTitle) + '</div>';
+      if (previewText) {
+        html += '<div class="card-section-btn-preview">' + escapeHtml(previewText) + '</div>';
+      }
+      html += '</div>';
+      html += '<div class="card-section-btn-divider"></div>';
+      html += '<div class="card-section-btn-bottom">';
+      html += '<div class="card-section-btn-meta">';
+      html += '<span class="card-section-btn-category">Раздел ' + (index + 1) + '</span>';
+      html += '</div>';
+      html += '<div class="card-section-btn-divider-vertical"></div>';
+      html += '<div class="card-section-btn-arrow">';
+      html += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+      html += '<path d="M5 12h14M12 5l7 7-7 7"/>';
+      html += '</svg>';
+      html += '</div>';
+      html += '</div>';
+      html += '</button>';
     });
-  });
-}
 
-// === Получение превью текста ===
-function getPreviewText(html) {
-  if (!html) return '';
-  var temp = document.createElement('div');
-  temp.innerHTML = html;
-  var text = temp.textContent || temp.innerText || '';
-  text = text.replace(/\s+/g, ' ').trim();
-  return text.length > 80 ? text.substring(0, 80) + '...' : text;
-}
+    elements.sections.innerHTML = html;
 
-  // === Открытие секции в полноэкранном режиме ===
-  var sectionHistory = []; // История навигации для кнопки "Назад"
+    elements.sections.querySelectorAll('.card-section-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var index = parseInt(this.dataset.sectionIndex);
+        openSectionPage(index);
+      });
+    });
+  }
 
-  // Поддержка кнопки "Назад" браузера
-  window.addEventListener('popstate', function(e) {
-    if (e.state && e.state.sectionOpen) {
-      // Не делаем ничего - пользователь нажал вперёд
-    } else {
-      closeSectionPage();
+  function getPreviewText(html) {
+    if (!html) return '';
+    var temp = document.createElement('div');
+    temp.innerHTML = html;
+    var text = temp.textContent || temp.innerText || '';
+    text = text.replace(/\s+/g, ' ').trim();
+    return text.length > 80 ? text.substring(0, 80) + '...' : text;
+  }
+
+  // === Открытие секции ===
+  function openSectionPage(index) {
+    var section = sectionsData[index];
+    if (!section) return;
+
+    if (!elements.sectionPage || !elements.sectionPageTitle || !elements.sectionPageContent) {
+      console.error('Section page elements not found');
+      return;
     }
-  });
 
-// === Открытие секции в модальном окне ===
-function openSectionModal(index) {
-  var section = sectionsData[index];
-  if (!section) return;
+    elements.sectionPageTitle.textContent = section.title || 'Секция ' + (index + 1);
 
-  var modal = document.getElementById('section-modal');
-  var modalTitle = document.getElementById('section-modal-title');
-  var modalContent = document.getElementById('section-modal-content');
-  var modalClose = document.getElementById('section-modal-close');
+    var contentHtml = '';
 
-  if (!modal || !modalTitle || !modalContent) return;
-
-  // Заполняем контент
-  modalTitle.textContent = section.title || 'Секция ' + (index + 1);
-
-  var contentHtml = '';
-
-  // Основной контент
-  if (section.content) {
-    contentHtml += '<div class="card-block-content">' + processContent(sanitizeHtml(section.content)) + '</div>';
-  }
-
-  // Изображения секции
-  var sectionImages = section.images || [];
-  if (sectionImages.length > 0) {
-    contentHtml += '<div class="card-block-images">';
-    sectionImages.forEach(function(imgUrl) {
-      contentHtml += '<img src="' + escapeAttr(imgUrl) + '" alt="" class="card-block-image" loading="lazy">';
-    });
-    contentHtml += '</div>';
-  }
-
-  // Вложенные секции (если есть)
-  var nestedSections = section.nestedSections || [];
-  if (nestedSections.length > 0) {
-    nestedSections.forEach(function(nested, nestedIndex) {
-      contentHtml += '<button class="nested-section-btn" data-parent-index="' + index + '" data-nested-index="' + nestedIndex + '">';
-      contentHtml += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
-      contentHtml += '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>';
-      contentHtml += '<polyline points="14 2 14 8 20 8"></polyline>';
-      contentHtml += '</svg>';
-      contentHtml += '<span>' + escapeHtml(nested.title || 'Подраздел ' + (nestedIndex + 1)) + '</span>';
-      contentHtml += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto;">';
-      contentHtml += '<polyline points="9 18 15 12 9 6"></polyline>';
-      contentHtml += '</svg>';
-      contentHtml += '</button>';
-    });
-  }
-
-  modalContent.innerHTML = contentHtml;
-
-  // Инициализируем карусели в контенте
-  initContentCarousels(modalContent);
-
-  // Привязываем обработчики для вложенных секций
-  modalContent.querySelectorAll('.nested-section-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var parentIdx = parseInt(this.dataset.parentIndex);
-      var nestedIdx = parseInt(this.dataset.nestedIndex);
-      openNestedSection(parentIdx, nestedIdx);
-    });
-  });
-
-  // Открываем модальное окно
-  modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-
-  // Кнопка закрытия
-  if (modalClose) {
-    modalClose.onclick = function() {
-      closeSectionModal();
-    };
-  }
-
-  // Закрытие по клику на фон
-  modal.onclick = function(e) {
-    if (e.target === modal) {
-      closeSectionModal();
+    if (section.content) {
+      contentHtml += '<div class="card-block-content">' + processContent(sanitizeHtml(section.content)) + '</div>';
     }
-  };
 
-  // Закрытие по Escape
-  document.addEventListener('keydown', handleEscapeKey);
+    var sectionImages = section.images || [];
+    if (sectionImages.length > 0) {
+      contentHtml += '<div class="card-block-images">';
+      sectionImages.forEach(function(imgUrl) {
+        contentHtml += '<img src="' + escapeAttr(imgUrl) + '" alt="" class="card-block-image" loading="lazy">';
+      });
+      contentHtml += '</div>';
+    }
 
-  // Скроллим контент наверх
-  var modalBody = modal.querySelector('.section-modal-body');
-  if (modalBody) modalBody.scrollTop = 0;
-}
+    var nestedSections = section.nestedSections || [];
+    if (nestedSections.length > 0) {
+      nestedSections.forEach(function(nested, nestedIndex) {
+        contentHtml += '<button class="nested-section-btn" data-parent-index="' + index + '" data-nested-index="' + nestedIndex + '">';
+        contentHtml += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+        contentHtml += '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>';
+        contentHtml += '<polyline points="14 2 14 8 20 8"></polyline>';
+        contentHtml += '</svg>';
+        contentHtml += '<span>' + escapeHtml(nested.title || 'Подраздел ' + (nestedIndex + 1)) + '</span>';
+        contentHtml += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto;">';
+        contentHtml += '<polyline points="9 18 15 12 9 6"></polyline>';
+        contentHtml += '</svg>';
+        contentHtml += '</button>';
+      });
+    }
 
-function openNestedSection(parentIndex, nestedIndex) {
-  var parentSection = sectionsData[parentIndex];
-  if (!parentSection || !parentSection.nestedSections) return;
+    elements.sectionPageContent.innerHTML = contentHtml;
 
-  var nested = parentSection.nestedSections[nestedIndex];
-  if (!nested) return;
+    initContentCarousels(elements.sectionPageContent);
 
-  var modalTitle = document.getElementById('section-modal-title');
-  var modalContent = document.getElementById('section-modal-content');
-
-  if (!modalTitle || !modalContent) return;
-
-  modalTitle.textContent = nested.title || 'Подраздел ' + (nestedIndex + 1);
-
-  var contentHtml = '';
-  if (nested.content) {
-    contentHtml += '<div class="card-block-content">' + processContent(sanitizeHtml(nested.content)) + '</div>';
-  }
-
-  var nestedImages = nested.images || [];
-  if (nestedImages.length > 0) {
-    contentHtml += '<div class="card-block-images">';
-    nestedImages.forEach(function(imgUrl) {
-      contentHtml += '<img src="' + escapeAttr(imgUrl) + '" alt="" class="card-block-image" loading="lazy">';
+    elements.sectionPageContent.querySelectorAll('.nested-section-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var parentIdx = parseInt(this.dataset.parentIndex);
+        var nestedIdx = parseInt(this.dataset.nestedIndex);
+        openNestedSection(parentIdx, nestedIdx);
+      });
     });
-    contentHtml += '</div>';
+
+    elements.sectionPage.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    var pageBody = elements.sectionPage.querySelector('.section-page-body');
+    if (pageBody) pageBody.scrollTop = 0;
   }
 
-  // Кнопка "Назад" к родительской секции
-  contentHtml += '<button class="back-to-parent-btn" data-parent-index="' + parentIndex + '">';
-  contentHtml += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
-  contentHtml += '<path d="M19 12H5M12 19l-7-7 7-7"/>';
-  contentHtml += '</svg>';
-  contentHtml += '<span>Назад</span>';
-  contentHtml += '</button>';
+  function openNestedSection(parentIndex, nestedIndex) {
+    var parentSection = sectionsData[parentIndex];
+    if (!parentSection || !parentSection.nestedSections) return;
 
-  modalContent.innerHTML = contentHtml;
-  initContentCarousels(modalContent);
+    var nested = parentSection.nestedSections[nestedIndex];
+    if (!nested) return;
 
-  // Обработчик кнопки "Назад"
-  var backBtn = modalContent.querySelector('.back-to-parent-btn');
-  if (backBtn) {
-    backBtn.addEventListener('click', function() {
-      openSectionModal(parseInt(this.dataset.parentIndex));
-    });
+    elements.sectionPageTitle.textContent = nested.title || 'Подраздел ' + (nestedIndex + 1);
+
+    var contentHtml = '';
+    if (nested.content) {
+      contentHtml += '<div class="card-block-content">' + processContent(sanitizeHtml(nested.content)) + '</div>';
+    }
+
+    var nestedImages = nested.images || [];
+    if (nestedImages.length > 0) {
+      contentHtml += '<div class="card-block-images">';
+      nestedImages.forEach(function(imgUrl) {
+        contentHtml += '<img src="' + escapeAttr(imgUrl) + '" alt="" class="card-block-image" loading="lazy">';
+      });
+      contentHtml += '</div>';
+    }
+
+    contentHtml += '<button class="back-to-parent-btn" data-parent-index="' + parentIndex + '">';
+    contentHtml += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+    contentHtml += '<path d="M19 12H5M12 19l-7-7 7-7"/>';
+    contentHtml += '</svg>';
+    contentHtml += '<span>Назад</span>';
+    contentHtml += '</button>';
+
+    elements.sectionPageContent.innerHTML = contentHtml;
+    initContentCarousels(elements.sectionPageContent);
+
+    var backBtn = elements.sectionPageContent.querySelector('.back-to-parent-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function() {
+        openSectionPage(parseInt(this.dataset.parentIndex));
+      });
+    }
+
+    var pageBody = elements.sectionPage.querySelector('.section-page-body');
+    if (pageBody) pageBody.scrollTop = 0;
   }
 
-  // Скроллим наверх
-  var modal = document.getElementById('section-modal');
-  var modalBody = modal.querySelector('.section-modal-body');
-  if (modalBody) modalBody.scrollTop = 0;
-}
-
-function closeSectionModal() {
-  var modal = document.getElementById('section-modal');
-  if (modal) {
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
+  function closeSectionPage() {
+    if (elements.sectionPage) {
+      elements.sectionPage.classList.remove('open');
+      document.body.style.overflow = '';
+    }
   }
-  document.removeEventListener('keydown', handleEscapeKey);
-}
 
-function handleEscapeKey(e) {
-  if (e.key === 'Escape') {
-    closeSectionModal();
-  }
-}
-
-// Делаем функции глобальными
-window.openSectionModal = openSectionModal;
-window.closeSectionModal = closeSectionModal;
-
-  // === Обработка контента (карусели, видео и т.д.) ===
+  // === Обработка контента ===
   function processContent(html) {
     if (!html) return '';
 
-    // Преобразуем data-carousel в интерактивные карусели
     var temp = document.createElement('div');
     temp.innerHTML = html;
 
-    // Находим все карусели и преобразуем их
     temp.querySelectorAll('[data-carousel]').forEach(function(carousel) {
       var images = carousel.dataset.carousel.split(',');
       if (images.length > 0) {
@@ -440,7 +376,6 @@ window.closeSectionModal = closeSectionModal;
     return temp.innerHTML;
   }
 
-  // === Инициализация каруселей в контенте ===
   function initContentCarousels(container) {
     container.querySelectorAll('.content-carousel').forEach(function(carousel) {
       var track = carousel.querySelector('.content-carousel-track');
@@ -478,31 +413,20 @@ window.closeSectionModal = closeSectionModal;
         });
       });
 
-      // Свайп поддержка
       var startX = 0;
-      var endX = 0;
-
       carousel.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
       });
 
       carousel.addEventListener('touchend', function(e) {
-        endX = e.changedTouches[0].clientX;
+        var endX = e.changedTouches[0].clientX;
         var diff = startX - endX;
         if (Math.abs(diff) > 50) {
-          if (diff > 0) {
-            goToSlide(currentIndex + 1);
-          } else {
-            goToSlide(currentIndex - 1);
-          }
+          goToSlide(diff > 0 ? currentIndex + 1 : currentIndex - 1);
         }
       });
     });
   }
-
-  // Делаем функции глобальными
-  window.openSectionModal = openSectionModal;
-  window.closeSectionPage = closeSectionPage;
 
   function sanitizeHtml(html) {
     if (!html) return '';
@@ -558,16 +482,9 @@ window.closeSectionModal = closeSectionModal;
 
       Array.from(node.attributes).forEach(function(attr) {
         if (allAllowedAttrs.includes(attr.name)) {
-          if (attr.name === 'href') {
-            const href = attr.value.toLowerCase().trim();
-            if (href.startsWith('javascript:') || href.startsWith('data:')) {
-              return;
-            }
-          }
-
-          if (attr.name === 'src') {
-            const src = attr.value.toLowerCase().trim();
-            if (src.startsWith('javascript:') || src.startsWith('data:text')) {
+          if (attr.name === 'href' || attr.name === 'src') {
+            const val = attr.value.toLowerCase().trim();
+            if (val.startsWith('javascript:') || val.startsWith('data:text')) {
               return;
             }
           }
@@ -616,30 +533,22 @@ window.closeSectionModal = closeSectionModal;
 
   function renderChecklist(items) {
     if (!items || items.length === 0) {
-      if (elements.checklistBtn) {
-        elements.checklistBtn.style.display = 'none';
-      }
-      if (elements.checklistPanel) {
-        elements.checklistPanel.style.display = 'none';
-      }
+      if (elements.checklistBtn) elements.checklistBtn.style.display = 'none';
+      if (elements.checklistPanel) elements.checklistPanel.style.display = 'none';
       return;
     }
 
-    if (elements.checklistBtn) {
-      elements.checklistBtn.style.display = 'flex';
-    }
+    if (elements.checklistBtn) elements.checklistBtn.style.display = 'flex';
 
     let html = '';
 
     items.forEach(function(item, index) {
       const storageKey = 'checklist_' + cardId + '_' + index;
       const isChecked = localStorage.getItem(storageKey) === 'true';
-      const checkedAttr = isChecked ? 'checked' : '';
-      const checkedClass = isChecked ? 'checked' : '';
 
-      html += '<li class="card-checklist-item ' + checkedClass + '">';
+      html += '<li class="card-checklist-item ' + (isChecked ? 'checked' : '') + '">';
       html += '<label>';
-      html += '<input type="checkbox" data-index="' + index + '" ' + checkedAttr + '>';
+      html += '<input type="checkbox" data-index="' + index + '" ' + (isChecked ? 'checked' : '') + '>';
       html += '<span class="card-checkbox"></span>';
       html += '<span class="card-checkbox-text">' + escapeHtml(item) + '</span>';
       html += '</label>';
@@ -649,18 +558,11 @@ window.closeSectionModal = closeSectionModal;
     if (elements.checklistItems) {
       elements.checklistItems.innerHTML = html;
 
-      const checkboxes = elements.checklistItems.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(function(checkbox) {
+      elements.checklistItems.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
           const index = this.getAttribute('data-index');
-          const storageKey = 'checklist_' + cardId + '_' + index;
-          localStorage.setItem(storageKey, this.checked);
-
-          const li = this.closest('li');
-          if (li) {
-            li.classList.toggle('checked', this.checked);
-          }
-
+          localStorage.setItem('checklist_' + cardId + '_' + index, this.checked);
+          this.closest('li').classList.toggle('checked', this.checked);
           updateChecklistCounter(items.length);
         });
       });
@@ -671,37 +573,29 @@ window.closeSectionModal = closeSectionModal;
 
   function updateChecklistCounter(total) {
     if (!elements.checklistItems || !elements.checklistBtnText) return;
-
-    const checked = elements.checklistItems.querySelectorAll('input[type="checkbox"]:checked').length;
+    const checked = elements.checklistItems.querySelectorAll('input:checked').length;
     elements.checklistBtnText.textContent = 'Чек-лист (' + checked + '/' + total + ')';
   }
 
   function toggleChecklist() {
-    if (elements.checklistPanel) {
-      elements.checklistPanel.classList.toggle('open');
-    }
-    if (elements.checklistBtn) {
-      elements.checklistBtn.classList.toggle('open');
-    }
+    if (elements.checklistPanel) elements.checklistPanel.classList.toggle('open');
+    if (elements.checklistBtn) elements.checklistBtn.classList.toggle('open');
   }
 
   function resetChecklist() {
     if (!elements.checklistItems) return;
 
-    const checkboxes = elements.checklistItems.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(function(checkbox) {
+    elements.checklistItems.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
       checkbox.checked = false;
-      const index = checkbox.getAttribute('data-index');
-      const storageKey = 'checklist_' + cardId + '_' + index;
-      localStorage.removeItem(storageKey);
-
-      const li = checkbox.closest('li');
-      if (li) {
-        li.classList.remove('checked');
-      }
+      localStorage.removeItem('checklist_' + cardId + '_' + checkbox.getAttribute('data-index'));
+      checkbox.closest('li').classList.remove('checked');
     });
 
-    updateChecklistCounter(checkboxes.length);
+    updateChecklistCounter(elements.checklistItems.querySelectorAll('input').length);
   }
+
+  // Глобальные функции
+  window.openSectionPage = openSectionPage;
+  window.closeSectionPage = closeSectionPage;
 
 })();
