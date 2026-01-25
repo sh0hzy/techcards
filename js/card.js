@@ -166,48 +166,304 @@
     }
   }
 
-  // === ИСПРАВЛЕНО: Рендер секций с поддержкой HTML ===
+  // === Хранение данных секций для модального окна ===
+  let sectionsData = [];
+
+  // === Рендер секций как кнопок ===
   function renderSections(sections) {
     if (!elements.sections) return;
 
     if (!sections || sections.length === 0) {
       elements.sections.innerHTML = '';
+      sectionsData = [];
       return;
     }
 
+    sectionsData = sections;
     let html = '';
 
-    sections.forEach(function(section) {
-      const sectionTitle = section.title || '';
+    sections.forEach(function(section, index) {
+      const sectionTitle = section.title || 'Секция ' + (index + 1);
       const sectionContent = section.content || '';
-      const sectionImages = section.images || [];
 
-      html += '<section class="card-block">';
-      
-      // Заголовок секции
-      if (sectionTitle) {
-        html += '<h3 class="card-block-title">' + escapeHtml(sectionTitle) + '</h3>';
+      // Получаем превью текста (убираем HTML и обрезаем)
+      const previewText = getPreviewText(sectionContent);
+
+      html += '<button class="card-section-btn" data-section-index="' + index + '">';
+      html += '<div class="card-section-btn-icon">';
+      html += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+      html += '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>';
+      html += '<polyline points="14 2 14 8 20 8"></polyline>';
+      html += '<line x1="16" y1="13" x2="8" y2="13"></line>';
+      html += '<line x1="16" y1="17" x2="8" y2="17"></line>';
+      html += '</svg>';
+      html += '</div>';
+      html += '<div class="card-section-btn-content">';
+      html += '<div class="card-section-btn-title">' + escapeHtml(sectionTitle) + '</div>';
+      if (previewText) {
+        html += '<div class="card-section-btn-preview">' + escapeHtml(previewText) + '</div>';
       }
-      
-      // Контент секции - рендерим HTML как есть (он уже отформатирован в админке)
-      if (sectionContent) {
-        html += '<div class="card-block-content">' + sanitizeHtml(sectionContent) + '</div>';
-      }
-      
-      // Изображения секции (если есть отдельно от контента)
-      if (sectionImages.length > 0) {
-        html += '<div class="card-block-images">';
-        sectionImages.forEach(function(imgUrl) {
-          html += '<img src="' + escapeAttr(imgUrl) + '" alt="" class="card-block-image" loading="lazy">';
-        });
-        html += '</div>';
-      }
-      
-      html += '</section>';
+      html += '</div>';
+      html += '<div class="card-section-btn-arrow">';
+      html += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+      html += '<polyline points="9 18 15 12 9 6"></polyline>';
+      html += '</svg>';
+      html += '</div>';
+      html += '</button>';
     });
 
     elements.sections.innerHTML = html;
+
+    // Привязываем обработчики кликов
+    elements.sections.querySelectorAll('.card-section-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var index = parseInt(this.dataset.sectionIndex);
+        openSectionModal(index);
+      });
+    });
   }
+
+  // === Получение превью текста ===
+  function getPreviewText(html) {
+    if (!html) return '';
+    var temp = document.createElement('div');
+    temp.innerHTML = html;
+    var text = temp.textContent || temp.innerText || '';
+    text = text.replace(/\s+/g, ' ').trim();
+    return text.length > 60 ? text.substring(0, 60) + '...' : text;
+  }
+
+  // === Модальное окно секции ===
+  function openSectionModal(index) {
+    var section = sectionsData[index];
+    if (!section) return;
+
+    var modal = document.getElementById('section-modal');
+    var modalTitle = document.getElementById('section-modal-title');
+    var modalContent = document.getElementById('section-modal-content');
+    var modalClose = document.getElementById('section-modal-close');
+
+    if (!modal || !modalTitle || !modalContent) return;
+
+    // Заполняем контент
+    modalTitle.textContent = section.title || 'Секция ' + (index + 1);
+
+    var contentHtml = '';
+
+    // Основной контент
+    if (section.content) {
+      contentHtml += '<div class="card-block-content">' + processContent(sanitizeHtml(section.content)) + '</div>';
+    }
+
+    // Изображения секции
+    var sectionImages = section.images || [];
+    if (sectionImages.length > 0) {
+      contentHtml += '<div class="card-block-images">';
+      sectionImages.forEach(function(imgUrl) {
+        contentHtml += '<img src="' + escapeAttr(imgUrl) + '" alt="" class="card-block-image" loading="lazy">';
+      });
+      contentHtml += '</div>';
+    }
+
+    // Вложенные секции (если есть)
+    var nestedSections = section.nestedSections || [];
+    if (nestedSections.length > 0) {
+      nestedSections.forEach(function(nested, nestedIndex) {
+        contentHtml += '<button class="nested-section-btn" data-parent-index="' + index + '" data-nested-index="' + nestedIndex + '">';
+        contentHtml += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+        contentHtml += '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>';
+        contentHtml += '<polyline points="14 2 14 8 20 8"></polyline>';
+        contentHtml += '</svg>';
+        contentHtml += '<span>' + escapeHtml(nested.title || 'Подраздел ' + (nestedIndex + 1)) + '</span>';
+        contentHtml += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto;">';
+        contentHtml += '<polyline points="9 18 15 12 9 6"></polyline>';
+        contentHtml += '</svg>';
+        contentHtml += '</button>';
+      });
+    }
+
+    modalContent.innerHTML = contentHtml;
+
+    // Инициализируем карусели в контенте
+    initContentCarousels(modalContent);
+
+    // Привязываем обработчики для вложенных секций
+    modalContent.querySelectorAll('.nested-section-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var parentIdx = parseInt(this.dataset.parentIndex);
+        var nestedIdx = parseInt(this.dataset.nestedIndex);
+        openNestedSectionModal(parentIdx, nestedIdx);
+      });
+    });
+
+    // Открываем модальное окно
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Закрытие
+    modalClose.onclick = closeSectionModal;
+    modal.onclick = function(e) {
+      if (e.target === modal) {
+        closeSectionModal();
+      }
+    };
+
+    // Закрытие по Escape
+    document.addEventListener('keydown', handleEscapeKey);
+  }
+
+  function openNestedSectionModal(parentIndex, nestedIndex) {
+    var parentSection = sectionsData[parentIndex];
+    if (!parentSection || !parentSection.nestedSections) return;
+
+    var nested = parentSection.nestedSections[nestedIndex];
+    if (!nested) return;
+
+    var modalTitle = document.getElementById('section-modal-title');
+    var modalContent = document.getElementById('section-modal-content');
+
+    if (!modalTitle || !modalContent) return;
+
+    modalTitle.textContent = nested.title || 'Подраздел ' + (nestedIndex + 1);
+
+    var contentHtml = '';
+    if (nested.content) {
+      contentHtml += '<div class="card-block-content">' + processContent(sanitizeHtml(nested.content)) + '</div>';
+    }
+
+    var nestedImages = nested.images || [];
+    if (nestedImages.length > 0) {
+      contentHtml += '<div class="card-block-images">';
+      nestedImages.forEach(function(imgUrl) {
+        contentHtml += '<img src="' + escapeAttr(imgUrl) + '" alt="" class="card-block-image" loading="lazy">';
+      });
+      contentHtml += '</div>';
+    }
+
+    // Кнопка "Назад"
+    contentHtml = '<button class="nested-section-btn" onclick="openSectionModal(' + parentIndex + ')" style="margin-bottom: 16px;">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<polyline points="15 18 9 12 15 6"></polyline>' +
+      '</svg>' +
+      '<span>Назад к ' + escapeHtml(parentSection.title || 'секции') + '</span>' +
+      '</button>' + contentHtml;
+
+    modalContent.innerHTML = contentHtml;
+    initContentCarousels(modalContent);
+  }
+
+  function closeSectionModal() {
+    var modal = document.getElementById('section-modal');
+    if (modal) {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.removeEventListener('keydown', handleEscapeKey);
+  }
+
+  function handleEscapeKey(e) {
+    if (e.key === 'Escape') {
+      closeSectionModal();
+    }
+  }
+
+  // === Обработка контента (карусели, видео и т.д.) ===
+  function processContent(html) {
+    if (!html) return '';
+
+    // Преобразуем data-carousel в интерактивные карусели
+    var temp = document.createElement('div');
+    temp.innerHTML = html;
+
+    // Находим все карусели и преобразуем их
+    temp.querySelectorAll('[data-carousel]').forEach(function(carousel) {
+      var images = carousel.dataset.carousel.split(',');
+      if (images.length > 0) {
+        var carouselHtml = '<div class="content-carousel" data-images="' + images.join(',') + '">';
+        carouselHtml += '<div class="content-carousel-track">';
+        images.forEach(function(img) {
+          carouselHtml += '<div class="content-carousel-slide"><img src="' + img.trim() + '" alt="" loading="lazy"></div>';
+        });
+        carouselHtml += '</div>';
+        if (images.length > 1) {
+          carouselHtml += '<button class="content-carousel-btn prev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>';
+          carouselHtml += '<button class="content-carousel-btn next"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>';
+          carouselHtml += '<div class="content-carousel-nav">';
+          images.forEach(function(img, idx) {
+            carouselHtml += '<button class="content-carousel-dot' + (idx === 0 ? ' active' : '') + '" data-index="' + idx + '"></button>';
+          });
+          carouselHtml += '</div>';
+        }
+        carouselHtml += '</div>';
+        carousel.outerHTML = carouselHtml;
+      }
+    });
+
+    return temp.innerHTML;
+  }
+
+  // === Инициализация каруселей в контенте ===
+  function initContentCarousels(container) {
+    container.querySelectorAll('.content-carousel').forEach(function(carousel) {
+      var track = carousel.querySelector('.content-carousel-track');
+      var dots = carousel.querySelectorAll('.content-carousel-dot');
+      var prevBtn = carousel.querySelector('.content-carousel-btn.prev');
+      var nextBtn = carousel.querySelector('.content-carousel-btn.next');
+      var slides = carousel.querySelectorAll('.content-carousel-slide');
+      var currentIndex = 0;
+
+      function goToSlide(index) {
+        if (index < 0) index = slides.length - 1;
+        if (index >= slides.length) index = 0;
+        currentIndex = index;
+        track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+        dots.forEach(function(dot, i) {
+          dot.classList.toggle('active', i === currentIndex);
+        });
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+          goToSlide(currentIndex - 1);
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+          goToSlide(currentIndex + 1);
+        });
+      }
+
+      dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          goToSlide(parseInt(this.dataset.index));
+        });
+      });
+
+      // Свайп поддержка
+      var startX = 0;
+      var endX = 0;
+
+      carousel.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+      });
+
+      carousel.addEventListener('touchend', function(e) {
+        endX = e.changedTouches[0].clientX;
+        var diff = startX - endX;
+        if (Math.abs(diff) > 50) {
+          if (diff > 0) {
+            goToSlide(currentIndex + 1);
+          } else {
+            goToSlide(currentIndex - 1);
+          }
+        }
+      });
+    });
+  }
+
+  // Делаем функцию openSectionModal глобальной для кнопки "Назад"
+  window.openSectionModal = openSectionModal;
 
   // === Безопасная очистка HTML (разрешаем только безопасные теги) ===
   function sanitizeHtml(html) {
@@ -222,15 +478,21 @@
       'p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike',
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
       'ul', 'ol', 'li',
-      'a', 'img',
+      'a', 'img', 'iframe',
       'blockquote', 'pre', 'code',
-      'div', 'span'
+      'div', 'span', 'font',
+      'table', 'thead', 'tbody', 'tr', 'th', 'td',
+      'button'
     ];
 
     // Разрешённые атрибуты
     const allowedAttrs = {
       'a': ['href', 'target', 'rel'],
-      'img': ['src', 'alt', 'width', 'height', 'style'],
+      'img': ['src', 'alt', 'width', 'height', 'style', 'loading'],
+      'iframe': ['src', 'width', 'height', 'frameborder', 'allowfullscreen', 'allow'],
+      'div': ['style', 'class', 'data-carousel', 'data-images'],
+      'button': ['class', 'data-index', 'onclick'],
+      'font': ['size', 'color', 'face'],
       '*': ['style', 'class']
     };
 

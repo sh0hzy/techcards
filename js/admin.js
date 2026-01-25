@@ -26,7 +26,7 @@
     title: {},
     description: {},
     checklist: {},
-    sections: {} // sections[lang] = [{title, content, images}, ...]
+    sections: {} // sections[lang] = [{title, content, images, nestedSections: []}, ...]
   };
 
   // === Элементы ===
@@ -310,13 +310,24 @@
     }
   }
 
-  function addSection(title = '', content = '', images = []) {
+  // Helper to escape HTML in nested section inputs
+  function escapeHtmlAttr(text) {
+    if (!text) return '';
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function addSection(title = '', content = '', images = [], nestedSections = []) {
     if (!formData.sections[currentLang]) {
       formData.sections[currentLang] = [];
     }
 
     const index = formData.sections[currentLang].length;
-    formData.sections[currentLang].push({ title, content, images });
+    formData.sections[currentLang].push({ title, content, images, nestedSections });
 
     addSectionElement(title, content, images, index);
     unsavedChanges = true;
@@ -366,7 +377,109 @@
     // Render section images
     renderSectionImages(section, images, index);
 
+    // Nested sections
+    const nestedContainer = section.querySelector('.nested-sections-list');
+    const addNestedBtn = section.querySelector('.btn-add-nested');
+
+    if (addNestedBtn) {
+      addNestedBtn.addEventListener('click', () => {
+        addNestedSection(index);
+      });
+    }
+
+    // Render existing nested sections
+    const nestedSections = formData.sections[currentLang]?.[index]?.nestedSections || [];
+    renderNestedSections(section, index, nestedSections);
+
     elements.sectionsList.appendChild(section);
+  }
+
+  // === Nested Sections ===
+  function addNestedSection(parentIndex, title = '', content = '') {
+    if (!formData.sections[currentLang]) {
+      formData.sections[currentLang] = [];
+    }
+    if (!formData.sections[currentLang][parentIndex]) {
+      formData.sections[currentLang][parentIndex] = { title: '', content: '', images: [], nestedSections: [] };
+    }
+    if (!formData.sections[currentLang][parentIndex].nestedSections) {
+      formData.sections[currentLang][parentIndex].nestedSections = [];
+    }
+
+    formData.sections[currentLang][parentIndex].nestedSections.push({ title, content, images: [] });
+
+    const parentSection = elements.sectionsList?.querySelector(`[data-index="${parentIndex}"]`);
+    if (parentSection) {
+      renderNestedSections(parentSection, parentIndex, formData.sections[currentLang][parentIndex].nestedSections);
+    }
+    unsavedChanges = true;
+  }
+
+  function renderNestedSections(parentSection, parentIndex, nestedSections) {
+    const container = parentSection.querySelector('.nested-sections-list');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!nestedSections || nestedSections.length === 0) {
+      return;
+    }
+
+    nestedSections.forEach((nested, nestedIndex) => {
+      const nestedEl = document.createElement('div');
+      nestedEl.className = 'nested-section-item';
+      nestedEl.dataset.nestedIndex = nestedIndex;
+
+      nestedEl.innerHTML = `
+        <div class="nested-section-header">
+          <input type="text" class="nested-section-title" placeholder="Заголовок подраздела" value="${escapeHtmlAttr(nested.title || '')}">
+          <button type="button" class="nested-section-remove" title="Удалить">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="nested-section-editor" contenteditable="true" data-placeholder="Содержимое подраздела...">${nested.content || ''}</div>
+      `;
+
+      // Title input
+      const titleInput = nestedEl.querySelector('.nested-section-title');
+      titleInput.addEventListener('input', () => {
+        updateNestedSectionData(parentIndex, nestedIndex, 'title', titleInput.value);
+      });
+
+      // Content editor
+      const editor = nestedEl.querySelector('.nested-section-editor');
+      editor.addEventListener('input', () => {
+        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+      });
+
+      // Remove button
+      const removeBtn = nestedEl.querySelector('.nested-section-remove');
+      removeBtn.addEventListener('click', () => {
+        removeNestedSection(parentIndex, nestedIndex);
+      });
+
+      container.appendChild(nestedEl);
+    });
+  }
+
+  function updateNestedSectionData(parentIndex, nestedIndex, field, value) {
+    if (!formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]) return;
+    formData.sections[currentLang][parentIndex].nestedSections[nestedIndex][field] = value;
+    unsavedChanges = true;
+  }
+
+  function removeNestedSection(parentIndex, nestedIndex) {
+    if (!formData.sections[currentLang]?.[parentIndex]?.nestedSections) return;
+    formData.sections[currentLang][parentIndex].nestedSections.splice(nestedIndex, 1);
+
+    const parentSection = elements.sectionsList?.querySelector(`[data-index="${parentIndex}"]`);
+    if (parentSection) {
+      renderNestedSections(parentSection, parentIndex, formData.sections[currentLang][parentIndex].nestedSections);
+    }
+    unsavedChanges = true;
   }
 
   function updateSectionData(index, field, value) {
@@ -374,7 +487,7 @@
       formData.sections[currentLang] = [];
     }
     if (!formData.sections[currentLang][index]) {
-      formData.sections[currentLang][index] = { title: '', content: '', images: [] };
+      formData.sections[currentLang][index] = { title: '', content: '', images: [], nestedSections: [] };
     }
     formData.sections[currentLang][index][field] = value;
     unsavedChanges = true;
@@ -394,7 +507,7 @@
     const sectionElements = elements.sectionsList.querySelectorAll('.content-section');
     const sections = [];
 
-    sectionElements.forEach((section) => {
+    sectionElements.forEach((section, sectionIdx) => {
       const titleInput = section.querySelector('.section-title-input');
       const editor = section.querySelector('.rich-editor');
       const imagesContainer = section.querySelector('.section-images');
@@ -411,7 +524,18 @@
         });
       }
 
-      sections.push({ title, content, images });
+      // Save nested sections
+      const nestedSections = [];
+      const nestedContainer = section.querySelector('.nested-sections-list');
+      if (nestedContainer) {
+        nestedContainer.querySelectorAll('.nested-section-item').forEach(nestedEl => {
+          const nestedTitle = nestedEl.querySelector('.nested-section-title')?.value || '';
+          const nestedContent = nestedEl.querySelector('.nested-section-editor')?.innerHTML || '';
+          nestedSections.push({ title: nestedTitle, content: nestedContent, images: [] });
+        });
+      }
+
+      sections.push({ title, content, images, nestedSections });
     });
 
     formData.sections[currentLang] = sections;
@@ -444,14 +568,28 @@ function bindEditorToolbar(section, index) {
     formatSelect.addEventListener('change', (e) => {
       const value = e.target.value;
       editor.focus();
-      
+
       if (value) {
         document.execCommand('formatBlock', false, value);
       } else {
         document.execCommand('formatBlock', false, 'p');
       }
-      
+
       updateSectionData(index, 'content', editor.innerHTML);
+      e.target.value = ''; // Reset select
+    });
+  }
+
+  // Select для размера шрифта
+  const fontSizeSelect = toolbar.querySelector('.toolbar-fontsize');
+  if (fontSizeSelect) {
+    fontSizeSelect.addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (value) {
+        editor.focus();
+        document.execCommand('fontSize', false, value);
+        updateSectionData(index, 'content', editor.innerHTML);
+      }
       e.target.value = ''; // Reset select
     });
   }
@@ -511,17 +649,17 @@ function bindEditorToolbar(section, index) {
     tableBtn.addEventListener('click', () => {
       const rows = prompt('Количество строк:', '3');
       const cols = prompt('Количество столбцов:', '3');
-      
+
       if (rows && cols) {
         const r = parseInt(rows) || 3;
         const c = parseInt(cols) || 3;
-        
+
         let table = '<table><thead><tr>';
         for (let i = 0; i < c; i++) {
           table += '<th>Заголовок</th>';
         }
         table += '</tr></thead><tbody>';
-        
+
         for (let i = 0; i < r - 1; i++) {
           table += '<tr>';
           for (let j = 0; j < c; j++) {
@@ -530,11 +668,19 @@ function bindEditorToolbar(section, index) {
           table += '</tr>';
         }
         table += '</tbody></table>';
-        
+
         editor.focus();
         document.execCommand('insertHTML', false, table);
         updateSectionData(index, 'content', editor.innerHTML);
       }
+    });
+  }
+
+  // Кнопка карусели
+  const carouselBtn = toolbar.querySelector('.toolbar-carousel-btn');
+  if (carouselBtn) {
+    carouselBtn.addEventListener('click', () => {
+      showCarouselModal(index, editor);
     });
   }
 
@@ -708,6 +854,65 @@ function extractYouTubeId(url) {
     urlInput.focus();
   }
 
+  // === Carousel Modal ===
+  function showCarouselModal(sectionIndex, editor) {
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.innerHTML = `
+      <div class="image-modal-content" style="max-width: 600px;">
+        <h3>Добавить карусель изображений</h3>
+        <p style="font-size: 13px; color: #6b7280; margin-bottom: 16px;">Добавьте URL изображений для карусели (каждый URL с новой строки):</p>
+        <textarea id="carousel-urls" rows="6" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg&#10;https://example.com/image3.jpg" style="width: 100%; resize: vertical;"></textarea>
+        <div class="image-modal-actions">
+          <button class="btn-secondary" id="carousel-modal-cancel">Отмена</button>
+          <button class="btn-primary" id="carousel-modal-add">Вставить карусель</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const urlsInput = modal.querySelector('#carousel-urls');
+    const cancelBtn = modal.querySelector('#carousel-modal-cancel');
+    const addBtn = modal.querySelector('#carousel-modal-add');
+
+    cancelBtn.addEventListener('click', () => modal.remove());
+
+    addBtn.addEventListener('click', () => {
+      const urls = urlsInput.value
+        .split('\n')
+        .map(url => url.trim())
+        .filter(url => url && url.startsWith('http'));
+
+      if (urls.length > 0) {
+        // Создаём HTML для карусели
+        let carouselHtml = '<div class="content-carousel-preview" data-carousel="' + urls.join(',') + '" contenteditable="false" style="background: #f3f4f6; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">';
+        carouselHtml += '<p style="margin: 0 0 8px; font-weight: 600; color: #1f2933;">Карусель (' + urls.length + ' изобр.)</p>';
+        carouselHtml += '<div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">';
+        urls.slice(0, 4).forEach(url => {
+          carouselHtml += '<img src="' + url + '" style="width: 80px; height: 60px; object-fit: cover; border-radius: 8px;" />';
+        });
+        if (urls.length > 4) {
+          carouselHtml += '<span style="display: flex; align-items: center; color: #6b7280;">+' + (urls.length - 4) + '</span>';
+        }
+        carouselHtml += '</div>';
+        carouselHtml += '</div>';
+
+        editor.focus();
+        document.execCommand('insertHTML', false, carouselHtml);
+        updateSectionData(sectionIndex, 'content', editor.innerHTML);
+        unsavedChanges = true;
+      }
+      modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+
+    urlsInput.focus();
+  }
+
   // === Create New Card ===
   function createNewCard() {
     if (unsavedChanges && !confirm('Есть несохранённые изменения. Продолжить?')) {
@@ -781,7 +986,12 @@ function extractYouTubeId(url) {
         formData.sections[lang] = (content.sections || []).map(s => ({
           title: s.title || '',
           content: s.content || '',
-          images: s.images || []
+          images: s.images || [],
+          nestedSections: (s.nestedSections || []).map(n => ({
+            title: n.title || '',
+            content: n.content || '',
+            images: n.images || []
+          }))
         }));
       }
     });
@@ -921,11 +1131,16 @@ function extractYouTubeId(url) {
         .filter(line => line);
 
       const sections = (formData.sections[lang] || [])
-        .filter(s => s.title || s.content)
+        .filter(s => s.title || s.content || (s.nestedSections && s.nestedSections.length > 0))
         .map(s => ({
           title: s.title || '',
           content: s.content || '',
-          images: s.images || []
+          images: s.images || [],
+          nestedSections: (s.nestedSections || []).filter(n => n.title || n.content).map(n => ({
+            title: n.title || '',
+            content: n.content || '',
+            images: n.images || []
+          }))
         }));
 
       content[lang] = { sections, checklist };
