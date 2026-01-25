@@ -14,7 +14,6 @@ body {
   flex-direction: column;
 }
 
-/* ===== HEADER ===== */
 .header {
   position: fixed;
   top: 0;
@@ -37,7 +36,6 @@ body {
   text-decoration: none;
 }
 
-/* ===== HAMBURGER ===== */
 .burger {
   width: 28px;
   height: 20px;
@@ -63,7 +61,6 @@ body {
 .burger.active span:nth-child(2) { opacity: 0; }
 .burger.active span:nth-child(3) { transform: rotate(-45deg); top: 8px; }
 
-/* ===== MENU ===== */
 .menu {
   position: fixed;
   top: 64px;
@@ -98,7 +95,7 @@ body {
   color: #0b5ed7;
 }
 
-/* ===== LANGUAGE SWITCHER ===== */
+
 .language-switcher {
   display: flex;
   flex-wrap: wrap;
@@ -133,7 +130,7 @@ body {
   color: white;
 }
 
-/* ===== MAIN ===== */
+
 .main {
   flex: 1;
   padding: 96px 20px 40px; 
@@ -167,7 +164,6 @@ body {
   .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-/* ===== CARD ===== */
 .astm-card {
   width: 100%;
   max-width: 100%;       
@@ -221,7 +217,6 @@ body {
   margin: 15px 0;
 }
 
-/* ===== НИЖНЯЯ ЧАСТЬ КАРТОЧКИ ===== */
 .astm-bottom {
   display: flex;
   align-items: center;
@@ -244,7 +239,6 @@ body {
   border-radius: 20px;
 }
 
-/* Вертикальный разделитель */
 .astm-divider-vertical {
   width: 1px;
   align-self: stretch;
@@ -280,7 +274,6 @@ body {
   stroke-linejoin: round;
 }
 
-/* На мобильных — вертикально */
 @media (max-width: 500px) {
   .astm-bottom {
     flex-direction: column;
@@ -301,7 +294,6 @@ body {
   }
 }
 
-/* ===== SKELETON LOADING ===== */
 .astm-card.skeleton {
   pointer-events: none;
 }
@@ -334,7 +326,6 @@ body {
   100% { background-position: -200% 0; }
 }
 
-/* ===== NO RESULTS / ERROR ===== */
 .no-results {
   grid-column: 1 / -1;
   text-align: center;
@@ -351,7 +342,6 @@ body {
   font-size: 15px;
 }
 
-/* ===== FOOTER ===== */
 .footer {
   text-align: center;
   padding: 16px;
@@ -359,7 +349,6 @@ body {
   color: #6b7280;
 }
 
-/* ===== INSTALL ===== */
 .install-banner {
   position: fixed;
   top: 74px;
@@ -376,8 +365,7 @@ body {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(0, 0, 0, 0.06);
   z-index: 100;
-  
-  /* Анимация */
+
   opacity: 0;
   transform: translateY(-20px) scale(0.95);
   visibility: hidden;
@@ -474,7 +462,6 @@ body {
 
 /* ===== CARD PAGE ===== */
 
-/* Hero */
 .card-hero {
   position: relative;
   height: 45vh;
@@ -540,7 +527,6 @@ body {
   text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-/* Back button */
 .card-back-wrapper {
   max-width: 600px;
   margin: 16px auto 0;
@@ -561,14 +547,12 @@ body {
   opacity: 0.7;
 }
 
-/* Container */
 .card-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 16px 20px 60px;
 }
 
-/* Block */
 .card-block {
   background: #fff;
   border-radius: 14px;
@@ -615,8 +599,6 @@ body {
 }
 
 /* ===== CHECKLIST ===== */
-
-/* Кнопка открытия */
 .card-checklist-btn {
   display: flex;
   align-items: center;
@@ -657,7 +639,6 @@ body {
   border-bottom-color: transparent;
 }
 
-/* Панель чек-листа */
 .card-checklist-panel {
   background: #fff;
   border: 2px solid #e5e7eb;
@@ -673,7 +654,7 @@ body {
   padding: 16px 20px 20px;
 }
 
-/* Список */
+
 .card-checklist {
   list-style: none;
   margin: 0;
@@ -700,7 +681,6 @@ body {
   display: none;
 }
 
-/* Кастомный чекбокс */
 .card-checkbox {
   flex-shrink: 0;
   width: 24px;
@@ -734,7 +714,7 @@ body {
   transform: rotate(45deg) scale(1);
 }
 
-/* Текст чекбокса */
+
 .card-checkbox-text {
   font-size: 15px;
   line-height: 1.5;
@@ -1272,7 +1252,6 @@ body {
 }
 
 /* ===== SEARCH ===== */
-
 .search-section {
   max-width: 800px;
   margin: 0 auto;
@@ -1341,7 +1320,6 @@ body {
   color: #6b7280;
 }
 
-/* Подсветка найденного текста */
 mark {
   background: #fef08a;
   color: inherit;
@@ -1349,7 +1327,6 @@ mark {
   border-radius: 3px;
 }
 
-/* ===== CATEGORIES ===== */
 
 .categories-list {
   display: flex;
