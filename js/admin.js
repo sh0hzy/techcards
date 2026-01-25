@@ -1,5 +1,3 @@
-// js/admin.js
-
 (function() {
   'use strict';
 
@@ -74,6 +72,7 @@
     elements.previewClose = document.getElementById('preview-close');
     elements.previewIframe = document.getElementById('preview-iframe');
     elements.sectionTemplate = document.getElementById('section-template');
+    elements.nestedSectionTemplate = document.getElementById('nested-section-template');
   }
 
   function bindEvents() {
@@ -393,33 +392,338 @@
   }
 
   function renderNestedSections(parentSection, parentIndex, nestedSections) {
-    const container = parentSection.querySelector('.nested-sections-list');
-    if (!container) return;
+  const container = parentSection.querySelector('.nested-sections-list');
+  if (!container) return;
 
-    container.innerHTML = '';
+  container.innerHTML = '';
 
-    if (!nestedSections || nestedSections.length === 0) {
-      return;
+  if (!nestedSections || nestedSections.length === 0) {
+    return;
+  }
+
+  nestedSections.forEach((nested, nestedIndex) => {
+    addNestedSectionElement(container, parentIndex, nestedIndex, nested);
+  });
+}
+function addNestedSectionElement(container, parentIndex, nestedIndex, data = {}) {
+  if (!elements.nestedSectionTemplate) return;
+
+  const template = elements.nestedSectionTemplate.content.cloneNode(true);
+  const nestedEl = template.querySelector('.nested-section-item');
+  nestedEl.dataset.nestedIndex = nestedIndex;
+  nestedEl.dataset.parentIndex = parentIndex;
+
+  const titleInput = nestedEl.querySelector('.nested-section-title');
+  const editor = nestedEl.querySelector('.nested-rich-editor');
+  const toolbar = nestedEl.querySelector('.nested-editor-toolbar');
+
+  if (titleInput) {
+    titleInput.value = data.title || '';
+    titleInput.placeholder = `Заголовок подраздела (${LANG_NAMES[currentLang]})`;
+    titleInput.addEventListener('input', () => {
+      updateNestedSectionData(parentIndex, nestedIndex, 'title', titleInput.value);
+    });
+  }
+
+  if (editor) {
+    editor.innerHTML = data.content || '';
+    editor.dataset.placeholder = `Содержимое (${LANG_NAMES[currentLang]})...`;
+    editor.addEventListener('input', () => {
+      updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+    });
+  }
+
+  // Привязка toolbar
+  bindNestedEditorToolbar(nestedEl, parentIndex, nestedIndex);
+
+  // Удаление
+  const removeBtn = nestedEl.querySelector('.nested-section-remove');
+  if (removeBtn) {
+    removeBtn.addEventListener('click', () => {
+      removeNestedSection(parentIndex, nestedIndex);
+    });
+  }
+
+  // Изображения
+  renderNestedSectionImages(nestedEl, data.images || [], parentIndex, nestedIndex);
+
+  container.appendChild(nestedEl);
+}
+
+// Добавь функцию привязки toolbar для вложенных секций:
+function bindNestedEditorToolbar(nestedEl, parentIndex, nestedIndex) {
+  const toolbar = nestedEl.querySelector('.nested-editor-toolbar');
+  const editor = nestedEl.querySelector('.nested-rich-editor');
+
+  if (!toolbar || !editor) return;
+
+  // Команды форматирования
+  toolbar.querySelectorAll('button[data-command]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const command = btn.dataset.command;
+      editor.focus();
+      document.execCommand(command, false, null);
+      updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+      updateNestedToolbarState(toolbar);
+    });
+  });
+
+  // Select для формата
+  const formatSelect = toolbar.querySelector('.toolbar-format-nested');
+  if (formatSelect) {
+    formatSelect.addEventListener('change', (e) => {
+      const value = e.target.value;
+      editor.focus();
+      if (value) {
+        document.execCommand('formatBlock', false, value);
+      } else {
+        document.execCommand('formatBlock', false, 'p');
+      }
+      updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+      e.target.value = '';
+    });
+  }
+
+  // Кнопка ссылки
+  const linkBtn = toolbar.querySelector('.nested-link-btn');
+  if (linkBtn) {
+    linkBtn.addEventListener('click', () => {
+      const url = prompt('Введите URL ссылки:', 'https://');
+      if (url) {
+        editor.focus();
+        const selection = window.getSelection();
+        const selectedText = selection.toString();
+        if (selectedText) {
+          document.execCommand('createLink', false, url);
+        } else {
+          const linkText = prompt('Текст ссылки:', url);
+          document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${linkText || url}</a>`);
+        }
+        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+      }
+    });
+  }
+
+  // Кнопка изображения
+  const imageBtn = toolbar.querySelector('.nested-image-btn');
+  if (imageBtn) {
+    imageBtn.addEventListener('click', () => {
+      showNestedImageModal(nestedEl, parentIndex, nestedIndex);
+    });
+  }
+
+  // Кнопка видео
+  const videoBtn = toolbar.querySelector('.nested-video-btn');
+  if (videoBtn) {
+    videoBtn.addEventListener('click', () => {
+      const url = prompt('Вставьте ссылку на YouTube:', 'https://www.youtube.com/watch?v=');
+      if (url) {
+        const videoId = extractYouTubeId(url);
+        if (videoId) {
+          const iframe = `<div class="video-wrapper"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+          editor.focus();
+          document.execCommand('insertHTML', false, iframe);
+          updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        } else {
+          alert('Неверная ссылка на YouTube');
+        }
+      }
+    });
+  }
+
+  // Кнопка таблицы
+  const tableBtn = toolbar.querySelector('.nested-table-btn');
+  if (tableBtn) {
+    tableBtn.addEventListener('click', () => {
+      const rows = prompt('Количество строк:', '3');
+      const cols = prompt('Количество столбцов:', '3');
+      if (rows && cols) {
+        const r = parseInt(rows) || 3;
+        const c = parseInt(cols) || 3;
+        let table = '<table><thead><tr>';
+        for (let i = 0; i < c; i++) table += '<th>Заголовок</th>';
+        table += '</tr></thead><tbody>';
+        for (let i = 0; i < r - 1; i++) {
+          table += '<tr>';
+          for (let j = 0; j < c; j++) table += '<td>Ячейка</td>';
+          table += '</tr>';
+        }
+        table += '</tbody></table>';
+        editor.focus();
+        document.execCommand('insertHTML', false, table);
+        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+      }
+    });
+  }
+
+  // Горячие клавиши
+  editor.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'b':
+          e.preventDefault();
+          document.execCommand('bold', false, null);
+          break;
+        case 'i':
+          e.preventDefault();
+          document.execCommand('italic', false, null);
+          break;
+        case 'u':
+          e.preventDefault();
+          document.execCommand('underline', false, null);
+          break;
+      }
+      updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+      updateNestedToolbarState(toolbar);
     }
+  });
 
-    nestedSections.forEach((nested, nestedIndex) => {
-      const nestedEl = document.createElement('div');
-      nestedEl.className = 'nested-section-item';
-      nestedEl.dataset.nestedIndex = nestedIndex;
+  editor.addEventListener('keyup', () => updateNestedToolbarState(toolbar));
+  editor.addEventListener('mouseup', () => updateNestedToolbarState(toolbar));
+}
 
-      nestedEl.innerHTML = `
-        <div class="nested-section-header">
-          <input type="text" class="nested-section-title" placeholder="Заголовок подраздела" value="${escapeHtmlAttr(nested.title || '')}">
-          <button type="button" class="nested-section-remove" title="Удалить">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-        <div class="nested-section-editor" contenteditable="true" data-placeholder="Содержимое подраздела...">${nested.content || ''}</div>
-      `;
+function updateNestedToolbarState(toolbar) {
+  toolbar.querySelectorAll('button[data-command]').forEach(btn => {
+    const command = btn.dataset.command;
+    try {
+      const isActive = document.queryCommandState(command);
+      btn.classList.toggle('active', isActive);
+    } catch (e) {}
+  });
+}
 
+// Модальное окно для изображений в подразделах
+function showNestedImageModal(nestedEl, parentIndex, nestedIndex) {
+  const modal = document.createElement('div');
+  modal.className = 'image-modal';
+  modal.innerHTML = `
+    <div class="image-modal-content">
+      <h3>Добавить изображение</h3>
+      <input type="url" id="nested-image-url" placeholder="https://example.com/image.jpg">
+      <label style="display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer;">
+        <input type="checkbox" id="nested-insert-in-editor" checked>
+        <span>Вставить в текст</span>
+      </label>
+      <div class="image-modal-actions">
+        <button class="btn-secondary" id="nested-image-cancel">Отмена</button>
+        <button class="btn-primary" id="nested-image-add">Добавить</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const urlInput = modal.querySelector('#nested-image-url');
+  const insertCheckbox = modal.querySelector('#nested-insert-in-editor');
+  const cancelBtn = modal.querySelector('#nested-image-cancel');
+  const addBtn = modal.querySelector('#nested-image-add');
+
+  cancelBtn.addEventListener('click', () => modal.remove());
+
+  addBtn.addEventListener('click', () => {
+    const url = urlInput.value.trim();
+    if (url && url.startsWith('http')) {
+      // Добавляем в массив изображений
+      if (!formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]) return;
+      
+      if (!formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images) {
+        formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images = [];
+      }
+      formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images.push(url);
+
+      renderNestedSectionImages(
+        nestedEl,
+        formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images,
+        parentIndex,
+        nestedIndex
+      );
+
+      if (insertCheckbox.checked) {
+        const editor = nestedEl.querySelector('.nested-rich-editor');
+        if (editor) {
+          editor.focus();
+          document.execCommand('insertImage', false, url);
+          updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        }
+      }
+
+      unsavedChanges = true;
+    }
+    modal.remove();
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+
+  urlInput.focus();
+}
+
+// Рендер изображений для вложенных секций
+function renderNestedSectionImages(nestedEl, images, parentIndex, nestedIndex) {
+  const container = nestedEl.querySelector('.nested-section-images');
+  if (!container) return;
+
+  if (!images || images.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = images.map((url, idx) => `
+    <div class="image-item" style="background-image: url('${url}');" data-index="${idx}">
+      <button type="button" class="image-item-remove" data-index="${idx}">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.image-item-remove').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.index);
+      
+      if (formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]?.images) {
+        formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images.splice(idx, 1);
+        renderNestedSectionImages(
+          nestedEl,
+          formData.sections[currentLang][parentIndex].nestedSections[nestedIndex].images,
+          parentIndex,
+          nestedIndex
+        );
+        unsavedChanges = true;
+      }
+    });
+  });
+}
+
+// Обнови addNestedSection чтобы использовать новый рендер:
+function addNestedSection(parentIndex, title = '', content = '') {
+  if (!formData.sections[currentLang]) {
+    formData.sections[currentLang] = [];
+  }
+  if (!formData.sections[currentLang][parentIndex]) {
+    formData.sections[currentLang][parentIndex] = { title: '', content: '', images: [], nestedSections: [] };
+  }
+  if (!formData.sections[currentLang][parentIndex].nestedSections) {
+    formData.sections[currentLang][parentIndex].nestedSections = [];
+  }
+
+  const nestedIndex = formData.sections[currentLang][parentIndex].nestedSections.length;
+  formData.sections[currentLang][parentIndex].nestedSections.push({ title, content, images: [] });
+
+  const parentSection = elements.sectionsList?.querySelector(`[data-index="${parentIndex}"]`);
+  if (parentSection) {
+    const container = parentSection.querySelector('.nested-sections-list');
+    if (container) {
+      addNestedSectionElement(container, parentIndex, nestedIndex, { title, content, images: [] });
+    }
+  }
+  unsavedChanges = true;
+}
       // Title input
       const titleInput = nestedEl.querySelector('.nested-section-title');
       titleInput.addEventListener('input', () => {
@@ -440,7 +744,7 @@
 
       container.appendChild(nestedEl);
     });
-  }
+  
 
   function updateNestedSectionData(parentIndex, nestedIndex, field, value) {
     if (!formData.sections[currentLang]?.[parentIndex]?.nestedSections?.[nestedIndex]) return;
@@ -1265,4 +1569,3 @@ function extractYouTubeId(url) {
       .substring(0, 50) + '-' + Date.now();
   }
 
-})();
