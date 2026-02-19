@@ -10,390 +10,6 @@ function debounce(func, wait) {
   };
 }
 
-(function() {
-  'use strict';
-  let categories = [];
-  let cards = [];
-  let currentCategory = 'all';
-  let searchQuery = '';
-  let searchTimeout = null;
-
-  let elements = {};
-
-  document.addEventListener('DOMContentLoaded', init);
-
-  function init() {
-    cacheElements();
-    bindEvents();
-    loadData();
-  }
-
-  function cacheElements() {
-    elements = {
-      categoriesList: document.getElementById('categories-list'),
-      cardsGrid: document.getElementById('cards-grid'),
-      searchInput: document.getElementById('search-input'),
-      searchClear: document.getElementById('search-clear'),
-      searchResults: document.getElementById('search-results')
-    };
-  }
-
-  function bindEvents() {
-    if (elements.searchInput) {
-      elements.searchInput.addEventListener('input', handleSearchInput);
-      elements.searchInput.addEventListener('keydown', handleSearchKeydown);
-    }
-
-    if (elements.searchClear) {
-      elements.searchClear.addEventListener('click', clearSearch);
-    }
-
-    document.addEventListener('localeChanged', function() {
-      renderCategories();
-      renderFilteredCards();
-    });
-  }
-
-  function handleSearchInput(e) {
-    searchQuery = e.target.value.trim().toLowerCase();
-
-    if (elements.searchClear) {
-      elements.searchClear.style.display = searchQuery ? 'flex' : 'none';
-    }
-
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(function() {
-      renderFilteredCards();
-    }, 300);
-  }
-
-  function handleSearchKeydown(e) {
-    if (e.key === 'Enter') {
-      clearTimeout(searchTimeout);
-      renderFilteredCards();
-    }
-    if (e.key === 'Escape') {
-      clearSearch();
-    }
-  }
-
-  function clearSearch() {
-    searchQuery = '';
-    if (elements.searchInput) {
-      elements.searchInput.value = '';
-    }
-    if (elements.searchClear) {
-      elements.searchClear.style.display = 'none';
-    }
-    renderFilteredCards();
-    elements.searchInput?.focus();
-  }
-
-  async function loadData() {
-    showLoading();
-
-    try {
-
-      const categoriesResponse = await fetch(
-        CONFIG.SUPABASE_URL + '/rest/v1/categories?order=sort_order.asc',
-        {
-          headers: {
-            'apikey': CONFIG.SUPABASE_ANON_KEY,
-            'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
-          }
-        }
-      );
-      categories = await categoriesResponse.json();
-
-      const cardsResponse = await fetch(
-        CONFIG.SUPABASE_URL + '/rest/v1/cards?is_published=eq.true&select=*,category:categories(*)&order=created_at.desc',
-        {
-          headers: {
-            'apikey': CONFIG.SUPABASE_ANON_KEY,
-            'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
-          }
-        }
-      );
-      cards = await cardsResponse.json();
-
-      console.log('Loaded cards:', cards.length);
-      console.log('Loaded categories:', categories.length);
-
-      renderCategories();
-      renderFilteredCards();
-
-    } catch (error) {
-      console.error('Ошибка загрузки:', error);
-      showError();
-    }
-  }
-
-  function getFilteredCards() {
-    const lang = localStorage.getItem('locale') || 'ru';
-    let result = cards;
-
-    if (currentCategory !== 'all') {
-      result = result.filter(function(card) {
-        return card.category_id === currentCategory;
-      });
-    }
-
-    if (searchQuery && searchQuery.length > 0) {
-      result = result.filter(function(card) {
-        var title = getText(card.title, lang).toLowerCase();
-        var description = getText(card.description, lang).toLowerCase();
-        var categoryName = '';
-        
-        if (card.category && card.category.name) {
-          categoryName = getText(card.category.name, lang).toLowerCase();
-        }
-
-        var contentText = '';
-        var content = card.content;
-        if (content && content[lang]) {
-          var langContent = content[lang];
-          if (langContent.sections && langContent.sections.length > 0) {
-            langContent.sections.forEach(function(section) {
-              if (section.title) {
-                contentText += ' ' + section.title;
-              }
-              if (section.content) {
-                contentText += ' ' + section.content.replace(/<[^>]*>/g, '');
-              }
-            });
-          }
-          if (langContent.checklist && langContent.checklist.length > 0) {
-            contentText += ' ' + langContent.checklist.join(' ');
-          }
-        }
-        contentText = contentText.toLowerCase();
-
-        var words = searchQuery.split(/\s+/);
-        
-        return words.every(function(word) {
-          if (word.length === 0) return true;
-          return title.indexOf(word) !== -1 || 
-                 description.indexOf(word) !== -1 || 
-                 categoryName.indexOf(word) !== -1 ||
-                 contentText.indexOf(word) !== -1;
-        });
-      });
-    }
-
-    return result;
-  }
-
-  function getText(obj, lang) {
-    if (!obj) return '';
-    if (typeof obj === 'string') return obj;
-    return obj[lang] || obj['ru'] || obj['en'] || '';
-  }
-
-  function renderCategories() {
-    if (!elements.categoriesList) return;
-
-    var lang = localStorage.getItem('locale') || 'ru';
-    var html = '';
-
-    html += '<button class="category-btn ' + (currentCategory === 'all' ? 'active' : '') + '" data-id="all">';
-    html += '<span class="category-icon">📋</span>';
-    html += '<span class="category-name">' + getAllText(lang) + '</span>';
-    html += '<span class="category-count">' + cards.length + '</span>';
-    html += '</button>';
-
-    categories.forEach(function(cat) {
-      var name = getText(cat.name, lang);
-      var count = cards.filter(function(c) { return c.category_id === cat.id; }).length;
-      var isActive = currentCategory === cat.id;
-
-      html += '<button class="category-btn ' + (isActive ? 'active' : '') + '" data-id="' + cat.id + '">';
-      html += '<span class="category-icon">' + (cat.icon || '📁') + '</span>';
-      html += '<span class="category-name">' + escapeHtml(name) + '</span>';
-      html += '<span class="category-count">' + count + '</span>';
-      html += '</button>';
-    });
-
-    elements.categoriesList.innerHTML = html;
-
-    elements.categoriesList.querySelectorAll('.category-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var id = this.getAttribute('data-id');
-        currentCategory = id;
-
-        elements.categoriesList.querySelectorAll('.category-btn').forEach(function(b) {
-          b.classList.remove('active');
-        });
-        this.classList.add('active');
-
-        renderFilteredCards();
-      });
-    });
-  }
-
-  function getAllText(lang) {
-    var texts = {
-      ru: 'Все',
-      kk: 'Барлығы',
-      uz: 'Hammasi',
-      en: 'All',
-      tk: 'Hemmesi'
-    };
-    return texts[lang] || texts.ru;
-  }
-
-  function renderFilteredCards() {
-    var filtered = getFilteredCards();
-    
-    updateSearchResults(filtered.length);
-    
-    renderCards(filtered);
-  }
-
-  function renderCards(cardsToRender) {
-    if (!elements.cardsGrid) return;
-
-    var lang = localStorage.getItem('locale') || 'ru';
-
-    if (cardsToRender.length === 0) {
-      elements.cardsGrid.innerHTML = '<div class="empty-state">' +
-        '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">' +
-        '<circle cx="11" cy="11" r="8"></circle>' +
-        '<path d="m21 21-4.35-4.35"></path>' +
-        '</svg>' +
-        '<p>' + getNotFoundText(lang) + '</p>' +
-        '</div>';
-      return;
-    }
-
-    var html = '';
-
-    cardsToRender.forEach(function(card) {
-      var title = getText(card.title, lang) || 'Без названия';
-      var description = getText(card.description, lang) || '';
-      var image = card.cover_image || (card.images && card.images[0]) || '';
-      var categoryName = card.category ? getText(card.category.name, lang) : '';
-
-      var displayTitle = highlightText(title, searchQuery);
-      var displayDesc = highlightText(truncateText(description, 100), searchQuery);
-
-      html += '<a href="card.html?id=' + card.id + '" class="card-item">';
-      html += '<div class="card-image"' + (image ? ' style="background-image: url(\'' + image + '\');"' : '') + '>';
-      if (!image) {
-        html += '<div class="card-image-placeholder"></div>';
-      }
-      html += '</div>';
-      html += '<div class="card-content">';
-      if (categoryName) {
-        html += '<span class="card-category">' + escapeHtml(categoryName) + '</span>';
-      }
-      html += '<h3 class="card-title">' + displayTitle + '</h3>';
-      if (description) {
-        html += '<p class="card-description">' + displayDesc + '</p>';
-      }
-      html += '</div>';
-      html += '</a>';
-    });
-
-    elements.cardsGrid.innerHTML = html;
-  }
-
-  function updateSearchResults(count) {
-    if (!elements.searchResults) return;
-
-    if (searchQuery && searchQuery.length > 0) {
-      var lang = localStorage.getItem('locale') || 'ru';
-      var text = '';
-      
-      if (count === 0) {
-        text = getNotFoundText(lang);
-      } else {
-        text = getFoundText(lang, count);
-      }
-
-      elements.searchResults.textContent = text;
-      elements.searchResults.style.display = 'block';
-    } else {
-      elements.searchResults.style.display = 'none';
-    }
-  }
-
-  function getNotFoundText(lang) {
-    var texts = {
-      ru: 'Ничего не найдено',
-      kk: 'Ештеңе табылмады',
-      uz: 'Hech narsa topilmadi',
-      en: 'Nothing found',
-      tk: 'Hiç zat tapylmady'
-    };
-    return texts[lang] || texts.ru;
-  }
-
-  function getFoundText(lang, count) {
-    var texts = {
-      ru: 'Найдено: ' + count,
-      kk: 'Табылды: ' + count,
-      uz: 'Topildi: ' + count,
-      en: 'Found: ' + count,
-      tk: 'Tapyldy: ' + count
-    };
-    return texts[lang] || texts.ru;
-  }
-
-  function highlightText(text, query) {
-    if (!query || !text) return escapeHtml(text);
-
-    var escaped = escapeHtml(text);
-    var words = query.split(/\s+/);
-
-    words.forEach(function(word) {
-      if (word.length > 0) {
-        var regex = new RegExp('(' + escapeRegex(word) + ')', 'gi');
-        escaped = escaped.replace(regex, '<mark>$1</mark>');
-      }
-    });
-
-    return escaped;
-  }
-
-  function escapeRegex(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  function showLoading() {
-    if (!elements.cardsGrid) return;
-
-    elements.cardsGrid.innerHTML = 
-      '<div class="skeleton-card"></div>' +
-      '<div class="skeleton-card"></div>' +
-      '<div class="skeleton-card"></div>' +
-      '<div class="skeleton-card"></div>' +
-      '<div class="skeleton-card"></div>' +
-      '<div class="skeleton-card"></div>';
-  }
-
-  function showError() {
-    if (!elements.cardsGrid) return;
-
-    elements.cardsGrid.innerHTML = '<div class="empty-state">' +
-      '<p>Ошибка загрузки данных</p>' +
-      '<button onclick="location.reload()" style="margin-top:12px;padding:10px 20px;background:#1b98fb;color:#fff;border:none;border-radius:8px;cursor:pointer;">Повторить</button>' +
-      '</div>';
-  }
-
-  function escapeHtml(text) {
-    if (!text) return '';
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  function truncateText(text, length) {
-    if (!text) return '';
-    if (text.length <= length) return text;
-    return text.substring(0, length) + '...';
-  }
-
-})();
 function showSkeletons(container, count = 6) {
   if (!container) return;
   container.innerHTML = Array(count).fill(`
@@ -404,7 +20,8 @@ function showSkeletons(container, count = 6) {
     </div>
   `).join('');
 }
-function renderCards(cards, container) {
+
+function renderCards(cards, container, searchQuery) {
   if (!container) return;
 
   if (cards.length === 0) {
@@ -421,14 +38,17 @@ function renderCards(cards, container) {
     const description = i18n.localize(card.description, '');
     const categoryName = card.category ? i18n.localize(card.category.name, '') : '';
 
+    const displayTitle = searchQuery ? highlightText(title, searchQuery) : escapeHtml(title);
+    const displayDesc = searchQuery ? highlightText(truncateText(description, 100), searchQuery) : escapeHtml(truncateText(description, 100));
+
     return `
       <div class="astm-card" data-card-id="${card.id}">
-        <h3 class="astm-title">${title}</h3>
-        <p class="astm-description">${description}</p>
+        <h3 class="astm-title">${displayTitle}</h3>
+        <p class="astm-description">${displayDesc}</p>
         <div class="astm-divider"></div>
         <div class="astm-bottom">
           <div class="astm-meta">
-            ${categoryName ? `<span class="astm-category">${categoryName}</span>` : ''}
+            ${categoryName ? `<span class="astm-category">${escapeHtml(categoryName)}</span>` : ''}
           </div>
           <div class="astm-divider-vertical"></div>
           <a href="card.html?id=${card.id}" class="astm-button">
@@ -441,6 +61,7 @@ function renderCards(cards, container) {
     `;
   }).join('');
 }
+
 function renderCategories(categories, container) {
   if (!container) return;
 
@@ -454,97 +75,158 @@ function renderCategories(categories, container) {
     `;
   }).join('');
 }
-function initBurgerMenu() {
-  const burger = document.getElementById('burger');
-  const menu = document.getElementById('menu');
 
-  if (!burger || !menu) return;
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
 
-  const toggleMenu = () => {
-    burger.classList.toggle('active');
-    menu.classList.toggle('active');
-  };
+function truncateText(text, length) {
+  if (!text) return '';
+  if (text.length <= length) return text;
+  return text.substring(0, length) + '...';
+}
 
-  burger.addEventListener('click', toggleMenu);
-  burger.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggleMenu();
+function highlightText(text, query) {
+  if (!query || !text) return escapeHtml(text);
+  const escaped = escapeHtml(text);
+  const words = query.split(/\s+/);
+  let result = escaped;
+  words.forEach(word => {
+    if (word.length > 0) {
+      const regex = new RegExp('(' + word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      result = result.replace(regex, '<mark>$1</mark>');
     }
   });
-
-  menu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      burger.classList.remove('active');
-      menu.classList.remove('active');
-    });
-  });
+  return result;
 }
 
-function initInstallBanner() {
-  let deferredPrompt;
-  const installBanner = document.getElementById('installBanner');
-  const installBtn = document.getElementById('installBtn');
-  const dismissBtn = document.getElementById('dismissBtn');
-
-  if (!installBanner) return;
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBanner.classList.add('show');
-  });
-
-  if (installBtn) {
-    installBtn.addEventListener('click', () => {
-      installBanner.classList.remove('show');
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          deferredPrompt = null;
-        });
-      }
-    });
-  }
-
-  if (dismissBtn) {
-    dismissBtn.addEventListener('click', () => {
-      installBanner.classList.remove('show');
-    });
-  }
+function getLocalText(obj, lang) {
+  if (!obj) return '';
+  if (typeof obj === 'string') return obj;
+  return obj[lang] || obj['ru'] || obj['en'] || '';
 }
 
-function initServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('SW registered'))
-      .catch((err) => console.log('SW error:', err));
-  }
-}
+// ============ HOME PAGE ============
+
+let _homeAllCards = [];
+let _homeSearchBound = false;
+
 async function initHomePage() {
   const cardsContainer = document.getElementById('cards-container');
-  const categoriesContainer = document.getElementById('categories-container');
+  const searchInput = document.getElementById('search-input');
+  const searchClear = document.getElementById('search-clear');
+  const searchResults = document.getElementById('search-results');
 
   if (cardsContainer) {
     showSkeletons(cardsContainer, 6);
   }
 
   try {
-    if (categoriesContainer) {
-      const categories = await DB.getCategories();
-      renderCategories(categories, categoriesContainer);
-    }
-    if (cardsContainer) {
-      const cards = await DB.getPopularCards(6);
-      renderCards(cards, cardsContainer);
-    }
+    _homeAllCards = await DB.getCards();
+    renderHome();
   } catch (error) {
     console.error('Error loading data:', error);
     if (cardsContainer) {
       cardsContainer.innerHTML = `<p class="error">${i18n.t('common.error')}</p>`;
     }
+    return;
+  }
+
+  if (!_homeSearchBound) {
+    _homeSearchBound = true;
+
+    if (searchInput) {
+      searchInput.addEventListener('input', debounce(function() {
+        if (searchClear) {
+          searchClear.style.display = searchInput.value.trim() ? 'flex' : 'none';
+        }
+        renderHome();
+      }, 300));
+
+      searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          searchInput.value = '';
+          if (searchClear) searchClear.style.display = 'none';
+          renderHome();
+          searchInput.focus();
+        }
+        if (e.key === 'Enter') {
+          renderHome();
+        }
+      });
+    }
+
+    if (searchClear) {
+      searchClear.addEventListener('click', function() {
+        if (searchInput) searchInput.value = '';
+        searchClear.style.display = 'none';
+        renderHome();
+        if (searchInput) searchInput.focus();
+      });
+    }
+  }
+
+  function renderHome() {
+    if (!cardsContainer) return;
+
+    const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+    const lang = i18n.getLocale();
+    let filtered;
+
+    if (query) {
+      filtered = _homeAllCards.filter(card => {
+        const title = getLocalText(card.title, lang).toLowerCase();
+        const desc = getLocalText(card.description, lang).toLowerCase();
+        const catName = card.category ? getLocalText(card.category.name, lang).toLowerCase() : '';
+
+        let contentText = '';
+        const content = card.content;
+        if (content && content[lang]) {
+          const lc = content[lang];
+          if (lc.sections) {
+            lc.sections.forEach(s => {
+              if (s.title) contentText += ' ' + s.title;
+              if (s.content) contentText += ' ' + s.content.replace(/<[^>]*>/g, '');
+            });
+          }
+          if (lc.checklist) {
+            contentText += ' ' + lc.checklist.join(' ');
+          }
+        }
+        contentText = contentText.toLowerCase();
+
+        const words = query.split(/\s+/);
+        return words.every(word => {
+          if (!word) return true;
+          return title.includes(word) || desc.includes(word) ||
+                 catName.includes(word) || contentText.includes(word);
+        });
+      });
+    } else {
+      filtered = [..._homeAllCards]
+        .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
+        .slice(0, 6);
+    }
+
+    if (searchResults) {
+      if (query) {
+        searchResults.textContent = filtered.length > 0
+          ? i18n.t('catalog.found', { count: filtered.length })
+          : i18n.t('catalog.noResults');
+        searchResults.style.display = 'block';
+      } else {
+        searchResults.style.display = 'none';
+      }
+    }
+
+    renderCards(filtered, cardsContainer, query);
   }
 }
+
+// ============ CATALOG PAGE ============
 
 async function initCatalogPage() {
   const cardsContainer = document.getElementById('cards-container');
@@ -626,7 +308,7 @@ async function initCatalogPage() {
     }
 
     if (resultsCount) {
-      resultsCount.textContent = filtered.length > 0 
+      resultsCount.textContent = filtered.length > 0
         ? i18n.t('catalog.found', { count: filtered.length })
         : '';
     }
@@ -634,6 +316,8 @@ async function initCatalogPage() {
     renderCards(filtered, cardsContainer);
   }
 }
+
+// ============ CARD PAGE ============
 
 async function initCardPage() {
   const params = new URLSearchParams(window.location.search);
@@ -666,7 +350,7 @@ async function initCardPage() {
     const pdfUrl = i18n.localize(card.pdf_urls, null);
 
     document.title = `${title} — KAZARBUILD`;
-    
+
     if (titleEl) titleEl.textContent = title;
     if (descriptionEl) descriptionEl.textContent = description;
     if (categoryEl) categoryEl.textContent = categoryName;
@@ -697,44 +381,75 @@ async function initCardPage() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  i18n.init();
-  i18n.initLanguageSwitcher();
-  
-  initBurgerMenu();
-  initInstallBanner();
-  initServiceWorker();
-  initOfflineIndicator();
-  const page = document.body.dataset.page;
-  
-  switch (page) {
-    case 'home':
-      initHomePage();
-      break;
-    case 'catalog':
-      initCatalogPage();
-      break;
-    case 'card':
-      initCardPage();
-      break;
-  }
+// ============ COMMON INIT ============
 
-  document.addEventListener('localeChanged', () => {
-    switch (page) {
-      case 'home':
-        initHomePage();
-        break;
-      case 'catalog':
-        initCatalogPage();
-        break;
-      case 'card':
-        initCardPage();
-        break;
+function initBurgerMenu() {
+  const burger = document.getElementById('burger');
+  const menu = document.getElementById('menu');
+
+  if (!burger || !menu) return;
+
+  const toggleMenu = () => {
+    burger.classList.toggle('active');
+    menu.classList.toggle('active');
+  };
+
+  burger.addEventListener('click', toggleMenu);
+  burger.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleMenu();
     }
   });
-});
 
+  menu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      burger.classList.remove('active');
+      menu.classList.remove('active');
+    });
+  });
+}
 
+function initInstallBanner() {
+  let deferredPrompt;
+  const installBanner = document.getElementById('installBanner');
+  const installBtn = document.getElementById('installBtn');
+  const dismissBtn = document.getElementById('dismissBtn');
+
+  if (!installBanner) return;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBanner.classList.add('show');
+  });
+
+  if (installBtn) {
+    installBtn.addEventListener('click', () => {
+      installBanner.classList.remove('show');
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+        });
+      }
+    });
+  }
+
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', () => {
+      installBanner.classList.remove('show');
+    });
+  }
+}
+
+function initServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW registered'))
+      .catch((err) => console.log('SW error:', err));
+  }
+}
 
 // ============ OFFLINE ============
 
@@ -763,3 +478,42 @@ function initOfflineIndicator() {
   window.addEventListener('offline', updateStatus);
   updateStatus();
 }
+
+// ============ BOOTSTRAP ============
+
+document.addEventListener('DOMContentLoaded', () => {
+  i18n.init();
+  i18n.initLanguageSwitcher();
+
+  initBurgerMenu();
+  initInstallBanner();
+  initServiceWorker();
+  initOfflineIndicator();
+  const page = document.body.dataset.page;
+
+  switch (page) {
+    case 'home':
+      initHomePage();
+      break;
+    case 'catalog':
+      initCatalogPage();
+      break;
+    case 'card':
+      initCardPage();
+      break;
+  }
+
+  document.addEventListener('localeChanged', () => {
+    switch (page) {
+      case 'home':
+        initHomePage();
+        break;
+      case 'catalog':
+        initCatalogPage();
+        break;
+      case 'card':
+        initCardPage();
+        break;
+    }
+  });
+});

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechCards Migration</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;padding:20px;max-width:900px;margin:0 auto}
+h1{color:#fff;margin-bottom:10px}
+.summary{background:#16213e;border-radius:8px;padding:16px;margin:16px 0}
+.summary span{color:#4fc3f7;font-weight:bold}
+button#startBtn{background:#4caf50;color:#fff;border:none;padding:14px 32px;font-size:18px;border-radius:8px;cursor:pointer;margin:16px 0;display:block}
+button#startBtn:hover{background:#388e3c}
+button#startBtn:disabled{background:#555;cursor:not-allowed}
+#log{background:#0d1117;border:1px solid #333;border-radius:8px;padding:12px;height:500px;overflow-y:auto;font-family:'Courier New',monospace;font-size:13px;line-height:1.5}
+.log-ok{color:#4caf50}.log-err{color:#f44336}.log-info{color:#4fc3f7}.log-warn{color:#ff9800}
+#progress{margin:10px 0;font-size:16px;color:#4fc3f7}
+</style>
+</head>
+<body>
+<h1>TechCards Supabase Migration</h1>
+<div class="summary">
+  <p>This will insert <span>33 categories</span> and approximately <span>170 cards</span> into Supabase.</p>
+  <p>Each category gets inserted first, then its subcategory cards are inserted with the returned category_id.</p>
+</div>
+<div id="progress"></div>
+<button id="startBtn" onclick="runMigration()">Start Migration</button>
+<div id="log"></div>
+
+<script>
+const SUPABASE_URL = 'https://pxcmilndzzqiickakfyr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4Y21pbG5kenpxaWlja2FrZnlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2ODQxODcsImV4cCI6MjA4MzI2MDE4N30.1Xw5sdxNK26S4eRUSgYU3ZYNDONL5t49qBGy65s16bA';
+
+const logEl = document.getElementById('log');
+const progressEl = document.getElementById('progress');
+
+function log(msg, cls='log-info') {
+  const d = document.createElement('div');
+  d.className = cls;
+  d.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  logEl.appendChild(d);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function generateSlug(text) {
+  const translitMap = {'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'};
+  return text.toLowerCase().split('').map(c => translitMap[c] || c).join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 50) + '-' + Date.now();
+}
+
+async function supabaseInsert(table, data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`${res.status}: ${errText}`);
+  }
+  return await res.json();
+}
+
+function emptyContent() {
+  const c = {};
+  ['ru','kk','uz','en','tk'].forEach(l => { c[l] = { sections: [], checklist: [] }; });
+  return c;
+}
+
+function ml(en, ru, uz, tm, kz) {
+  return { en: en, ru: ru, uz: uz, tk: tm, kk: kz };
+}
+
+const CATEGORIES = [
+  {
+    sort: 1, icon: '🏠',
+    name: ml('Project Start & Launch','Запуск и начало проекта','Loyiha ishga tushirish va boshlanishi','Proýektiň işe goýulmagy we başlamagy','Жоба іске қосу және бастау'),
+    cards: [
+      { id:'production-culture', title: ml('Production Culture','Производственная культура','Ishlab chiqarish madaniyati','Önümçilik medeniýeti','Өндіріс мәдениеті'), desc: ml('Establishing professional work standards','Установление профессиональных стандартов работы','Professional ish standartlarini oʻrnatish','Hünärli iş standartlaryny döretmek','Кәсіби жұмыс стандарттарын орнату') },
+      { id:'object-packaging', title: ml('Object Packaging & Protection','Упаковка и защита объекта','Obyektni qadoqlash va himoya qilish','Obýekti gaplamak we goramak','Объектіні орау және қорғау'), desc: ml('Methods for protecting work areas and materials','Методы защиты рабочих зон и материалов','Ish zonalari va materiallarini himoya qilish usullari','Iş zolaklaryny we materiallary goramak usullary','Жұмыс аймақтары мен материалдарды қорғау әдістері') },
+      { id:'temporary-utilities', title: ml('Temporary Electricity & Plumbing','Временные электричество и сантехника','Vaqtinchalik elektr va santexnika','Wagtlaýyn elektrik we santehnika','Уақытша электр және сантехника'), desc: ml('Setting up temporary site utilities','Настройка временных коммуникаций на объекте','Obyekt boʻyicha vaqtinchalik kommunikatsiyalarni sozlash','Obýektdäki wagtlaýyn aragatnaşyklary sazlamak','Объектідегі уақытша коммуникацияларды орнату') },
+      { id:'tech-setup', title: ml('Cameras & Router Setup','Настройка камер и роутера','Kameralar va routerlarni sozlash','Kameralary we routeri sazlamak','Камералар және роутерді орнату'), desc: ml('Installing monitoring and communication systems','Установка систем мониторинга и связи','Monitoring va aloqa tizimlarini oʻrnatish','Gözegçilik we aragatnaşyk ulgamlaryny ornaşdyrmak','Мониторинг және байланыс жүйелерін орнату') },
+      { id:'tools-materials', title: ml('Minimum Tools & Materials Kit','Минимальный набор инструментов и материалов','Minimal asboblar va materiallar toʻplami','Minimal gurallar we materiallar toplumy','Минималды құралдар және материалдар жиынтығы'), desc: ml('Essential equipment checklist for projects','Контрольный список необходимого оборудования для проектов','Loyihalar uchun zarur jihozlarning nazorat roʻyxati','Proýektler üçin zerur ýaraglaryň gözegçilik sanawy','Жобалар үшін қажетті жабдықтардың бақылау тізімі') },
+      { id:'project-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Complete startup verification list','Полный список проверки запуска','Ishga tushirishning toʻliq tekshiruv roʻyxati','Işe goýulmagyň doly barlag sanawy','Іске қосудың толық тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 2, icon: '🔨',
+    name: ml('Dismantling Works','Демонтажные работы','Demontaj ishlari','Sökmek işleri','Бөлшектеу жұмыстары'),
+    cards: [
+      { id:'finishing-removal', title: ml('Finishing Removal','Удаление отделки','Bezakni olib tashlash','Bezegi aýyrmak','Әрлеуді алу'), desc: ml('Removing existing finishing materials','Удаление существующих отделочных материалов','Mavjud bezak materiallarini olib tashlash','Bar bolan bezeg materiallaryny aýyrmak','Бар әрлеу материалдарын алу') },
+      { id:'rough-covering', title: ml('Rough Covering Removal','Удаление чернового покрытия','Qoralama qoplamani olib tashlash','Çig örtügi aýyrmak','Өңделмеген жабынды алу'), desc: ml('Removing rough coverings and substrates','Удаление черновых покрытий и оснований','Qoralama qoplama va asoslarni olib tashlash','Çig örtükleri we esaslary aýyrmak','Өңделмеген жабындылар мен негіздерді алу') },
+      { id:'flooring-dismantling', title: ml('Flooring Dismantling','Демонтаж пола','Polni demontaj qilish','Poly sökmek','Еденді бөлшектеу'), desc: ml('Floor covering removal procedures','Процедуры удаления напольных покрытий','Pol qoplamalarini olib tashlash tartiblari','Pol örtüklerini aýyrmak amallary','Еден жабындарын алу рәсімдері') },
+      { id:'ceiling-dismantling', title: ml('Ceiling Dismantling','Демонтаж потолка','Shiftni demontaj qilish','Potology sökmek','Төбені бөлшектеу'), desc: ml('Ceiling removal and preparation','Демонтаж и подготовка потолка','Shiftni demontaj qilish va tayyorlash','Potology sökmek we taýýarlamak','Төбені бөлшектеу және дайындау') },
+      { id:'tile-dismantling', title: ml('Tile Dismantling','Демонтаж плитки','Plitkani demontaj qilish','Plitka sökmek','Плитканы бөлшектеу'), desc: ml('Tile removal techniques','Техники удаления плитки','Plitkani olib tashlash texnikalari','Plitka aýyrmak usullary','Плитканы алу әдістері') },
+      { id:'dismantling-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Dismantling verification checklist','Контрольный список демонтажных работ','Demontaj ishlarining tekshiruv roʻyxati','Sökmek işleriniň barlag sanawy','Бөлшектеу жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 3, icon: '🏗️',
+    name: ml('Reconstruction & Remodeling','Реконструкция и перепланировка','Rekonstruktsiya va qayta rejalashtirish','Täzeden gurluşyk we täzeden meýilleşdirmek','Реконструкция және қайта жоспарлау'),
+    cards: [
+      { id:'space-planning', title: ml('Space Planning','Планировка пространства','Makonni rejalashtirish','Giňişligi meýilleşdirmek','Кеңістікті жоспарлау'), desc: ml('Room layout and space optimization','Планировка помещений и оптимизация пространства','Xonalar joylashuvi va makonni optimallashtirish','Otaglaryň ýerleşişi we giňişligi optimizasiýa etmek','Бөлмелердің орналасуы және кеңістікті оңтайландыру') }
+    ]
+  },
+  {
+    sort: 4, icon: '🧱',
+    name: ml('Wall Masonry','Кладка стен','Devor qurish','Diwar ýasamak','Қабырға құрылысы'),
+    cards: [
+      { id:'aerated-concrete', title: ml('Aerated Concrete','Газобетон','Gazobeton','Gazbeton','Газбетон'), desc: ml('Aerated concrete block masonry techniques','Техники кладки газобетонных блоков','Gazobeton bloklarini yotqizish texnikalari','Gazbeton bloklaryny ýerleşdirmek usullary','Газбетон блоктарын төсеу әдістері') },
+      { id:'gypsum-plates', title: ml('Gypsum Plates','Гипсовые плиты','Gipsli plitalar','Gips plitalary','Гипс плиталары'), desc: ml('Gypsum plate wall construction','Строительство стен из гипсовых плит','Gipsli plitalardan devor qurish','Gips plitalaryndan diwar gurmak','Гипс плиталарынан қабырға тұрғызу') }
+    ]
+  },
+  {
+    sort: 5, icon: '🎨',
+    name: ml('Plastering','Штукатурка','Shpaklyovka','Gipslemek','Сылақ'),
+    cards: [
+      { id:'plaster-materials', title: ml('Plaster Materials','Штукатурные материалы','Shtukaturka materiallari','Gipsleme materiallary','Сылақ материалдары'), desc: ml('Overview of plastering materials','Обзор штукатурных материалов','Shtukaturka materiallarining umumiy koʻrinishi','Gipsleme materiallaryna syn','Сылақ материалдарына шолу') },
+      { id:'plaster-preparation', title: ml('Surface Preparation','Подготовка поверхности','Yuzani tayyorlash','Ýüzi taýýarlamak','Бетті дайындау'), desc: ml('Preparing surfaces for plastering','Подготовка поверхностей для штукатурки','Shtukaturka uchun yuzalarni tayyorlash','Gipsleme üçin ýüzleri taýýarlamak','Сылақтау үшін беттерді дайындау') },
+      { id:'priming', title: ml('Priming','Грунтовка','Gruntlash','Gruntlamak','Грунттау'), desc: ml('Primer application techniques','Техники нанесения грунтовки','Grunt qoʻllash texnikalari','Grunt çalmak usullary','Грунт қолдану әдістері') },
+      { id:'beacon-installation', title: ml('Beacon Installation','Установка маяков','Mayoqlarni oʻrnatish','Maýaklary ornaşdyrmak','Маяктарды орнату'), desc: ml('Setting up guide beacons for plastering','Установка направляющих маяков для штукатурки','Shtukaturka uchun yoʻnaltiruvchi mayoqlarni oʻrnatish','Gipsleme üçin ugur görkeziji maýaklary ornaşdyrmak','Сылақтау үшін бағыттаушы маяктарды орнату') },
+      { id:'reinforcement', title: ml('Reinforcement','Армирование','Armaturalash','Armaturlamak','Арматуралау'), desc: ml('Mesh and reinforcement techniques','Техники армирования и использования сетки','Toʻr va armaturalash texnikalari','Tor we armaturlamak usullary','Тор және арматуралау әдістері') },
+      { id:'applying-plaster', title: ml('Applying Plaster','Нанесение штукатурки','Shtukaturka qoʻllash','Gips çalmak','Сылақ жағу'), desc: ml('Plaster application methods','Методы нанесения штукатурки','Shtukaturka qoʻllash usullari','Gips çalmak usullary','Сылақ жағу әдістері') },
+      { id:'plastered-slopes', title: ml('Plastered Slopes','Штукатурные откосы','Shtukaturka nishablar','Gipslenen eňňitmeler','Сылақталған еңістер'), desc: ml('Slope plastering techniques','Техники штукатурки откосов','Nishablarni shtukaturkalash texnikalari','Eňňitmeleri gipslemek usullary','Еңістерді сылақтау әдістері') },
+      { id:'ceiling-plastering', title: ml('Ceiling Plastering','Штукатурка потолка','Shiftni shtukaturkalash','Potology gipslemek','Төбені сылақтау'), desc: ml('Ceiling plastering methods','Методы штукатурки потолка','Shiftni shtukaturkalash usullari','Potology gipslemek usullary','Төбені сылақтау әдістері') },
+      { id:'wall-plastering', title: ml('Wall Plastering','Штукатурка стен','Devorlarni shtukaturkalash','Diwarlary gipslemek','Қабырғаларды сылақтау'), desc: ml('Wall plastering techniques','Техники штукатурки стен','Devorlarni shtukaturkalash texnikalari','Diwarlary gipslemek usullary','Қабырғаларды сылақтау әдістері') },
+      { id:'plastering-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Plastering verification checklist','Контрольный список штукатурных работ','Shtukaturka ishlarining tekshiruv roʻyxati','Gipsleme işleriniň barlag sanawy','Сылақтау жұмыстарының тексеру тізімі') },
+      { id:'plastering-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Plastering video tutorials','Видео уроки по штукатурке','Shtukaturka boʻyicha video darsliklar','Gipsleme boýunça wideo sapaklar','Сылақтау бойынша бейне сабақтар') },
+      { id:'plastering-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Plastering technical documentation','Техническая документация по штукатурке','Shtukaturka boʻyicha texnik hujjatlar','Gipsleme boýunça tehniki resminamalar','Сылақтау бойынша техникалық құжаттама') }
+    ]
+  },
+  {
+    sort: 6, icon: '🪟',
+    name: ml('Windows','Окна','Derazalar','Penjireler','Терезелер'),
+    cards: [
+      { id:'windows-sub', title: ml('Windows Overview','Окна обзор','Derazalar haqida','Penjireler hakynda','Терезелер туралы'), desc: ml('Window types and specifications','Типы и характеристики окон','Deraza turlari va xususiyatlari','Penjire görnüşleri we aýratynlyklary','Терезе түрлері және сипаттамалары') },
+      { id:'window-installation', title: ml('Window Installation','Установка окон','Derazalarni oʻrnatish','Penjireleri ornaşdyrmak','Терезелерді орнату'), desc: ml('Window installation procedures','Процедуры установки окон','Derazalarni oʻrnatish tartiblari','Penjireleri ornaşdyrmak amallary','Терезелерді орнату рәсімдері') }
+    ]
+  },
+  {
+    sort: 7, icon: '🌡️',
+    name: ml('Thermal Insulation','Теплоизоляция','Issiqlik izolyatsiyasi','Ýylylyk izolýasiýasy','Жылу оқшаулау'),
+    cards: [
+      { id:'balcony-insulation', title: ml('Balcony Insulation','Утепление балкона','Balkonni izolyatsiya qilish','Balkony izolýasiýa etmek','Балконды оқшаулау'), desc: ml('Balcony thermal insulation methods','Методы теплоизоляции балкона','Balkonni issiqlik izolyatsiyasi usullari','Balkonyň ýylylyk izolýasiýasy usullary','Балконды жылу оқшаулау әдістері') },
+      { id:'slope-insulation', title: ml('Slope Insulation','Утепление откосов','Nishablarni izolyatsiya qilish','Eňňitmeleri izolýasiýa etmek','Еңістерді оқшаулау'), desc: ml('Slope thermal insulation techniques','Техники теплоизоляции откосов','Nishablarni issiqlik izolyatsiyasi texnikalari','Eňňitmeleriň ýylylyk izolýasiýasy usullary','Еңістерді жылу оқшаулау әдістері') },
+      { id:'liquid-insulation', title: ml('Liquid Insulation','Жидкая изоляция','Suyuq izolyatsiya','Suwuk izolýasiýa','Сұйық оқшаулау'), desc: ml('Liquid thermal insulation application','Применение жидкой теплоизоляции','Suyuq issiqlik izolyatsiyasini qoʻllash','Suwuk ýylylyk izolýasiýasyny ulanmak','Сұйық жылу оқшаулауды қолдану') }
+    ]
+  },
+  {
+    sort: 8, icon: '📐',
+    name: ml('Slopes','Откосы','Nishablar','Eňňitmeler','Еңістер'),
+    cards: [
+      { id:'plaster-slopes', title: ml('Plaster Slopes','Штукатурные откосы','Shtukaturka nishablar','Gipsleme eňňitmeleri','Сылақ еңістері'), desc: ml('Plastered slope finishing','Отделка штукатурных откосов','Shtukaturka nishablarni bezash','Gipsleme eňňitmelerini bezemek','Сылақ еңістерін әрлеу') },
+      { id:'gypsum-slopes', title: ml('Gypsum Slopes','Гипсовые откосы','Gipsli nishablar','Gips eňňitmeleri','Гипс еңістері'), desc: ml('Gypsum board slope installation','Установка гипсовых откосов','Gipsli nishablarni oʻrnatish','Gips eňňitmelerini ornaşdyrmak','Гипс еңістерін орнату') },
+      { id:'sandwich-panels', title: ml('Sandwich Panels','Сэндвич-панели','Sendvich panellar','Sendwiç paneller','Сэндвич панельдер'), desc: ml('Sandwich panel slope installation','Установка откосов из сэндвич-панелей','Sendvich panelli nishablarni oʻrnatish','Sendwiç panelli eňňitmeleri ornaşdyrmak','Сэндвич панельді еңістерді орнату') },
+      { id:'slopes-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Slopes technical documentation','Техническая документация по откосам','Nishablar boʻyicha texnik hujjatlar','Eňňitmeler boýunça tehniki resminamalar','Еңістер бойынша техникалық құжаттама') }
+    ]
+  },
+  {
+    sort: 9, icon: '💧',
+    name: ml('Plumbing','Сантехника','Santexnika','Santehnika','Сантехника'),
+    cards: [
+      { id:'water-risers', title: ml('Water Risers','Водяные стояки','Suv stoyaklari','Suw stoýaklary','Су стояктары'), desc: ml('Water riser installation and replacement','Установка и замена водяных стояков','Suv stoyaklarini oʻrnatish va almashtirish','Suw stoýaklaryny ornaşdyrmak we çalyşmak','Су стояктарын орнату және ауыстыру') },
+      { id:'pipe-installation', title: ml('Pipe Installation','Установка труб','Trubalarni oʻrnatish','Turbalary ornaşdyrmak','Құбырларды орнату'), desc: ml('Pipe routing and installation methods','Методы прокладки и установки труб','Trubalarni yoʻnaltirish va oʻrnatish usullari','Turbalary ugratmak we ornaşdyrmak usullary','Құбырларды бағыттау және орнату әдістері') },
+      { id:'plumbing-cabinet', title: ml('Plumbing Cabinet','Сантехнический шкаф','Santexnika shkafi','Santehnika şkafy','Сантехника шкафы'), desc: ml('Plumbing cabinet installation','Установка сантехнического шкафа','Santexnika shkafini oʻrnatish','Santehnika şkafyny ornaşdyrmak','Сантехника шкафын орнату') },
+      { id:'threaded-joints', title: ml('Threaded Joints','Резьбовые соединения','Rezьbali biriktirishlar','Ýüpli birikdirmeler','Бұрандалы қосылыстар'), desc: ml('Threaded joint assembly techniques','Техники сборки резьбовых соединений','Rezьbali birikmalarni yigʻish texnikalari','Ýüpli birikdirmeleri ýygnamak usullary','Бұрандалы қосылыстарды құрастыру әдістері') },
+      { id:'plumber-requirements', title: ml('Plumber Requirements','Требования к сантехнику','Santexnikka talablar','Santehnikçä talaplar','Сантехникке талаптар'), desc: ml('Professional requirements for plumbers','Профессиональные требования к сантехникам','Santexniklarga professional talablar','Santehnikçilere hünärli talaplar','Сантехниктерге кәсіби талаптар') },
+      { id:'plumbing-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('Plumbing materials overview','Обзор сантехнических материалов','Santexnika materiallariga umumiy koʻrinish','Santehnika materiallaryna syn','Сантехника материалдарына шолу') },
+      { id:'plumbing-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Plumbing technical documentation','Техническая документация по сантехнике','Santexnika boʻyicha texnik hujjatlar','Santehnika boýunça tehniki resminamalar','Сантехника бойынша техникалық құжаттама') },
+      { id:'plumbing-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Plumbing video tutorials','Видео уроки по сантехнике','Santexnika boʻyicha video darsliklar','Santehnika boýunça wideo sapaklar','Сантехника бойынша бейне сабақтар') },
+      { id:'plumbing-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Plumbing verification checklist','Контрольный список сантехнических работ','Santexnika ishlarining tekshiruv roʻyxati','Santehnika işleriniň barlag sanawy','Сантехника жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 10, icon: '🔇',
+    name: ml('Soundproofing','Звукоизоляция','Ovoz izolyatsiyasi','Ses izolýasiýasy','Дыбыс оқшаулау'),
+    cards: [
+      { id:'wall-soundproofing', title: ml('Wall Soundproofing','Звукоизоляция стен','Devorlar ovoz izolyatsiyasi','Diwarlaryň ses izolýasiýasy','Қабырғалардың дыбыс оқшаулауы'), desc: ml('Wall acoustic insulation methods','Методы акустической изоляции стен','Devorlarning akustik izolyatsiya usullari','Diwarlaryň akustiki izolýasiýa usullary','Қабырғалардың акустикалық оқшаулау әдістері') },
+      { id:'floor-soundproofing', title: ml('Floor Soundproofing','Звукоизоляция пола','Pol ovoz izolyatsiyasi','Poluň ses izolýasiýasy','Еденнің дыбыс оқшаулауы'), desc: ml('Floor acoustic insulation methods','Методы акустической изоляции пола','Polning akustik izolyatsiya usullari','Poluň akustiki izolýasiýa usullary','Еденнің акустикалық оқшаулау әдістері') },
+      { id:'ceiling-soundproofing', title: ml('Ceiling Soundproofing','Звукоизоляция потолка','Shift ovoz izolyatsiyasi','Potologyň ses izolýasiýasy','Төбенің дыбыс оқшаулауы'), desc: ml('Ceiling acoustic insulation methods','Методы акустической изоляции потолка','Shiftning akustik izolyatsiya usullari','Potologyň akustiki izolýasiýa usullary','Төбенің акустикалық оқшаулау әдістері') },
+      { id:'pipe-soundproofing', title: ml('Pipe Soundproofing','Звукоизоляция труб','Trubalar ovoz izolyatsiyasi','Turbalaryň ses izolýasiýasy','Құбырлардың дыбыс оқшаулауы'), desc: ml('Pipe acoustic insulation methods','Методы акустической изоляции труб','Trubalarning akustik izolyatsiya usullari','Turbalaryň akustiki izolýasiýa usullary','Құбырлардың акустикалық оқшаулау әдістері') },
+      { id:'soundproofing-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Soundproofing technical documentation','Техническая документация по звукоизоляции','Ovoz izolyatsiyasi boʻyicha texnik hujjatlar','Ses izolýasiýasy boýunça tehniki resminamalar','Дыбыс оқшаулау бойынша техникалық құжаттама') },
+      { id:'soundproofing-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Soundproofing video tutorials','Видео уроки по звукоизоляции','Ovoz izolyatsiyasi boʻyicha video darsliklar','Ses izolýasiýasy boýunça wideo sapaklar','Дыбыс оқшаулау бойынша бейне сабақтар') }
+    ]
+  },
+  {
+    sort: 11, icon: '💡',
+    name: ml('Electrical Installation','Электромонтаж','Elektromontaj','Elektromontaj','Электр монтаждау'),
+    cards: [
+      { id:'socket-installation', title: ml('Socket Installation','Установка розеток','Rozetkalarni oʻrnatish','Rozetkalary ornaşdyrmak','Розеткаларды орнату'), desc: ml('Electrical socket installation procedures','Процедуры установки электрических розеток','Elektr rozetkalarini oʻrnatish tartiblari','Elektrik rozetkalaryny ornaşdyrmak amallary','Электр розеткаларын орнату рәсімдері') },
+      { id:'cable-installation', title: ml('Cable Installation','Прокладка кабеля','Kabelni yoʻnaltirish','Kabeli ugratmak','Кабельді бағыттау'), desc: ml('Electrical cable routing and installation','Прокладка и установка электрических кабелей','Elektr kabellarini yoʻnaltirish va oʻrnatish','Elektrik kabellerini ugratmak we ornaşdyrmak','Электр кабельдерін бағыттау және орнату') },
+      { id:'cable-connections', title: ml('Cable Connections','Соединения кабелей','Kabel ulanishlari','Kabel birikdirmeleri','Кабель қосылыстары'), desc: ml('Cable connection and termination methods','Методы соединения и оконцевания кабелей','Kabellarni ulash va tugatish usullari','Kabelleri birikdirmek we tamamlamak usullary','Кабельдерді қосу және аяқтау әдістері') },
+      { id:'switchboard', title: ml('Switchboard','Электрощит','Elektr shchiti','Elektrik şiti','Электр қалқаны'), desc: ml('Switchboard assembly and installation','Сборка и установка электрощита','Elektr shchitini yigʻish va oʻrnatish','Elektrik şitini ýygnamak we ornaşdyrmak','Электр қалқанын құрастыру және орнату') },
+      { id:'wall-chasing', title: ml('Wall Chasing','Штробление стен','Devorlarni shtrobish','Diwarlary ştroblamak','Қабырғаларды штробтау'), desc: ml('Creating channels in walls for cables','Создание каналов в стенах для кабелей','Kabellar uchun devorlarda kanallar yaratish','Kabeller üçin diwarlarda kanallary döretmek','Кабельдер үшін қабырғаларда арналар жасау') },
+      { id:'electrical-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('Electrical materials overview','Обзор электрических материалов','Elektr materiallariga umumiy koʻrinish','Elektrik materiallaryna syn','Электр материалдарына шолу') },
+      { id:'electrical-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Electrical technical documentation','Техническая документация по электрике','Elektr boʻyicha texnik hujjatlar','Elektrik boýunça tehniki resminamalar','Электр бойынша техникалық құжаттама') },
+      { id:'electrical-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Electrical video tutorials','Видео уроки по электрике','Elektr boʻyicha video darsliklar','Elektrik boýunça wideo sapaklar','Электр бойынша бейне сабақтар') },
+      { id:'electrical-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Electrical verification checklist','Контрольный список электромонтажных работ','Elektromontaj ishlarining tekshiruv roʻyxati','Elektromontaj işleriniň barlag sanawy','Электр монтаждау жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 12, icon: '🖥️',
+    name: ml('Low-Voltage Systems','Слаботочные системы','Past kuchlanish tizimlari','Pes woltly ulgamlar','Төмен кернеу жүйелері'),
+    cards: [
+      { id:'low-voltage-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Low-voltage systems documentation','Документация по слаботочным системам','Past kuchlanish tizimlari hujjatlari','Pes woltly ulgamlar resminamalary','Төмен кернеу жүйелерінің құжаттамасы') },
+      { id:'low-voltage-info', title: ml('Information','Информация','Maʻlumot','Maglumat','Ақпарат'), desc: ml('Low-voltage systems information','Информация о слаботочных системах','Past kuchlanish tizimlari haqida maʻlumot','Pes woltly ulgamlar hakynda maglumat','Төмен кернеу жүйелері туралы ақпарат') },
+      { id:'low-voltage-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Low-voltage systems video tutorials','Видео уроки по слаботочным системам','Past kuchlanish tizimlari boʻyicha video darsliklar','Pes woltly ulgamlar boýunça wideo sapaklar','Төмен кернеу жүйелері бойынша бейне сабақтар') }
+    ]
+  },
+  {
+    sort: 13, icon: '🔌',
+    name: ml('Sockets & Openings','Розетки и отверстия','Rozetkalar va teshiklar','Rozetkalar we deşikler','Розеткалар және тесіктер'),
+    cards: [
+      { id:'sockets-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Sockets and openings documentation','Документация по розеткам и отверстиям','Rozetkalar va teshiklar hujjatlari','Rozetkalar we deşikler resminamalary','Розеткалар және тесіктер құжаттамасы') },
+      { id:'sockets-info', title: ml('Information','Информация','Maʻlumot','Maglumat','Ақпарат'), desc: ml('Sockets and openings information','Информация о розетках и отверстиях','Rozetkalar va teshiklar haqida maʻlumot','Rozetkalar we deşikler hakynda maglumat','Розеткалар және тесіктер туралы ақпарат') },
+      { id:'sockets-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Sockets verification checklist','Контрольный список по розеткам','Rozetkalar tekshiruv roʻyxati','Rozetkalar barlag sanawy','Розеткалар тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 14, icon: '🌬️',
+    name: ml('Ventilation & Air Conditioning','Вентиляция и кондиционирование','Ventilyatsiya va konditsionerlash','Wentilýasiýa we kondisiýonerleme','Вентиляция және кондиционерлеу'),
+    cards: [
+      { id:'ventilation-system', title: ml('Ventilation System','Система вентиляции','Ventilyatsiya tizimi','Wentilýasiýa ulgamy','Вентиляция жүйесі'), desc: ml('Ventilation system installation','Установка системы вентиляции','Ventilyatsiya tizimini oʻrnatish','Wentilýasiýa ulgamyny ornaşdyrmak','Вентиляция жүйесін орнату') },
+      { id:'ac-breather', title: ml('AC & Breather','Кондиционер и бризер','Konditsioner va brizer','Kondisioner we brizer','Кондиционер және бризер'), desc: ml('Air conditioning and breather installation','Установка кондиционера и бризера','Konditsioner va brizerni oʻrnatish','Kondisioneri we brizeri ornaşdyrmak','Кондиционер және бризерді орнату') },
+      { id:'hvac-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('HVAC materials overview','Обзор материалов HVAC','HVAC materiallariga umumiy koʻrinish','HVAC materiallaryna syn','HVAC материалдарына шолу') },
+      { id:'hvac-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('HVAC technical documentation','Техническая документация по HVAC','HVAC boʻyicha texnik hujjatlar','HVAC boýunça tehniki resminamalar','HVAC бойынша техникалық құжаттама') },
+      { id:'hvac-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('HVAC video tutorials','Видео уроки по HVAC','HVAC boʻyicha video darsliklar','HVAC boýunça wideo sapaklar','HVAC бойынша бейне сабақтар') },
+      { id:'hvac-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('HVAC verification checklist','Контрольный список HVAC работ','HVAC ishlarining tekshiruv roʻyxati','HVAC işleriniň barlag sanawy','HVAC жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 15, icon: '📏',
+    name: ml('Screed','Стяжка','Qopqoq','Doldurgyç','Қабат'),
+    cards: [
+      { id:'height-calculation', title: ml('Height Calculation','Расчет высот','Balandlikni hisoblash','Beýikligi hasaplamak','Биіктікті есептеу'), desc: ml('Floor height calculation methods','Методы расчета высот пола','Pol balandligini hisoblash usullari','Pol beýikligini hasaplamak usullary','Еден биіктігін есептеу әдістері') },
+      { id:'semi-dry-screed', title: ml('Semi-Dry Screed','Полусухая стяжка','Yarim quruq qopqoq','Ýarym gury doldurgyç','Жартылай құрғақ қабат'), desc: ml('Semi-dry screed installation','Устройство полусухой стяжки','Yarim quruq qopqoq oʻrnatish','Ýarym gury doldurgyç ornaşdyrmak','Жартылай құрғақ қабат орнату') },
+      { id:'wet-screed', title: ml('Wet Screed','Мокрая стяжка','Hoʻl qopqoq','Öl doldurgyç','Ылғал қабат'), desc: ml('Wet screed installation','Устройство мокрой стяжки','Hoʻl qopqoq oʻrnatish','Öl doldurgyç ornaşdyrmak','Ылғал қабат орнату') },
+      { id:'dry-screed', title: ml('Dry Screed','Сухая стяжка','Quruq qopqoq','Gury doldurgyç','Құрғақ қабат'), desc: ml('Dry screed installation','Устройство сухой стяжки','Quruq qopqoq oʻrnatish','Gury doldurgyç ornaşdyrmak','Құрғақ қабат орнату') },
+      { id:'screed-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Screed video tutorials','Видео уроки по стяжке','Qopqoq boʻyicha video darsliklar','Doldurgyç boýunça wideo sapaklar','Қабат бойынша бейне сабақтар') },
+      { id:'screed-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Screed verification checklist','Контрольный список работ по стяжке','Qopqoq ishlarining tekshiruv roʻyxati','Doldurgyç işleriniň barlag sanawy','Қабат жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 16, icon: '👁️',
+    name: ml('Hidden Baseboard','Скрытый плинтус','Yashirin plintus','Gizlin plintus','Жасырын плинтус'),
+    cards: [
+      { id:'hidden-baseboard-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Hidden baseboard documentation','Документация по скрытому плинтусу','Yashirin plintus hujjatlari','Gizlin plintus resminamalary','Жасырын плинтус құжаттамасы') },
+      { id:'hidden-baseboard-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Hidden baseboard video tutorials','Видео уроки по скрытому плинтусу','Yashirin plintus boʻyicha video darsliklar','Gizlin plintus boýunça wideo sapaklar','Жасырын плинтус бойынша бейне сабақтар') },
+      { id:'hidden-baseboard-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Hidden baseboard checklist','Контрольный список по скрытому плинтусу','Yashirin plintus tekshiruv roʻyxati','Gizlin plintus barlag sanawy','Жасырын плинтус тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 17, icon: '🚪',
+    name: ml('Doors','Двери','Eshiklar','Gapylar','Есіктер'),
+    cards: [
+      { id:'hidden-doors', title: ml('Hidden Doors','Скрытые двери','Yashirin eshiklar','Gizlin gapylar','Жасырын есіктер'), desc: ml('Hidden door installation','Установка скрытых дверей','Yashirin eshiklarni oʻrnatish','Gizlin gapylary ornaşdyrmak','Жасырын есіктерді орнату') },
+      { id:'sliding-doors', title: ml('Sliding Doors','Раздвижные двери','Surma eshiklar','Süýşürilýän gapylar','Сырғымалы есіктер'), desc: ml('Sliding door installation','Установка раздвижных дверей','Surma eshiklarni oʻrnatish','Süýşürilýän gapylary ornaşdyrmak','Сырғымалы есіктерді орнату') },
+      { id:'door-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('Door materials overview','Обзор материалов для дверей','Eshiklar uchun materiallar koʻrinishi','Gapylar üçin materiallar syny','Есіктер үшін материалдарға шолу') },
+      { id:'doors-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Doors technical documentation','Техническая документация по дверям','Eshiklar boʻyicha texnik hujjatlar','Gapylar boýunça tehniki resminamalar','Есіктер бойынша техникалық құжаттама') },
+      { id:'doors-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Doors video tutorials','Видео уроки по дверям','Eshiklar boʻyicha video darsliklar','Gapylar boýunça wideo sapaklar','Есіктер бойынша бейне сабақтар') },
+      { id:'doors-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Doors verification checklist','Контрольный список по дверям','Eshiklar tekshiruv roʻyxati','Gapylar barlag sanawy','Есіктер тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 18, icon: '🔥',
+    name: ml('Electric Heated Floors','Электрические теплые полы','Elektr issiq pollar','Elektrik ýyly pollar','Электр жылы едендер'),
+    cards: [
+      { id:'cable-heating', title: ml('Cable Heating','Кабельный обогрев','Kabelli isitish','Kabelli ýylatmak','Кабельді жылыту'), desc: ml('Cable heating system installation','Установка системы кабельного обогрева','Kabelli isitish tizimini oʻrnatish','Kabelli ýylatmak ulgamyny ornaşdyrmak','Кабельді жылыту жүйесін орнату') },
+      { id:'heating-mat', title: ml('Heating Mat','Нагревательный мат','Isitish mati','Ýyladyjy mat','Жылыту маты'), desc: ml('Heating mat installation','Установка нагревательного мата','Isitish matini oʻrnatish','Ýyladyjy maty ornaşdyrmak','Жылыту матын орнату') },
+      { id:'heating-testing', title: ml('Heating Testing','Тестирование обогрева','Isitishni sinovdan oʻtkazish','Ýylatmagy synag etmek','Жылытуды сынау'), desc: ml('Heated floor testing procedures','Процедуры тестирования теплого пола','Issiq polni sinovdan oʻtkazish tartiblari','Ýyly poly synag etmek amallary','Жылы еденді сынау рәсімдері') }
+    ]
+  },
+  {
+    sort: 19, icon: '🛡️',
+    name: ml('Waterproofing','Гидроизоляция','Gidroizolyatsiya','Gidroizolýasiýa','Гидрооқшаулау'),
+    cards: [
+      { id:'waterproofing-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('Waterproofing materials overview','Обзор гидроизоляционных материалов','Gidroizolyatsiya materiallariga umumiy koʻrinish','Gidroizolýasiýa materiallaryna syn','Гидрооқшаулау материалдарына шолу') },
+      { id:'waterproofing-mastic', title: ml('Mastic Waterproofing','Мастичная гидроизоляция','Mastikali gidroizolyatsiya','Mastikaly gidroizolýasiýa','Мастикалық гидрооқшаулау'), desc: ml('Mastic waterproofing application','Применение мастичной гидроизоляции','Mastikali gidroizolyatsiyani qoʻllash','Mastikaly gidroizolýasiýany ulanmak','Мастикалық гидрооқшаулауды қолдану') },
+      { id:'roll-membranes', title: ml('Roll Membranes','Рулонные мембраны','Rulon membranalar','Rulon membranalar','Орамалық мембраналар'), desc: ml('Roll membrane waterproofing','Рулонная мембранная гидроизоляция','Rulon membranali gidroizolyatsiya','Rulon membranaly gidroizolýasiýa','Орамалық мембраналық гидрооқшаулау') },
+      { id:'reinforcing-mesh', title: ml('Reinforcing Mesh','Армирующая сетка','Armaturaviy toʻr','Armaturlaýjy tor','Арматуралаушы тор'), desc: ml('Reinforcing mesh application','Применение армирующей сетки','Armaturaviy toʻrni qoʻllash','Armaturlaýjy tory ulanmak','Арматуралаушы торды қолдану') },
+      { id:'waterproofing-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Waterproofing technical documentation','Техническая документация по гидроизоляции','Gidroizolyatsiya boʻyicha texnik hujjatlar','Gidroizolýasiýa boýunça tehniki resminamalar','Гидрооқшаулау бойынша техникалық құжаттама') },
+      { id:'waterproofing-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Waterproofing video tutorials','Видео уроки по гидроизоляции','Gidroizolyatsiya boʻyicha video darsliklar','Gidroizolýasiýa boýunça wideo sapaklar','Гидрооқшаулау бойынша бейне сабақтар') },
+      { id:'waterproofing-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Waterproofing verification checklist','Контрольный список гидроизоляционных работ','Gidroizolyatsiya ishlarining tekshiruv roʻyxati','Gidroizolýasiýa işleriniň barlag sanawy','Гидрооқшаулау жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 20, icon: '🔲',
+    name: ml('Tiling','Плиточные работы','Plitka ishlari','Plitka işleri','Плитка жұмыстары'),
+    cards: [
+      { id:'corner-cuts', title: ml('Corner Cuts','Угловые срезы','Burchak kesimlari','Burç kesimleri','Бұрыштық кесімдер'), desc: ml('Tile corner cutting techniques','Техники резки углов плитки','Plitka burchaklarini kesish texnikalari','Plitka burçlaryny kesmek usullary','Плитка бұрыштарын кесу әдістері') },
+      { id:'bathtub-tiling', title: ml('Bathtub Tiling','Облицовка ванны','Vannani qoplash','Wannany örtmek','Ваннаны қаптау'), desc: ml('Bathtub area tiling methods','Методы облицовки зоны ванны','Vanna zonasini plitka qoplash usullari','Wanna zolagyny plitka örtmek usullary','Ванна аймағын плиткамен қаптау әдістері') },
+      { id:'shower-drains', title: ml('Shower Drains','Душевые трапы','Dush traplari','Duş traplary','Душ траптары'), desc: ml('Shower drain installation','Установка душевых трапов','Dush traplarini oʻrnatish','Duş traplaryny ornaşdyrmak','Душ траптарын орнату') },
+      { id:'hidden-hatches', title: ml('Hidden Hatches','Скрытые люки','Yashirin lyuklar','Gizlin lýuklar','Жасырын люктер'), desc: ml('Hidden hatch installation','Установка скрытых люков','Yashirin lyuklarni oʻrnatish','Gizlin lýuklary ornaşdyrmak','Жасырын люктерді орнату') },
+      { id:'tiling-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Tiling technical documentation','Техническая документация по плитке','Plitka boʻyicha texnik hujjatlar','Plitka boýunça tehniki resminamalar','Плитка бойынша техникалық құжаттама') },
+      { id:'tiling-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Tiling video tutorials','Видео уроки по плитке','Plitka boʻyicha video darsliklar','Plitka boýunça wideo sapaklar','Плитка бойынша бейне сабақтар') },
+      { id:'tiling-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Tiling verification checklist','Контрольный список плиточных работ','Plitka ishlarining tekshiruv roʻyxati','Plitka işleriniň barlag sanawy','Плитка жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 21, icon: '⚙️',
+    name: ml('Grouting & Silicone Sealing','Затирка и силиконовая герметизация','Zatirovka va silikon muhrlash','Zatirowka we silikon ýapmak','Затирка және силикон тығыздау'),
+    cards: [
+      { id:'epoxy-grout', title: ml('Epoxy Grout','Эпоксидная затирка','Epoksid zatirovka','Epoksid zatirowka','Эпоксидті затирка'), desc: ml('Epoxy grout application','Применение эпоксидной затирки','Epoksid zatirovkani qoʻllash','Epoksid zatirowkany ulanmak','Эпоксидті затирканы қолдану') },
+      { id:'cement-grout', title: ml('Cement Grout','Цементная затирка','Sement zatirovka','Sement zatirowka','Цементті затирка'), desc: ml('Cement grout application','Применение цементной затирки','Sement zatirovkani qoʻllash','Sement zatirowkany ulanmak','Цементті затирканы қолдану') },
+      { id:'silicone-joints', title: ml('Silicone Joints','Силиконовые швы','Silikon tikuvlar','Silikon tikinler','Силикон тігістер'), desc: ml('Silicone joint sealing','Герметизация силиконовых швов','Silikon tikuvlarni muhrlash','Silikon tikinleri ýapmak','Силикон тігістерді тығыздау') },
+      { id:'grouting-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Grouting verification checklist','Контрольный список затирочных работ','Zatirovka ishlarining tekshiruv roʻyxati','Zatirowka işleriniň barlag sanawy','Затирка жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 22, icon: '📦',
+    name: ml('Drywall Works','Гипсокартонные работы','Gipsokarton ishlari','Gipsokarton işleri','Гипсокартон жұмыстары'),
+    cards: [
+      { id:'vertical-walls', title: ml('Vertical Walls','Вертикальные стены','Vertikal devorlar','Wertikal diwarlar','Тік қабырғалар'), desc: ml('Drywall vertical wall construction','Строительство вертикальных стен из гипсокартона','Gipsokartondan vertikal devor qurish','Gipsokartondan wertikal diwar gurmak','Гипсокартоннан тік қабырға тұрғызу') },
+      { id:'drywall-ceilings', title: ml('Drywall Ceilings','Потолки из гипсокартона','Gipsokarton shiftlar','Gipsokarton potoloklar','Гипсокартон төбелер'), desc: ml('Drywall ceiling installation','Установка потолков из гипсокартона','Gipsokarton shiftlarni oʻrnatish','Gipsokarton potoloklary ornaşdyrmak','Гипсокартон төбелерді орнату') },
+      { id:'joint-reinforcement', title: ml('Joint Reinforcement','Армирование швов','Tikuvlarni armaturalash','Tikinleri armaturlamak','Тігістерді арматуралау'), desc: ml('Drywall joint reinforcement','Армирование швов гипсокартона','Gipsokarton tikuvlarini armaturalash','Gipsokarton tikinlerini armaturlamak','Гипсокартон тігістерін арматуралау') },
+      { id:'bending-milling', title: ml('Bending & Milling','Гибка и фрезеровка','Bukish va frezalash','Egmek we frezalamak','Бүгу және фрезерлеу'), desc: ml('Drywall bending and milling techniques','Техники гибки и фрезеровки гипсокартона','Gipsokartonni bukish va frezalash texnikalari','Gipsokartony egmek we frezalamak usullary','Гипсокартонды бүгу және фрезерлеу әдістері') },
+      { id:'drywall-slopes', title: ml('Drywall Slopes','Откосы из гипсокартона','Gipsokarton nishablar','Gipsokarton eňňitmeler','Гипсокартон еңістер'), desc: ml('Drywall slope installation','Установка откосов из гипсокартона','Gipsokarton nishablarni oʻrnatish','Gipsokarton eňňitmeleri ornaşdyrmak','Гипсокартон еңістерді орнату') },
+      { id:'drywall-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Drywall technical documentation','Техническая документация по гипсокартону','Gipsokarton boʻyicha texnik hujjatlar','Gipsokarton boýunça tehniki resminamalar','Гипсокартон бойынша техникалық құжаттама') },
+      { id:'drywall-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Drywall video tutorials','Видео уроки по гипсокартону','Gipsokarton boʻyicha video darsliklar','Gipsokarton boýunça wideo sapaklar','Гипсокартон бойынша бейне сабақтар') },
+      { id:'drywall-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Drywall verification checklist','Контрольный список гипсокартонных работ','Gipsokarton ishlarining tekshiruv roʻyxati','Gipsokarton işleriniň barlag sanawy','Гипсокартон жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 23, icon: '🖌️',
+    name: ml('Puttying','Шпаклевка','Shpaklyovka','Şpaklýowka','Шпаклевка'),
+    cards: [
+      { id:'walls-ceilings-putty', title: ml('Walls & Ceilings Putty','Шпаклевка стен и потолков','Devor va shiftlar shpaklyovkasi','Diwar we potolok şpaklýowkasy','Қабырғалар мен төбелер шпаклевкасы'), desc: ml('Wall and ceiling puttying techniques','Техники шпаклевки стен и потолков','Devor va shiftlarni shpaklyovkalash texnikalari','Diwar we potoloklary şpaklýowkalamak usullary','Қабырғалар мен төбелерді шпаклевкалау әдістері') },
+      { id:'drywall-putty', title: ml('Drywall Putty','Шпаклевка гипсокартона','Gipsokarton shpaklyovkasi','Gipsokarton şpaklýowkasy','Гипсокартон шпаклевкасы'), desc: ml('Drywall puttying techniques','Техники шпаклевки гипсокартона','Gipsokartonni shpaklyovkalash texnikalari','Gipsokartony şpaklýowkalamak usullary','Гипсокартонды шпаклевкалау әдістері') },
+      { id:'fiberglass-nonwoven', title: ml('Fiberglass Nonwoven','Стеклохолст','Shisha toʻqimasiz mato','Aýna dokalmadyk mata','Шыны тоқымасыз мата'), desc: ml('Fiberglass nonwoven application','Применение стеклохолста','Shisha toʻqimasiz matoni qoʻllash','Aýna dokalmadyk matany ulanmak','Шыны тоқымасыз матаны қолдану') },
+      { id:'putty-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('Puttying materials overview','Обзор шпаклевочных материалов','Shpaklyovka materiallariga umumiy koʻrinish','Şpaklýowka materiallaryna syn','Шпаклевка материалдарына шолу') },
+      { id:'puttying-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Puttying technical documentation','Техническая документация по шпаклевке','Shpaklyovka boʻyicha texnik hujjatlar','Şpaklýowka boýunça tehniki resminamalar','Шпаклевка бойынша техникалық құжаттама') },
+      { id:'puttying-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Puttying video tutorials','Видео уроки по шпаклевке','Shpaklyovka boʻyicha video darsliklar','Şpaklýowka boýunça wideo sapaklar','Шпаклевка бойынша бейне сабақтар') },
+      { id:'puttying-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Puttying verification checklist','Контрольный список шпаклевочных работ','Shpaklyovka ishlarining tekshiruv roʻyxati','Şpaklýowka işleriniň barlag sanawy','Шпаклевка жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 24, icon: '📐',
+    name: ml('Self-Leveling Floor','Самовыравнивающийся пол','Oʻz-oʻzini tekislovchi pol','Özi tekizleýän pol','Өздігінен тегістейтін еден'),
+    cards: [
+      { id:'self-leveling-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Self-leveling floor video tutorials','Видео уроки по самовыравнивающемуся полу','Oʻz-oʻzini tekislovchi pol boʻyicha video darsliklar','Özi tekizleýän pol boýunça wideo sapaklar','Өздігінен тегістейтін еден бойынша бейне сабақтар') },
+      { id:'self-leveling-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Self-leveling floor checklist','Контрольный список по самовыравнивающемуся полу','Oʻz-oʻzini tekislovchi pol tekshiruv roʻyxati','Özi tekizleýän pol barlag sanawy','Өздігінен тегістейтін еден тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 25, icon: '🖼️',
+    name: ml('Gypsum Molding & Panels','Гипсовая лепнина и панели','Gipsli dekor va panellar','Gips dekoratiw we paneller','Гипс декор және панельдер'),
+    cards: [
+      { id:'molding-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('Gypsum molding materials','Материалы для гипсовой лепнины','Gipsli dekor materiallari','Gips dekoratiw materiallary','Гипс декор материалдары') },
+      { id:'molding-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Gypsum molding documentation','Документация по гипсовой лепнине','Gipsli dekor hujjatlari','Gips dekoratiw resminamalary','Гипс декор құжаттамасы') },
+      { id:'molding-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Gypsum molding checklist','Контрольный список по гипсовой лепнине','Gipsli dekor tekshiruv roʻyxati','Gips dekoratiw barlag sanawy','Гипс декор тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 26, icon: '🪵',
+    name: ml('Flooring','Напольные покрытия','Pol qoplamalari','Pol örtükleri','Еден жабындары'),
+    cards: [
+      { id:'engineered-flooring', title: ml('Engineered Flooring','Инженерная доска','Injenerlik taxta','Inžener tagtasy','Инженерлік тақта'), desc: ml('Engineered flooring installation','Установка инженерной доски','Injenerlik taxtani oʻrnatish','Inžener tagtasyny ornaşdyrmak','Инженерлік тақтаны орнату') },
+      { id:'quartz-vinyl', title: ml('Quartz Vinyl','Кварцвинил','Kvartsvinil','Kwarswinil','Кварцвинил'), desc: ml('Quartz vinyl flooring installation','Установка кварцвинила','Kvartsvinilni oʻrnatish','Kwarswinilyni ornaşdyrmak','Кварцвинилді орнату') },
+      { id:'laminate', title: ml('Laminate','Ламинат','Laminat','Laminat','Ламинат'), desc: ml('Laminate flooring installation','Установка ламината','Laminatni oʻrnatish','Laminaty ornaşdyrmak','Ламинатты орнату') },
+      { id:'flooring-joints', title: ml('Flooring Joints','Стыки напольных покрытий','Pol qoplamalari tutashuvi','Pol örtükleriniň birleşmesi','Еден жабындарының жалғасы'), desc: ml('Flooring joint treatment','Обработка стыков напольных покрытий','Pol qoplamalari tutashuvini qayta ishlash','Pol örtükleriniň birleşmesini işlemek','Еден жабындарының жалғасын өңдеу') },
+      { id:'flooring-packaging', title: ml('Flooring Packaging','Упаковка напольных покрытий','Pol qoplamalarini qadoqlash','Pol örtüklerini gaplamak','Еден жабындарын орау'), desc: ml('Flooring packaging and protection','Упаковка и защита напольных покрытий','Pol qoplamalarini qadoqlash va himoya qilish','Pol örtüklerini gaplamak we goramak','Еден жабындарын орау және қорғау') },
+      { id:'flooring-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Flooring technical documentation','Техническая документация по напольным покрытиям','Pol qoplamalari boʻyicha texnik hujjatlar','Pol örtükleri boýunça tehniki resminamalar','Еден жабындары бойынша техникалық құжаттама') },
+      { id:'flooring-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Flooring video tutorials','Видео уроки по напольным покрытиям','Pol qoplamalari boʻyicha video darsliklar','Pol örtükleri boýunça wideo sapaklar','Еден жабындары бойынша бейне сабақтар') },
+      { id:'flooring-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Flooring verification checklist','Контрольный список по напольным покрытиям','Pol qoplamalari tekshiruv roʻyxati','Pol örtükleri barlag sanawy','Еден жабындары тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 27, icon: '⬜',
+    name: ml('Stretch Ceilings','Натяжные потолки','Choʻziluvchan shiftlar','Çekilýän potoloklar','Созылмалы төбелер'),
+    cards: [
+      { id:'stretch-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Stretch ceiling documentation','Документация по натяжным потолкам','Choʻziluvchan shiftlar hujjatlari','Çekilýän potoloklar resminamalary','Созылмалы төбелер құжаттамасы') },
+      { id:'stretch-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Stretch ceiling video tutorials','Видео уроки по натяжным потолкам','Choʻziluvchan shiftlar boʻyicha video darsliklar','Çekilýän potoloklar boýunça wideo sapaklar','Созылмалы төбелер бойынша бейне сабақтар') },
+      { id:'stretch-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Stretch ceiling checklist','Контрольный список по натяжным потолкам','Choʻziluvchan shiftlar tekshiruv roʻyxati','Çekilýän potoloklar barlag sanawy','Созылмалы төбелер тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 28, icon: '🪟',
+    name: ml('Window Sills','Подоконники','Deraza tokchalari','Penjire eşikleri','Терезе табалдырықтары'),
+    cards: [
+      { id:'sills-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('Window sill materials','Материалы для подоконников','Deraza tokchalari materiallari','Penjire eşikleri materiallary','Терезе табалдырықтары материалдары') },
+      { id:'sills-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Window sill video tutorials','Видео уроки по подоконникам','Deraza tokchalari boʻyicha video darsliklar','Penjire eşikleri boýunça wideo sapaklar','Терезе табалдырықтары бойынша бейне сабақтар') },
+      { id:'sills-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Window sill documentation','Документация по подоконникам','Deraza tokchalari hujjatlari','Penjire eşikleri resminamalary','Терезе табалдырықтары құжаттамасы') },
+      { id:'sills-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Window sill checklist','Контрольный список по подоконникам','Deraza tokchalari tekshiruv roʻyxati','Penjire eşikleri barlag sanawy','Терезе табалдырықтары тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 29, icon: '➖',
+    name: ml('Baseboard','Плинтус','Plintus','Plintus','Плинтус'),
+    cards: [
+      { id:'baseboard-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Baseboard video tutorials','Видео уроки по плинтусу','Plintus boʻyicha video darsliklar','Plintus boýunça wideo sapaklar','Плинтус бойынша бейне сабақтар') },
+      { id:'baseboard-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Baseboard verification checklist','Контрольный список по плинтусу','Plintus tekshiruv roʻyxati','Plintus barlag sanawy','Плинтус тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 30, icon: '🪑',
+    name: ml('Furniture','Мебель','Mebel','Mebel','Мебель'),
+    cards: [
+      { id:'furniture-assembly', title: ml('Furniture Assembly','Сборка мебели','Mebelni yigʻish','Mebeli ýygnamak','Мебельді құрастыру'), desc: ml('Furniture assembly procedures','Процедуры сборки мебели','Mebelni yigʻish tartiblari','Mebeli ýygnamak amallary','Мебельді құрастыру рәсімдері') }
+    ]
+  },
+  {
+    sort: 31, icon: '🎨',
+    name: ml('Painting','Покраска','Boʻyash','Boýamak','Бояу'),
+    cards: [
+      { id:'painting-materials', title: ml('Materials','Материалы','Materiallar','Materiallar','Материалдар'), desc: ml('Painting materials overview','Обзор материалов для покраски','Boʻyash materiallari koʻrinishi','Boýamak materiallary syny','Бояу материалдарына шолу') },
+      { id:'painting-documentation', title: ml('Documentation','Документация','Hujjatlar','Resminamalar','Құжаттама'), desc: ml('Painting technical documentation','Техническая документация по покраске','Boʻyash boʻyicha texnik hujjatlar','Boýamak boýunça tehniki resminamalar','Бояу бойынша техникалық құжаттама') },
+      { id:'painting-videos', title: ml('Video Tutorials','Видео уроки','Video darsliklar','Wideo sapaklar','Бейне сабақтар'), desc: ml('Painting video tutorials','Видео уроки по покраске','Boʻyash boʻyicha video darsliklar','Boýamak boýunça wideo sapaklar','Бояу бойынша бейне сабақтар') },
+      { id:'painting-checklist', title: ml('Checklist','Чек-лист','Tekshiruv roʻyxati','Barlag sanawy','Тексеру тізімі'), desc: ml('Painting verification checklist','Контрольный список покрасочных работ','Boʻyash ishlarining tekshiruv roʻyxati','Boýamak işleriniň barlag sanawy','Бояу жұмыстарының тексеру тізімі') }
+    ]
+  },
+  {
+    sort: 32, icon: '✨',
+    name: ml('Cleaning','Уборка','Tozalash','Arassalamak','Тазалау'),
+    cards: [
+      { id:'final-cleaning', title: ml('Final Cleaning','Финальная уборка','Yakuniy tozalash','Soňky arassalamak','Соңғы тазалау'), desc: ml('Final cleaning procedures','Процедуры финальной уборки','Yakuniy tozalash tartiblari','Soňky arassalamak amallary','Соңғы тазалау рәсімдері') }
+    ]
+  }
+];
+
+// Removed category 33 — only 32 listed above. The user said 33 but data shows 32 entries.
+
+let totalCards = 0;
+CATEGORIES.forEach(c => totalCards += c.cards.length);
+
+document.querySelector('.summary').innerHTML = `
+  <p>This will insert <span>${CATEGORIES.length} categories</span> and <span>${totalCards} cards</span> into Supabase.</p>
+  <p>Target: <span>${SUPABASE_URL}</span></p>
+  <p>Each category is inserted first, then its subcategory cards are inserted with the returned category_id.</p>
+`;
+
+async function runMigration() {
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  btn.textContent = 'Migration in progress...';
+
+  let catCount = 0, cardCount = 0, errCount = 0;
+  const now = new Date().toISOString();
+
+  for (const cat of CATEGORIES) {
+    log(`Inserting category: ${cat.name.en} ${cat.icon}`, 'log-info');
+    try {
+      const catData = {
+        name: cat.name,
+        icon: cat.icon,
+        sort_order: cat.sort
+      };
+      const result = await supabaseInsert('categories', catData);
+      const categoryId = result[0].id;
+      catCount++;
+      log(`  Category inserted: ${cat.name.en} (id: ${categoryId})`, 'log-ok');
+
+      // Insert cards for this category
+      for (let i = 0; i < cat.cards.length; i++) {
+        const card = cat.cards[i];
+        const slug = generateSlug(card.title.ru || card.title.en);
+        try {
+          const cardData = {
+            title: card.title,
+            description: card.desc,
+            content: emptyContent(),
+            category_id: categoryId,
+            is_published: true,
+            slug: slug,
+            views_count: 0,
+            created_at: now,
+            updated_at: now
+          };
+          await supabaseInsert('cards', cardData);
+          cardCount++;
+          log(`    Card ${i+1}/${cat.cards.length}: ${card.title.en}`, 'log-ok');
+        } catch (e) {
+          errCount++;
+          log(`    ERROR card "${card.title.en}": ${e.message}`, 'log-err');
+        }
+      }
+    } catch (e) {
+      errCount++;
+      log(`  ERROR category "${cat.name.en}": ${e.message}`, 'log-err');
+    }
+
+    progressEl.textContent = `Progress: ${catCount}/${CATEGORIES.length} categories, ${cardCount} cards inserted, ${errCount} errors`;
+  }
+
+  log('', 'log-info');
+  log('=== MIGRATION COMPLETE ===', 'log-ok');
+  log(`Categories: ${catCount}/${CATEGORIES.length}`, catCount === CATEGORIES.length ? 'log-ok' : 'log-warn');
+  log(`Cards: ${cardCount}/${totalCards}`, cardCount === totalCards ? 'log-ok' : 'log-warn');
+  log(`Errors: ${errCount}`, errCount === 0 ? 'log-ok' : 'log-err');
+
+  btn.textContent = errCount === 0 ? 'Migration Complete!' : `Done with ${errCount} errors`;
+  progressEl.textContent = `Final: ${catCount} categories, ${cardCount} cards, ${errCount} errors`;
+}
+</script>
+</body>
+</html>
