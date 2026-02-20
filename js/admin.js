@@ -72,6 +72,7 @@
     elements.previewIframe = document.getElementById('preview-iframe');
     elements.sectionTemplate = document.getElementById('section-template');
     elements.nestedSectionTemplate = document.getElementById('nested-section-template');
+    elements.translateBtn = document.getElementById('translate-btn');
   }
 
   function bindEvents() {
@@ -112,6 +113,7 @@
     elements.deleteBtn?.addEventListener('click', deleteCard);
     elements.previewBtn?.addEventListener('click', showPreview);
     elements.previewClose?.addEventListener('click', hidePreview);
+    elements.translateBtn?.addEventListener('click', handleTranslateClick);
 
     window.addEventListener('beforeunload', (e) => {
       if (unsavedChanges) {
@@ -1643,6 +1645,158 @@
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // === ПЕРЕВОД ===
+
+  // Language code mapping: admin lang code → Google Translate lang code
+  const GT_LANG_MAP = {
+    ru: 'ru',
+    kk: 'kk',
+    uz: 'uz',
+    en: 'en',
+    tk: 'tk'
+  };
+
+  async function translateText(text, targetLang) {
+    if (!text || !text.trim()) return '';
+
+    const gtLang = GT_LANG_MAP[targetLang] || targetLang;
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=${gtLang}&dt=t&q=${encodeURIComponent(text)}`;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Translation error: ${response.status}`);
+
+    const data = await response.json();
+    // Response structure: [[["translated", "original", ...], ...], ...]
+    return (data[0] || []).map(part => part[0] || '').join('');
+  }
+
+  // Translate HTML content (preserves tags, only translates text nodes)
+  async function translateHtml(html, targetLang) {
+    if (!html || !html.trim()) return '';
+
+    // Strip tags to get plain text, translate, then return
+    // For rich content we translate a simplified version - strip tags and translate
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const plainText = div.textContent || div.innerText || '';
+
+    if (!plainText.trim()) return html; // no translatable text
+
+    const translated = await translateText(plainText, targetLang);
+    return translated;
+  }
+
+  async function handleTranslateClick() {
+    // First save current lang data
+    saveSectionsToFormData();
+    if (elements.titleInput) formData.title[currentLang] = elements.titleInput.value;
+    if (elements.descriptionInput) formData.description[currentLang] = elements.descriptionInput.value;
+    if (elements.checklistInput) formData.checklist[currentLang] = elements.checklistInput.value;
+
+    const ruTitle = formData.title['ru'] || '';
+    const ruDesc = formData.description['ru'] || '';
+    const ruChecklist = formData.checklist['ru'] || '';
+    const ruSections = formData.sections['ru'] || [];
+
+    if (!ruTitle && !ruDesc && !ruChecklist && ruSections.length === 0) {
+      alert('Сначала заполните данные на русском языке.');
+      return;
+    }
+
+    const targetLangs = LANGUAGES.filter(l => l !== 'ru');
+
+    elements.translateBtn.disabled = true;
+    elements.translateBtn.classList.add('translating');
+    const origHTML = elements.translateBtn.innerHTML;
+    elements.translateBtn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M12 6v6l4 2"></path>
+      </svg>
+      Перевожу...
+    `;
+
+    try {
+      for (const lang of targetLangs) {
+        // Title
+        if (ruTitle) {
+          formData.title[lang] = await translateText(ruTitle, lang);
+        }
+
+        // Description
+        if (ruDesc) {
+          formData.description[lang] = await translateText(ruDesc, lang);
+        }
+
+        // Checklist (translate each line separately)
+        if (ruChecklist) {
+          const lines = ruChecklist.split('\n');
+          const translatedLines = [];
+          for (const line of lines) {
+            const prefix = line.match(/^[-•]\s*/)?.[0] || '';
+            const content = line.replace(/^[-•]\s*/, '').trim();
+            if (content) {
+              const translated = await translateText(content, lang);
+              translatedLines.push(prefix + translated);
+            } else {
+              translatedLines.push(line);
+            }
+          }
+          formData.checklist[lang] = translatedLines.join('\n');
+        }
+
+        // Sections
+        if (ruSections.length > 0) {
+          const translatedSections = [];
+          for (const section of ruSections) {
+            const tSection = {
+              title: section.title ? await translateText(section.title, lang) : '',
+              content: section.content ? await translateHtml(section.content, lang) : '',
+              images: section.images || [],
+              nestedSections: []
+            };
+
+            if (section.nestedSections && section.nestedSections.length > 0) {
+              for (const nested of section.nestedSections) {
+                tSection.nestedSections.push({
+                  title: nested.title ? await translateText(nested.title, lang) : '',
+                  content: nested.content ? await translateHtml(nested.content, lang) : '',
+                  images: nested.images || []
+                });
+              }
+            }
+
+            translatedSections.push(tSection);
+          }
+          formData.sections[lang] = translatedSections;
+        }
+      }
+
+      // Reload current lang display (in case user is on a target lang tab)
+      loadLanguageData();
+      unsavedChanges = true;
+
+      elements.translateBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Готово!
+      `;
+      setTimeout(() => {
+        elements.translateBtn.innerHTML = origHTML;
+        elements.translateBtn.classList.remove('translating');
+        elements.translateBtn.disabled = false;
+      }, 2000);
+
+    } catch (err) {
+      console.error('Translation failed:', err);
+      alert('Ошибка перевода. Проверьте интернет-соединение и попробуйте ещё раз.');
+      elements.translateBtn.innerHTML = origHTML;
+      elements.translateBtn.classList.remove('translating');
+      elements.translateBtn.disabled = false;
+    }
   }
 
   function generateSlug(text) {
