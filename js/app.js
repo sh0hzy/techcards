@@ -207,8 +207,7 @@ async function initHomePage() {
       });
     } else {
       filtered = [..._homeAllCards]
-        .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
-        .slice(0, 6);
+        .sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
     }
 
     if (searchResults) {

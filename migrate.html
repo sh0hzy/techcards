@@ -424,14 +424,44 @@ const CATEGORIES = [
 
 // Removed category 33 — only 32 listed above. The user said 33 but data shows 32 entries.
 
-let totalCards = 0;
-CATEGORIES.forEach(c => totalCards += c.cards.length);
-
 document.querySelector('.summary').innerHTML = `
-  <p>This will insert <span>${CATEGORIES.length} categories</span> and <span>${totalCards} cards</span> into Supabase.</p>
+  <p>This will insert <span>${CATEGORIES.length} categories</span> and <span>${CATEGORIES.length} cards</span> (one card per category, subcategories become sections).</p>
   <p>Target: <span>${SUPABASE_URL}</span></p>
-  <p>Each category is inserted first, then its subcategory cards are inserted with the returned category_id.</p>
+  <p><strong>Step 1:</strong> Clears existing cards &amp; categories. <strong>Step 2:</strong> Inserts fresh data.</p>
 `;
+
+async function supabaseDelete(table) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=not.is.null`, {
+    method: 'DELETE',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Prefer': 'return=minimal'
+    }
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`${res.status}: ${errText}`);
+  }
+}
+
+// Build content object: each subcategory becomes a section, per language
+function buildContent(subcards) {
+  const langs = ['ru', 'kk', 'uz', 'en', 'tk'];
+  const content = {};
+  langs.forEach(lang => {
+    content[lang] = {
+      sections: subcards.map(sub => ({
+        title: sub.title[lang] || sub.title.ru || sub.title.en || '',
+        content: `<p>${sub.desc[lang] || sub.desc.ru || sub.desc.en || ''}</p>`,
+        images: [],
+        nestedSections: []
+      })),
+      checklist: []
+    };
+  });
+  return content;
+}
 
 async function runMigration() {
   const btn = document.getElementById('startBtn');
@@ -439,8 +469,29 @@ async function runMigration() {
   btn.textContent = 'Migration in progress...';
 
   let catCount = 0, cardCount = 0, errCount = 0;
-  const now = new Date().toISOString();
 
+  // Step 1: Clear existing data
+  log('Clearing existing cards...', 'log-warn');
+  try {
+    await supabaseDelete('cards');
+    log('  Cards cleared.', 'log-ok');
+  } catch (e) {
+    log(`  WARNING clearing cards: ${e.message}`, 'log-warn');
+  }
+
+  log('Clearing existing categories...', 'log-warn');
+  try {
+    await supabaseDelete('categories');
+    log('  Categories cleared.', 'log-ok');
+  } catch (e) {
+    log(`  WARNING clearing categories: ${e.message}`, 'log-warn');
+  }
+
+  log('', 'log-info');
+  log('Starting fresh insert...', 'log-info');
+  log('', 'log-info');
+
+  // Step 2: Insert categories and one card per category
   for (const cat of CATEGORIES) {
     log(`Inserting category: ${cat.name.en} ${cat.icon}`, 'log-info');
     try {
@@ -453,44 +504,44 @@ async function runMigration() {
       const result = await supabaseInsert('categories', catData);
       const categoryId = result[0].id;
       catCount++;
-      log(`  Category inserted: ${cat.name.en} (id: ${categoryId})`, 'log-ok');
+      log(`  ✓ Category inserted (id: ${categoryId})`, 'log-ok');
 
-      // Insert cards for this category
-      for (let i = 0; i < cat.cards.length; i++) {
-        const card = cat.cards[i];
-        const slug = generateSlug(card.title.ru || card.title.en);
-        try {
-          const cardData = {
-            title: card.title,
-            description: card.desc,
-            content: emptyContent(),
-            category_id: categoryId,
-            is_published: true,
-            slug: slug,
-            views_count: 0,
-            created_at: now,
-            updated_at: now
-          };
-          await supabaseInsert('cards', cardData);
-          cardCount++;
-          log(`    Card ${i+1}/${cat.cards.length}: ${card.title.en}`, 'log-ok');
-        } catch (e) {
-          errCount++;
-          log(`    ERROR card "${card.title.en}": ${e.message}`, 'log-err');
-        }
+      // Build one card with subcategories as sections
+      const cardData = {
+        title: cat.name,
+        description: { ru: '', kk: '', uz: '', en: '', tk: '' },
+        content: buildContent(cat.cards),
+        category_id: categoryId,
+        is_published: true,
+        slug: generateSlug(cat.name.ru || cat.name.en),
+        views_count: 0,
+        images: [],
+        cover_image: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert('cards', cardData);
+        cardCount++;
+        log(`  ✓ Card inserted with ${cat.cards.length} sections`, 'log-ok');
+      } catch (e) {
+        errCount++;
+        log(`  ERROR card: ${e.message}`, 'log-err');
       }
+
     } catch (e) {
       errCount++;
       log(`  ERROR category "${cat.name.en}": ${e.message}`, 'log-err');
     }
 
-    progressEl.textContent = `Progress: ${catCount}/${CATEGORIES.length} categories, ${cardCount} cards inserted, ${errCount} errors`;
+    progressEl.textContent = `Progress: ${catCount}/${CATEGORIES.length} categories, ${cardCount} cards, ${errCount} errors`;
   }
 
   log('', 'log-info');
   log('=== MIGRATION COMPLETE ===', 'log-ok');
   log(`Categories: ${catCount}/${CATEGORIES.length}`, catCount === CATEGORIES.length ? 'log-ok' : 'log-warn');
-  log(`Cards: ${cardCount}/${totalCards}`, cardCount === totalCards ? 'log-ok' : 'log-warn');
+  log(`Cards: ${cardCount}/${CATEGORIES.length}`, cardCount === CATEGORIES.length ? 'log-ok' : 'log-warn');
   log(`Errors: ${errCount}`, errCount === 0 ? 'log-ok' : 'log-err');
 
   btn.textContent = errCount === 0 ? 'Migration Complete!' : `Done with ${errCount} errors`;
