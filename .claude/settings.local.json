@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "WebFetch(domain:xn--80aafma3abvkxse9a7f.xn--p1ai)"
+    ]
+  }
+}
