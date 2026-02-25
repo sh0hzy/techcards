@@ -68,12 +68,12 @@ async function supabaseInsert(table, data) {
 
 function emptyContent() {
   const c = {};
-  ['ru','kk','uz','en','tk'].forEach(l => { c[l] = { sections: [], checklist: [] }; });
+  ['ru','kz','uz','en','tk'].forEach(l => { c[l] = { sections: [], checklist: [] }; });
   return c;
 }
 
 function ml(en, ru, uz, tm, kz) {
-  return { en: en, ru: ru, uz: uz, tk: tm, kk: kz };
+  return { en: en, ru: ru, uz: uz, tk: tm, kz: kz };
 }
 
 const CATEGORIES = [
@@ -447,7 +447,7 @@ async function supabaseDelete(table) {
 
 // Build content object: each subcategory becomes a section, per language
 function buildContent(subcards) {
-  const langs = ['ru', 'kk', 'uz', 'en', 'tk'];
+  const langs = ['ru', 'kz', 'uz', 'en', 'tk'];
   const content = {};
   langs.forEach(lang => {
     content[lang] = {
@@ -509,7 +509,7 @@ async function runMigration() {
       // Build one card with subcategories as sections
       const cardData = {
         title: cat.name,
-        description: { ru: '', kk: '', uz: '', en: '', tk: '' },
+        description: { ru: '', kz: '', uz: '', en: '', tk: '' },
         content: buildContent(cat.cards),
         category_id: categoryId,
         is_published: true,

@@ -2,10 +2,10 @@
 
   // === Конфигурация ===
   const ADMIN_PASSWORD = 'kz27';
-  const LANGUAGES = ['ru', 'kk', 'uz', 'en', 'tk'];
+  const LANGUAGES = ['ru', 'kz', 'uz', 'en', 'tk'];
   const LANG_NAMES = {
     ru: 'Русский',
-    kk: 'Қазақша',
+    kz: 'Қазақша',
     uz: 'O\'zbekcha',
     en: 'English',
     tk: 'Türkmençe'
@@ -1514,7 +1514,7 @@
   async function saveCard() {
     const data = collectFormData();
 
-    if (!data.title.ru && !data.title.en && !data.title.kk) {
+    if (!data.title.ru && !data.title.en && !data.title.kz) {
       alert('Введите заголовок хотя бы на одном языке');
       return;
     }
@@ -1522,7 +1522,7 @@
     data.updated_at = new Date().toISOString();
 
     if (!currentCardId) {
-      data.slug = generateSlug(data.title.ru || data.title.en || data.title.kk || 'card');
+      data.slug = generateSlug(data.title.ru || data.title.en || data.title.kz || 'card');
       data.views_count = 0;
       data.created_at = new Date().toISOString();
     }
@@ -1652,7 +1652,7 @@
   // Language code mapping: admin lang code → Google Translate lang code
   const GT_LANG_MAP = {
     ru: 'ru',
-    kk: 'kk',
+    kz: 'kz',
     uz: 'uz',
     en: 'en',
     tk: 'tk'

@@ -135,7 +135,7 @@
   function getLocalized(obj, lang) {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
-    return obj[lang] || obj['ru'] || obj['en'] || obj['kk'] || '';
+    return obj[lang] || obj['ru'] || obj['en'] || obj['kz'] || '';
   }
 
   function renderCarousel(images, coverImage) {

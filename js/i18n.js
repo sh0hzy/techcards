@@ -6,7 +6,7 @@ const translations = {
       about: 'О проекте'
     },
     home: {
-      title: 'Технологические карты',
+      title: 'Технологическое руководство по строительным процессам',
       subtitle: 'База знаний по строительным процессам',
       searchPlaceholder: 'Поиск технологических карт...',
       popular: 'Популярные',
@@ -44,14 +44,14 @@ const translations = {
     }
   },
 
-  kk: {
+  kz: {
     nav: {
       home: 'Басты бет',
       catalog: 'Тех.карталар',
       about: 'Жоба туралы'
     },
     home: {
-      title: 'Технологиялық карталар',
+      title: 'Құрылыс процестері бойынша технологиялық нұсқаулық',
       subtitle: 'Құрылыс процестері бойынша білім базасы',
       searchPlaceholder: 'Технологиялық карталарды іздеу...',
       popular: 'Танымал',
@@ -96,7 +96,7 @@ const translations = {
       about: 'Loyiha haqida'
     },
     home: {
-      title: 'Texnologik kartalar',
+      title: "Qurilish jarayonlari bo'yicha texnologik qo'llanmasi",
       subtitle: "Qurilish jarayonlari bo'yicha bilim bazasi",
       searchPlaceholder: 'Texnologik kartalarni qidirish...',
       popular: 'Mashhur',
@@ -141,7 +141,7 @@ const translations = {
       about: 'About'
     },
     home: {
-      title: 'Technology Cards',
+      title: 'Technological guidance on construction processes',
       subtitle: 'Knowledge base for construction processes',
       searchPlaceholder: 'Search technology cards...',
       popular: 'Popular',
@@ -227,7 +227,7 @@ const translations = {
 
 const languages = [
   { code: 'ru', name: 'Русский', shortName: 'RU', flag: '🇷🇺' },
-  { code: 'kk', name: 'Қазақша', shortName: 'KK', flag: '🇰🇿' },
+  { code: 'kz', name: 'Қазақша', shortName: 'KZ', flag: '🇰🇿' },
   { code: 'uz', name: "O'zbekcha", shortName: 'UZ', flag: '🇺🇿' },
   { code: 'en', name: 'English', shortName: 'EN', flag: '🇬🇧' },
   { code: 'tk', name: 'Türkmençe', shortName: 'TK', flag: '🇹🇲' }
