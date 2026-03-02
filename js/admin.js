@@ -1672,20 +1672,29 @@
     return (data[0] || []).map(part => part[0] || '').join('');
   }
 
-  // Translate HTML content (preserves tags, only translates text nodes)
+  // Translate HTML content — walks text nodes only, preserves all tags/formatting
   async function translateHtml(html, targetLang) {
     if (!html || !html.trim()) return '';
 
-    // Strip tags to get plain text, translate, then return
-    // For rich content we translate a simplified version - strip tags and translate
     const div = document.createElement('div');
     div.innerHTML = html;
-    const plainText = div.textContent || div.innerText || '';
 
-    if (!plainText.trim()) return html; // no translatable text
+    // Collect all leaf text nodes that have real content
+    const walker = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null);
+    const textNodes = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.textContent.trim()) textNodes.push(node);
+    }
 
-    const translated = await translateText(plainText, targetLang);
-    return translated;
+    if (!textNodes.length) return html;
+
+    // Translate each text node individually so HTML structure is fully preserved
+    for (const textNode of textNodes) {
+      textNode.textContent = await translateText(textNode.textContent, targetLang);
+    }
+
+    return div.innerHTML;
   }
 
   async function handleTranslateClick() {
