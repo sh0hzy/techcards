@@ -1652,7 +1652,7 @@
   // Language code mapping: admin lang code → Google Translate lang code
   const GT_LANG_MAP = {
     ru: 'ru',
-    kz: 'kz',
+    kz: 'kk',
     uz: 'uz',
     en: 'en',
     tk: 'tk'
