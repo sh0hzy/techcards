@@ -186,7 +186,7 @@ const translations = {
       about: 'Taslama hakynda'
     },
     home: {
-      title: 'Tehnologiýa kartalary',
+      title: 'Gurluşyk prosesleri boýunça tehnologiýa ýol-ýörelgesi',
       subtitle: 'Gurluşyk prosesleri boýunça bilim bazasy',
       searchPlaceholder: 'Tehnologiýa kartalaryny gözle...',
       popular: 'Meşhur',
