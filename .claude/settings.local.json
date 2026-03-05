@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(grep:*)",
-      "WebFetch(domain:xn--80aafma3abvkxse9a7f.xn--p1ai)"
+      "WebFetch(domain:xn--80aafma3abvkxse9a7f.xn--p1ai)",
+      "Bash(python3:*)",
+      "Bash(set PYTHONIOENCODING=utf-8:*)"
     ]
   }
 }
