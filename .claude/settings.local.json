@@ -4,7 +4,10 @@
       "Bash(grep:*)",
       "WebFetch(domain:xn--80aafma3abvkxse9a7f.xn--p1ai)",
       "Bash(python3:*)",
-      "Bash(set PYTHONIOENCODING=utf-8:*)"
+      "Bash(set PYTHONIOENCODING=utf-8:*)",
+      "Read(//c/tmp/**)",
+      "Bash(\"C:/Users/Admin/AppData/Local/Temp/all_html_content.txt\")",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }
