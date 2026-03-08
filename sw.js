@@ -140,7 +140,7 @@ async function cacheFirstWithUpdate(request) {
   if (cachedResponse) {
     return cachedResponse;
   }
-  
+    
   const networkResponse = await fetchPromise;
   
   if (networkResponse) {
