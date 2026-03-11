@@ -1537,36 +1537,35 @@
 
     console.log('Saving:', data);
 
+    const headers = {
+      'apikey': CONFIG.SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    };
+
+    async function patchCard(id, payload) {
+      const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${id}`, {
+        method: 'PATCH', headers, body: JSON.stringify(payload)
+      });
+      if (!r.ok) throw new Error(await r.text());
+    }
+
     try {
       let response;
 
       if (currentCardId) {
-        response = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${currentCardId}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': CONFIG.SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify(data)
-        });
+        // Split into two smaller requests: metadata first, then heavy content
+        const { content, ...meta } = data;
+        await patchCard(currentCardId, meta);
+        await patchCard(currentCardId, { content });
       } else {
         response = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards`, {
           method: 'POST',
-          headers: {
-            'apikey': CONFIG.SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
-          },
+          headers: { ...headers, 'Prefer': 'return=representation' },
           body: JSON.stringify(data)
         });
-      }
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText);
+        if (!response.ok) throw new Error(await response.text());
       }
 
       unsavedChanges = false;
