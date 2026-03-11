@@ -1492,7 +1492,9 @@
           }))
         }));
 
-      content[lang] = { sections, checklist };
+      if (sections.length > 0 || checklist.length > 0) {
+        content[lang] = { sections, checklist };
+      }
     });
 
     const images = getHeroImages();
