@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kazarbuild-v57';
+const CACHE_NAME = 'kazarbuild-v58';
 const DATA_CACHE_NAME = 'kazarbuild-data-v1';
 
 const ASSETS = [
@@ -57,6 +57,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   if (url.hostname.includes('supabase.co')) {
+    if (request.method !== 'GET') return; // let mutations go directly, no SW interception
     event.respondWith(networkFirstStrategy(request));
     return;
   }

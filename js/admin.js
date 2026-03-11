@@ -1511,7 +1511,11 @@
     };
   }
 
+  let isSaving = false;
+
   async function saveCard() {
+    if (isSaving) return;
+
     const data = collectFormData();
 
     if (!data.title.ru && !data.title.en && !data.title.kz) {
@@ -1520,6 +1524,8 @@
     }
 
     data.updated_at = new Date().toISOString();
+    isSaving = true;
+    if (elements.saveBtn) elements.saveBtn.disabled = true;
 
     if (!currentCardId) {
       data.slug = generateSlug(data.title.ru || data.title.en || data.title.kz || 'card');
@@ -1578,6 +1584,9 @@
     } catch (error) {
       console.error('Save error:', error);
       alert('Ошибка сохранения: ' + error.message);
+    } finally {
+      isSaving = false;
+      if (elements.saveBtn) elements.saveBtn.disabled = false;
     }
   }
 
