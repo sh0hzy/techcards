@@ -711,6 +711,26 @@
       });
     }
 
+    // Carousel button
+    const carouselBtn = toolbar.querySelector('.nested-carousel-btn');
+    if (carouselBtn) {
+      carouselBtn.addEventListener('click', () => {
+        showNestedCarouselModal(editor, parentIndex, nestedIndex);
+      });
+    }
+
+    // Background color
+    const bgColorInput = toolbar.querySelector('.toolbar-bgcolor-input');
+    if (bgColorInput) {
+      bgColorInput.addEventListener('input', (e) => {
+        editor.focus();
+        document.execCommand('hiliteColor', false, e.target.value);
+        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        const bar = toolbar.querySelector('.toolbar-color-bar');
+        if (bar) bar.style.background = e.target.value;
+      });
+    }
+
     // Hotkeys
     editor.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
@@ -1078,6 +1098,17 @@
       });
     }
 
+    const bgColorInput = toolbar.querySelector('.toolbar-bgcolor-input');
+    if (bgColorInput) {
+      bgColorInput.addEventListener('input', (e) => {
+        editor.focus();
+        document.execCommand('hiliteColor', false, e.target.value);
+        updateSectionData(index, 'content', editor.innerHTML);
+        const bar = toolbar.querySelector('.toolbar-color-bar');
+        if (bar) bar.style.background = e.target.value;
+      });
+    }
+
     editor.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
         switch (e.key.toLowerCase()) {
@@ -1284,6 +1315,126 @@
       if (e.target === modal) modal.remove();
     });
 
+    urlsInput.focus();
+  }
+
+  function showNestedCarouselModal(editor, parentIndex, nestedIndex) {
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.innerHTML = `
+      <div class="image-modal-content" style="max-width: 620px;">
+        <h3>Карусель изображений</h3>
+
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <button class="btn-small btn-secondary nested-car-tab active" data-tab="url" style="flex:1;">По ссылке</button>
+          <button class="btn-small btn-secondary nested-car-tab" data-tab="upload" style="flex:1;">Загрузить файлы</button>
+        </div>
+
+        <div id="nested-car-url-panel">
+          <p style="font-size:13px;color:#6b7280;margin-bottom:8px;">Каждый URL с новой строки:</p>
+          <textarea id="nested-carousel-urls" rows="5" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg" style="width:100%;resize:vertical;"></textarea>
+        </div>
+
+        <div id="nested-car-upload-panel" style="display:none;">
+          <div id="nested-car-drop-zone" style="border:2px dashed #d1d5db;border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all 0.15s;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-bottom:8px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p style="margin:0 0 4px;font-size:14px;color:#6b7280;">Перетащите изображения или <span style="color:#1b98fb;cursor:pointer;" id="nested-car-file-trigger">выберите файлы</span></p>
+            <p style="margin:0;font-size:12px;color:#9ca3af;">JPG, PNG, GIF, WebP</p>
+            <input type="file" id="nested-car-file-input" accept="image/*" multiple hidden>
+          </div>
+          <div id="nested-car-previews" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;"></div>
+        </div>
+
+        <div class="image-modal-actions">
+          <button class="btn-secondary" id="nested-car-cancel">Отмена</button>
+          <button class="btn-primary" id="nested-car-add">Вставить карусель</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const urlPanel = modal.querySelector('#nested-car-url-panel');
+    const uploadPanel = modal.querySelector('#nested-car-upload-panel');
+    const urlsInput = modal.querySelector('#nested-carousel-urls');
+    const fileInput = modal.querySelector('#nested-car-file-input');
+    const dropZone = modal.querySelector('#nested-car-drop-zone');
+    const previewsEl = modal.querySelector('#nested-car-previews');
+    let uploadedUrls = [];
+
+    // Tab switching
+    modal.querySelectorAll('.nested-car-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        modal.querySelectorAll('.nested-car-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        if (tab.dataset.tab === 'url') {
+          urlPanel.style.display = '';
+          uploadPanel.style.display = 'none';
+        } else {
+          urlPanel.style.display = 'none';
+          uploadPanel.style.display = '';
+        }
+      });
+    });
+
+    // File upload
+    modal.querySelector('#nested-car-file-trigger').addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('click', (e) => { if (e.target !== modal.querySelector('#nested-car-file-trigger')) fileInput.click(); });
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b98fb'; dropZone.style.background = '#eff6ff'; });
+    dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#d1d5db'; dropZone.style.background = ''; });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#d1d5db';
+      dropZone.style.background = '';
+      handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+    function handleFiles(files) {
+      Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedUrls.push(e.target.result);
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.cssText = 'width:80px;height:60px;object-fit:cover;border-radius:8px;';
+          previewsEl.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    modal.querySelector('#nested-car-cancel').addEventListener('click', () => modal.remove());
+
+    modal.querySelector('#nested-car-add').addEventListener('click', () => {
+      const activeTab = modal.querySelector('.nested-car-tab.active').dataset.tab;
+      let urls = [];
+      if (activeTab === 'url') {
+        urls = urlsInput.value.split('\n').map(u => u.trim()).filter(u => u && u.startsWith('http'));
+      } else {
+        urls = [...uploadedUrls];
+      }
+
+      if (urls.length > 0) {
+        let html = '<div class="content-carousel-preview" data-carousel="' + urls.join(',') + '" contenteditable="false" style="background:#f3f4f6;border-radius:12px;padding:16px;margin:16px 0;text-align:center;">';
+        html += '<p style="margin:0 0 8px;font-weight:600;color:#1f2933;">Карусель (' + urls.length + ' изобр.)</p>';
+        html += '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">';
+        urls.slice(0, 4).forEach(url => {
+          html += '<img src="' + url + '" style="width:80px;height:60px;object-fit:cover;border-radius:8px;" />';
+        });
+        if (urls.length > 4) {
+          html += '<span style="display:flex;align-items:center;color:#6b7280;">+' + (urls.length - 4) + '</span>';
+        }
+        html += '</div></div>';
+        editor.focus();
+        document.execCommand('insertHTML', false, html);
+        updateNestedSectionData(parentIndex, nestedIndex, 'content', editor.innerHTML);
+        unsavedChanges = true;
+      }
+      modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
     urlsInput.focus();
   }
 

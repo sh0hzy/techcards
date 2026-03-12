@@ -7,7 +7,8 @@
       "Bash(set PYTHONIOENCODING=utf-8:*)",
       "Read(//c/tmp/**)",
       "Bash(\"C:/Users/Admin/AppData/Local/Temp/all_html_content.txt\")",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(wc -l C:/Users/Admin/Documents/GitHub/techcards/js/*.js C:/Users/Admin/Documents/GitHub/techcards/*.css && wc -c C:/Users/Admin/Documents/GitHub/techcards/js/*.js C:/Users/Admin/Documents/GitHub/techcards/*.css)"
     ]
   }
 }

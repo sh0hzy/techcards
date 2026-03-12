@@ -224,6 +224,17 @@
               <path d="M6.7 19.1c1.5 1.4 3.5 1.9 5.4 1.9 3.2 0 5.9-1.9 5.9-5.3 0-1.6-.6-2.8-1.6-3.7"></path>
             </svg>
           </button>
+          <div class="toolbar-color" title="Фон выделенного текста">
+            <button type="button" class="toolbar-bgcolor-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                <path d="M2 17l10 5 10-5"></path>
+                <path d="M2 12l10 5 10-5"></path>
+              </svg>
+              <span class="toolbar-color-bar" id="main-bgcolor-bar" style="background:#ffff00;"></span>
+            </button>
+            <input type="color" class="toolbar-bgcolor-input" value="#ffff00" title="Фон текста">
+          </div>
         </div>
 
         <span class="toolbar-divider"></span>
@@ -245,13 +256,13 @@
         <div class="toolbar-group">
           <select class="toolbar-select toolbar-fontsize" title="Размер шрифта">
             <option value="">Размер</option>
-            <option value="1">Мелкий</option>
-            <option value="2">Маленький</option>
-            <option value="3">Обычный</option>
-            <option value="4">Средний</option>
-            <option value="5">Большой</option>
-            <option value="6">Крупный</option>
-            <option value="7">Огромный</option>
+            <option value="1">8px</option>
+            <option value="2">10px</option>
+            <option value="3">12px</option>
+            <option value="4">14px</option>
+            <option value="5">18px</option>
+            <option value="6">24px</option>
+            <option value="7">36px</option>
           </select>
         </div>
 
@@ -463,10 +474,21 @@
             <line x1="4" y1="21" x2="20" y2="21"></line>
           </svg>
         </button>
+        <div class="toolbar-color" title="Фон выделенного текста">
+          <button type="button" class="toolbar-bgcolor-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+              <path d="M2 17l10 5 10-5"></path>
+              <path d="M2 12l10 5 10-5"></path>
+            </svg>
+            <span class="toolbar-color-bar" style="background:#ffff00;"></span>
+          </button>
+          <input type="color" class="toolbar-bgcolor-input" value="#ffff00" title="Фон текста">
+        </div>
       </div>
-      
+
       <span class="toolbar-divider"></span>
-      
+
       <div class="toolbar-group">
         <select class="toolbar-select toolbar-format-nested" title="Формат">
           <option value="">Текст</option>
@@ -531,9 +553,19 @@
             <line x1="15" y1="3" x2="15" y2="21"></line>
           </svg>
         </button>
+        <button type="button" class="nested-carousel-btn" title="Карусель изображений">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+            <circle cx="7" cy="18" r="1"></circle>
+            <circle cx="12" cy="18" r="1"></circle>
+            <circle cx="17" cy="18" r="1"></circle>
+            <polyline points="6 10 9 13 6 16"></polyline>
+            <polyline points="18 10 15 13 18 16"></polyline>
+          </svg>
+        </button>
       </div>
     </div>
-    
+
     <div class="nested-rich-editor" contenteditable="true" data-placeholder="Содержимое подраздела..."></div>
     <div class="nested-section-images"></div>
   </div>
