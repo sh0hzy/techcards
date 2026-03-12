@@ -56,13 +56,10 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (url.hostname.includes('supabase.co')) {
-    if (request.method !== 'GET') return; // let mutations go directly, no SW interception
-    event.respondWith(networkFirstStrategy(request));
-    return;
-  }
-
-  if (!url.hostname.includes('github.io') && url.protocol === 'https:') {
+  // Skip non-GET and external APIs (translate, etc.)
+  if (request.method !== 'GET') return;
+  if (url.hostname.includes('supabase.co')) return;
+  if (!url.hostname.includes('github.io') && url.protocol === 'https:' && !url.hostname.includes('localhost')) {
     event.respondWith(cacheFirstStrategy(request));
     return;
   }

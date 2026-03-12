@@ -164,6 +164,44 @@ body[data-page="admin"] .logo {
   padding: 12px;
 }
 
+.sidebar-data-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.sidebar-data-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.sidebar-data-btn.migrate {
+  background: #fef3c7;
+  color: #92400e;
+}
+.sidebar-data-btn.migrate:hover { background: #fde68a; }
+
+.sidebar-data-btn.export {
+  background: #d1fae5;
+  color: #065f46;
+}
+.sidebar-data-btn.export:hover { background: #a7f3d0; }
+
+.sidebar-data-btn.import {
+  background: #ede9fe;
+  color: #4c1d95;
+}
+.sidebar-data-btn.import:hover { background: #ddd6fe; }
+
 .card-list-item {
   display: flex;
   align-items: center;

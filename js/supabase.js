@@ -1,152 +1,60 @@
 const DB = {
-  async request(endpoint, options = {}) {
-    const url = `${CONFIG.SUPABASE_URL}/rest/v1/${endpoint}`;
-    
-    const headers = {
-      'apikey': CONFIG.SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    };
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: { ...headers, ...options.headers }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      this.saveToLocalStorage(endpoint, data);
-      
-      return data;
-    } catch (error) {
-      console.warn('[DB] Request failed:', error.message);      
-      const cached = this.getFromLocalStorage(endpoint);
-      if (cached) {
-        console.log('[DB] Using localStorage cache for:', endpoint);
-        return cached;
-      }
-
-      console.log('[DB] No cache, returning empty array');
-      return [];
-    }
+  _get(key) {
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+    catch { return []; }
   },
 
-  saveToLocalStorage(key, data) {
-    try {
-      const cacheKey = `db_${key.replace(/[?&=]/g, '_')}`;
-      localStorage.setItem(cacheKey, JSON.stringify({
-        data,
-        timestamp: Date.now()
-      }));
-    } catch (e) {
-      console.warn('[DB] localStorage save failed:', e.message);
-    }
+  _set(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
   },
-  getFromLocalStorage(key) {
-    try {
-      const cacheKey = `db_${key.replace(/[?&=]/g, '_')}`;
-      const cached = localStorage.getItem(cacheKey);
-      
-      if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        const maxAge = 7 * 24 * 60 * 60 * 1000;
-        if (Date.now() - timestamp < maxAge) {
-          return data;
-        }
-      }
-    } catch (e) {
-      console.warn('[DB] localStorage read failed:', e.message);
-    }
-    return null;
-  },
-  
+
   async getCategories() {
-    return this.request('categories?order=sort_order.asc');
+    const cats = this._get('techcards_categories');
+    return cats.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   },
-  
+
   async getTags() {
-    return this.request('tags?order=name.asc');
+    return this._get('techcards_tags');
   },
-  
+
   async getCards(options = {}) {
-    let query = 'cards?is_published=eq.true';
-    query += '&select=*,category:categories(*)';
-    
-    if (options.orderBy) {
-      query += `&order=${options.orderBy}`;
-    } else {
-      query += '&order=created_at.desc';
-    }
-    
-    if (options.limit) {
-      query += `&limit=${options.limit}`;
-    }
-    
+    const cats = this._get('techcards_categories');
+    let cards = this._get('techcards_cards')
+      .filter(c => c.is_published)
+      .map(c => ({ ...c, category: cats.find(x => x.id === c.category_id) || null }));
+
     if (options.categoryId) {
-      query += `&category_id=eq.${options.categoryId}`;
+      cards = cards.filter(c => c.category_id === options.categoryId);
     }
 
-    return this.request(query);
+    if (options.orderBy === 'views_count.desc') {
+      cards.sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
+    } else {
+      cards.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+
+    if (options.limit) cards = cards.slice(0, options.limit);
+    return cards;
   },
 
   async getPopularCards(limit = 6) {
-    return this.getCards({ 
-      orderBy: 'views_count.desc', 
-      limit 
-    });
+    return this.getCards({ orderBy: 'views_count.desc', limit });
   },
 
   async getCardById(id) {
-    const data = await this.request(
-      `cards?id=eq.${id}&select=*,category:categories(*)`
-    );
-    return data[0] || null;
+    const cards = this._get('techcards_cards');
+    const card = cards.find(c => c.id === id);
+    if (!card) return null;
+    const cats = this._get('techcards_categories');
+    return { ...card, category: cats.find(x => x.id === card.category_id) || null };
   },
-  async incrementViews(cardId) {
-    if (!navigator.onLine) {
-      console.log('[DB] Offline, skipping view increment');
-      return;
-    }
-    
-    try {
-      const card = await this.getCardById(cardId);
-      if (!card) return;
 
-      await this.request(`cards?id=eq.${cardId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({
-          views_count: (card.views_count || 0) + 1
-        })
-      });
-    } catch (e) {
+  async incrementViews(cardId) {
+    const cards = this._get('techcards_cards');
+    const i = cards.findIndex(c => c.id === cardId);
+    if (i !== -1) {
+      cards[i].views_count = (cards[i].views_count || 0) + 1;
+      this._set('techcards_cards', cards);
     }
   }
 };
-
-(function prefetchData() {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', doFetch);
-  } else {
-    setTimeout(doFetch, 1000);
-  }
-  
-  async function doFetch() {
-    if (!navigator.onLine) return;
-    
-    console.log('[Prefetch] Loading data for offline...');
-    try {
-      await Promise.all([
-        DB.getCategories(),
-        DB.getCards()
-      ]);
-      console.log('[Prefetch] Done');
-    } catch (e) {
-      console.warn('[Prefetch] Failed:', e.message);
-    }
-  }
-})();

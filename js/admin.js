@@ -115,6 +115,10 @@
     elements.previewClose?.addEventListener('click', hidePreview);
     elements.translateBtn?.addEventListener('click', handleTranslateClick);
 
+    document.getElementById('migrate-btn')?.addEventListener('click', migrateFromSupabase);
+    document.getElementById('export-btn')?.addEventListener('click', exportData);
+    document.getElementById('import-btn')?.addEventListener('click', importData);
+
     window.addEventListener('beforeunload', (e) => {
       if (unsavedChanges) {
         e.preventDefault();
@@ -161,13 +165,14 @@
 
   async function loadData() {
     try {
-      const [categoriesData, cardsData] = await Promise.all([
-        fetchFromSupabase('categories?order=sort_order.asc'),
-        fetchFromSupabase('cards?select=*,category:categories(*)&order=created_at.desc')
-      ]);
+      categories = lsGet('techcards_categories')
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
-      categories = categoriesData || [];
-      cards = cardsData || [];
+      const allCards = lsGet('techcards_cards');
+      cards = allCards.map(card => ({
+        ...card,
+        category: categories.find(c => c.id === card.category_id) || null
+      })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
       renderCardsList();
       renderCategorySelect();
@@ -177,16 +182,80 @@
     }
   }
 
-  async function fetchFromSupabase(endpoint) {
-    const response = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${endpoint}`, {
-      headers: {
+  function lsGet(key) {
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+    catch { return []; }
+  }
+
+  function lsSet(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  async function migrateFromSupabase() {
+    if (!confirm('Загрузить все данные из Supabase в localStorage?\nТекущие данные в localStorage будут перезаписаны.')) return;
+    const btn = document.getElementById('migrate-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Загрузка...'; }
+    try {
+      const headers = {
         'apikey': CONFIG.SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
-      }
-    });
+      };
+      const [catsResp, cardsResp] = await Promise.all([
+        fetch(`${CONFIG.SUPABASE_URL}/rest/v1/categories?order=sort_order.asc`, { headers }),
+        fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards?select=*&order=created_at.desc`, { headers })
+      ]);
+      if (!catsResp.ok || !cardsResp.ok) throw new Error('Ошибка запроса к Supabase');
+      const [cats, fetchedCards] = await Promise.all([catsResp.json(), cardsResp.json()]);
+      lsSet('techcards_categories', cats);
+      lsSet('techcards_cards', fetchedCards);
+      alert(`Готово! Загружено: ${cats.length} категорий, ${fetchedCards.length} карточек.`);
+      await loadData();
+    } catch (e) {
+      alert('Ошибка миграции: ' + e.message);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '↓ Импорт из Supabase'; }
+    }
+  }
 
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return response.json();
+  function exportData() {
+    const data = {
+      categories: lsGet('techcards_categories'),
+      cards: lsGet('techcards_cards'),
+      exported_at: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `techcards-backup-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!data.cards || !data.categories) throw new Error('Неверный формат файла');
+          if (!confirm(`Импортировать ${data.categories.length} категорий и ${data.cards.length} карточек? Текущие данные будут заменены.`)) return;
+          lsSet('techcards_categories', data.categories);
+          lsSet('techcards_cards', data.cards);
+          alert('Импорт завершён!');
+          loadData();
+        } catch (err) {
+          alert('Ошибка импорта: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   }
 
   function renderCardsList() {
@@ -1686,51 +1755,26 @@
       data.created_at = new Date().toISOString();
     }
 
-    console.log('Saving:', data);
-
-    const headers = {
-      'apikey': CONFIG.SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    };
-
-    async function patchCard(id, payload) {
-      const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${id}`, {
-        method: 'PATCH', headers, body: JSON.stringify(payload)
-      });
-      if (!r.ok) throw new Error(await r.text());
-    }
-
     try {
-      let response;
+      const allCards = lsGet('techcards_cards');
 
       if (currentCardId) {
-        // Split into two smaller requests: metadata first, then heavy content
-        const { content, ...meta } = data;
-        await patchCard(currentCardId, meta);
-        await patchCard(currentCardId, { content });
-      } else {
-        response = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards`, {
-          method: 'POST',
-          headers: { ...headers, 'Prefer': 'return=representation' },
-          body: JSON.stringify(data)
-        });
-        if (!response.ok) throw new Error(await response.text());
-      }
-
-      unsavedChanges = false;
-
-      await loadData();
-
-      if (!currentCardId && response.headers.get('content-type')?.includes('json')) {
-        const created = await response.json();
-        if (created?.[0]?.id) {
-          currentCardId = created[0].id;
-          renderCardsList();
+        const idx = allCards.findIndex(c => c.id === currentCardId);
+        if (idx !== -1) {
+          allCards[idx] = { ...allCards[idx], ...data };
         }
+      } else {
+        data.id = 'card_' + Date.now();
+        data.slug = generateSlug(data.title.ru || data.title.en || data.title.kz || 'card');
+        data.views_count = 0;
+        data.created_at = new Date().toISOString();
+        currentCardId = data.id;
+        allCards.unshift(data);
       }
 
+      lsSet('techcards_cards', allCards);
+      unsavedChanges = false;
+      await loadData();
       alert('Сохранено!');
 
     } catch (error) {
@@ -1750,17 +1794,8 @@
     }
 
     try {
-      const response = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${currentCardId}`, {
-        method: 'DELETE',
-        headers: {
-          'apikey': CONFIG.SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+      const allCards = lsGet('techcards_cards').filter(c => c.id !== currentCardId);
+      lsSet('techcards_cards', allCards);
 
       currentCardId = null;
       unsavedChanges = false;
@@ -1769,7 +1804,6 @@
       if (elements.editorPlaceholder) elements.editorPlaceholder.style.display = 'flex';
 
       await loadData();
-
       alert('Карточка удалена');
 
     } catch (error) {
