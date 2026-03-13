@@ -166,10 +166,10 @@
 
   async function loadData() {
     try {
-      categories = lsGet('techcards_categories')
+      categories = (await Store.get('techcards_categories'))
         .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
-      const allCards = lsGet('techcards_cards');
+      const allCards = await Store.get('techcards_cards');
       cards = allCards.map(card => ({
         ...card,
         category: categories.find(c => c.id === card.category_id) || null
@@ -183,17 +183,8 @@
     }
   }
 
-  function lsGet(key) {
-    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
-    catch { return []; }
-  }
-
-  function lsSet(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
-  }
-
   async function migrateFromSupabase() {
-    if (!confirm('Загрузить все данные из Supabase в localStorage?\nТекущие данные в localStorage будут перезаписаны.')) return;
+    if (!confirm('Загрузить все данные из Supabase в IndexedDB?\nТекущие данные будут перезаписаны.')) return;
     const btn = document.getElementById('migrate-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Загрузка...'; }
     try {
@@ -207,8 +198,8 @@
       ]);
       if (!catsResp.ok || !cardsResp.ok) throw new Error('Ошибка запроса к Supabase');
       const [cats, fetchedCards] = await Promise.all([catsResp.json(), cardsResp.json()]);
-      lsSet('techcards_categories', cats);
-      lsSet('techcards_cards', fetchedCards);
+      await Store.set('techcards_categories', cats);
+      await Store.set('techcards_cards', fetchedCards);
       alert(`Готово! Загружено: ${cats.length} категорий, ${fetchedCards.length} карточек.`);
       await loadData();
     } catch (e) {
@@ -218,10 +209,10 @@
     }
   }
 
-  function exportData() {
+  async function exportData() {
     const data = {
-      categories: lsGet('techcards_categories'),
-      cards: lsGet('techcards_cards'),
+      categories: await Store.get('techcards_categories'),
+      cards: await Store.get('techcards_cards'),
       exported_at: new Date().toISOString()
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -241,13 +232,13 @@
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         try {
           const data = JSON.parse(ev.target.result);
           if (!data.cards || !data.categories) throw new Error('Неверный формат файла');
           if (!confirm(`Импортировать ${data.categories.length} категорий и ${data.cards.length} карточек? Текущие данные будут заменены.`)) return;
-          lsSet('techcards_categories', data.categories);
-          lsSet('techcards_cards', data.cards);
+          await Store.set('techcards_categories', data.categories);
+          await Store.set('techcards_cards', data.cards);
           alert('Импорт завершён!');
           loadData();
         } catch (err) {
@@ -361,14 +352,14 @@
         if (catsFile) {
           const text = await readFile(catsFile);
           const cats = parseCsv(text);
-          lsSet('techcards_categories', cats);
+          await Store.set('techcards_categories', cats);
           status.textContent = `Категории: загружено ${cats.length}`;
         }
 
         if (cardsFile) {
           const text = await readFile(cardsFile);
           const parsed = parseCsv(text);
-          lsSet('techcards_cards', parsed);
+          await Store.set('techcards_cards', parsed);
           status.textContent += (catsFile ? ' | ' : '') + `Карточки: загружено ${parsed.length}`;
         }
 
@@ -1882,7 +1873,7 @@
     }
 
     try {
-      const allCards = lsGet('techcards_cards');
+      const allCards = await Store.get('techcards_cards');
 
       if (currentCardId) {
         const idx = allCards.findIndex(c => c.id === currentCardId);
@@ -1898,7 +1889,7 @@
         allCards.unshift(data);
       }
 
-      lsSet('techcards_cards', allCards);
+      await Store.set('techcards_cards', allCards);
       unsavedChanges = false;
       await loadData();
       alert('Сохранено!');
@@ -1920,8 +1911,8 @@
     }
 
     try {
-      const allCards = lsGet('techcards_cards').filter(c => c.id !== currentCardId);
-      lsSet('techcards_cards', allCards);
+      const allCards = (await Store.get('techcards_cards')).filter(c => c.id !== currentCardId);
+      await Store.set('techcards_cards', allCards);
 
       currentCardId = null;
       unsavedChanges = false;
