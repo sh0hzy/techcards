@@ -258,6 +258,131 @@
     input.click();
   }
 
+  // Parse a CSV string into array of objects, handles quoted fields with commas/newlines
+  function parseCsv(text) {
+    const lines = [];
+    let cur = '', inQuote = false, fields = [], rows = [];
+
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i], next = text[i + 1];
+      if (ch === '"') {
+        if (inQuote && next === '"') { cur += '"'; i++; }
+        else inQuote = !inQuote;
+      } else if (ch === ',' && !inQuote) {
+        fields.push(cur); cur = '';
+      } else if ((ch === '\n' || (ch === '\r' && next === '\n')) && !inQuote) {
+        if (ch === '\r') i++;
+        fields.push(cur); cur = '';
+        rows.push(fields); fields = [];
+      } else {
+        cur += ch;
+      }
+    }
+    if (cur || fields.length) { fields.push(cur); rows.push(fields); }
+
+    if (rows.length < 2) return [];
+    const headers = rows[0];
+    return rows.slice(1)
+      .filter(r => r.some(f => f.trim()))
+      .map(r => {
+        const obj = {};
+        headers.forEach((h, i) => {
+          const val = r[i] ?? '';
+          // Try to parse JSON fields (objects/arrays)
+          if (val.startsWith('{') || val.startsWith('[')) {
+            try { obj[h] = JSON.parse(val); return; } catch {}
+          }
+          // Booleans
+          if (val === 'true') { obj[h] = true; return; }
+          if (val === 'false') { obj[h] = false; return; }
+          // Numbers (but not IDs that look like UUIDs)
+          if (val !== '' && !isNaN(val) && !val.includes('-')) { obj[h] = Number(val); return; }
+          obj[h] = val;
+        });
+        return obj;
+      });
+  }
+
+  function importCsv() {
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.innerHTML = `
+      <div class="image-modal-content" style="max-width:560px;">
+        <h3>Импорт из CSV (Supabase)</h3>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:16px;">
+          Выберите файлы экспорта из Supabase:<br>
+          <b>cards.csv</b> и <b>categories.csv</b>
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+          <label style="font-size:13px;font-weight:600;color:#374151;">
+            cards.csv
+            <input type="file" id="csv-cards-input" accept=".csv" style="display:block;margin-top:4px;font-weight:normal;">
+          </label>
+          <label style="font-size:13px;font-weight:600;color:#374151;">
+            categories.csv
+            <input type="file" id="csv-cats-input" accept=".csv" style="display:block;margin-top:4px;font-weight:normal;">
+          </label>
+        </div>
+        <div id="csv-status" style="font-size:13px;color:#6b7280;min-height:20px;"></div>
+        <div class="image-modal-actions">
+          <button class="btn-secondary" id="csv-cancel">Отмена</button>
+          <button class="btn-primary" id="csv-import">Импортировать</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('#csv-cancel').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+
+    modal.querySelector('#csv-import').addEventListener('click', async () => {
+      const cardsFile = modal.querySelector('#csv-cards-input').files[0];
+      const catsFile = modal.querySelector('#csv-cats-input').files[0];
+      const status = modal.querySelector('#csv-status');
+
+      if (!cardsFile && !catsFile) {
+        status.textContent = 'Выберите хотя бы один файл.';
+        status.style.color = '#dc2626';
+        return;
+      }
+
+      const readFile = f => new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.onerror = rej;
+        r.readAsText(f, 'utf-8');
+      });
+
+      try {
+        status.style.color = '#6b7280';
+        status.textContent = 'Обработка...';
+
+        if (catsFile) {
+          const text = await readFile(catsFile);
+          const cats = parseCsv(text);
+          lsSet('techcards_categories', cats);
+          status.textContent = `Категории: загружено ${cats.length}`;
+        }
+
+        if (cardsFile) {
+          const text = await readFile(cardsFile);
+          const parsed = parseCsv(text);
+          lsSet('techcards_cards', parsed);
+          status.textContent += (catsFile ? ' | ' : '') + `Карточки: загружено ${parsed.length}`;
+        }
+
+        status.style.color = '#059669';
+        status.textContent += ' ✓ Готово!';
+        await loadData();
+        setTimeout(() => modal.remove(), 1200);
+
+      } catch (err) {
+        status.style.color = '#dc2626';
+        status.textContent = 'Ошибка: ' + err.message;
+      }
+    });
+  }
+
   function renderCardsList() {
     if (!elements.cardsList) return;
 
