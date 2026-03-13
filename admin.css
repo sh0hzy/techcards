@@ -196,6 +196,12 @@ body[data-page="admin"] .logo {
 }
 .sidebar-data-btn.export:hover { background: #a7f3d0; }
 
+.sidebar-data-btn.csv {
+  background: #e0f2fe;
+  color: #0c4a6e;
+}
+.sidebar-data-btn.csv:hover { background: #bae6fd; }
+
 .sidebar-data-btn.import {
   background: #ede9fe;
   color: #4c1d95;

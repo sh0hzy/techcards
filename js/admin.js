@@ -118,6 +118,7 @@
     document.getElementById('migrate-btn')?.addEventListener('click', migrateFromSupabase);
     document.getElementById('export-btn')?.addEventListener('click', exportData);
     document.getElementById('import-btn')?.addEventListener('click', importData);
+    document.getElementById('csv-btn')?.addEventListener('click', importCsv);
 
     window.addEventListener('beforeunload', (e) => {
       if (unsavedChanges) {
