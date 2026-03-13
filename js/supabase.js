@@ -1,5 +1,5 @@
 // IndexedDB key-value store (no size limit vs localStorage's 5MB)
-const Store = (() => {
+window.Store = (() => {
   const DB_NAME = 'techcards_db';
   const STORE_NAME = 'kv';
   let _db = null;
@@ -40,7 +40,7 @@ const Store = (() => {
   };
 })();
 
-const DB = {
+window.DB = {
   async getCategories() {
     const cats = await Store.get('techcards_categories');
     return cats.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
