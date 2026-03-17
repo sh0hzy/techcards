@@ -166,10 +166,13 @@
 
   async function loadData() {
     try {
-      categories = (await Store.get('techcards_categories'))
-        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      const [rawCategories, allCards] = await Promise.all([
+        Store.get('techcards_categories'),
+        Store.get('techcards_cards')
+      ]);
 
-      const allCards = await Store.get('techcards_cards');
+      categories = rawCategories.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
       cards = allCards.map(card => ({
         ...card,
         category: categories.find(c => c.id === card.category_id) || null
