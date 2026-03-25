@@ -112,6 +112,7 @@ function getLocalText(obj, lang) {
 // ============ HOME PAGE ============
 
 let _homeAllCards = [];
+let _homeCategories = [];
 let _homeSearchBound = false;
 
 async function initHomePage() {
@@ -125,7 +126,7 @@ async function initHomePage() {
   }
 
   try {
-    _homeAllCards = await DB.getCards();
+    [_homeAllCards, _homeCategories] = await Promise.all([DB.getCards(), DB.getCategories()]);
     renderHome();
   } catch (error) {
     console.error('Error loading data:', error);
@@ -173,11 +174,10 @@ async function initHomePage() {
     if (!cardsContainer) return;
 
     const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
-    const lang = i18n.getLocale();
-    let filtered;
 
     if (query) {
-      filtered = _homeAllCards.filter(card => {
+      const lang = i18n.getLocale();
+      const filtered = _homeAllCards.filter(card => {
         const title = getLocalText(card.title, lang).toLowerCase();
         const desc = getLocalText(card.description, lang).toLowerCase();
         const catName = card.category ? getLocalText(card.category.name, lang).toLowerCase() : '';
@@ -205,23 +205,22 @@ async function initHomePage() {
                  catName.includes(word) || contentText.includes(word);
         });
       });
-    } else {
-      filtered = [..._homeAllCards]
-        .sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
-    }
 
-    if (searchResults) {
-      if (query) {
+      if (searchResults) {
         searchResults.textContent = filtered.length > 0
           ? i18n.t('catalog.found', { count: filtered.length })
           : i18n.t('catalog.noResults');
         searchResults.style.display = 'block';
-      } else {
-        searchResults.style.display = 'none';
       }
-    }
 
-    renderCards(filtered, cardsContainer, query);
+      renderCards(filtered, cardsContainer, query);
+    } else {
+      if (searchResults) searchResults.style.display = 'none';
+
+      const catIdsWithCards = new Set(_homeAllCards.map(c => c.category_id));
+      const visibleCats = _homeCategories.filter(c => catIdsWithCards.has(c.id));
+      renderCategories(visibleCats, cardsContainer);
+    }
   }
 }
 
@@ -281,6 +280,12 @@ async function initCatalogPage() {
       searchInput.addEventListener('input', (e) => {
         handleSearch(e.target.value);
       });
+    }
+
+    const titleEl = document.getElementById('page-title');
+    if (titleEl && currentFilters.categoryId) {
+      const cat = allCategories.find(c => c.id === currentFilters.categoryId);
+      if (cat) titleEl.textContent = i18n.localize(cat.name, cat.slug);
     }
 
     filterAndRender();
