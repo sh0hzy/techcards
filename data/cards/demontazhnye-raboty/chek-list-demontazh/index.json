@@ -1,5 +1,5 @@
 {
-  "id": "card_1774427901157_66",
+  "id": "card_1774433417381_66",
   "slug": "chek-list-demontazh",
   "title": {
     "ru": "ЧЕК-ЛИСТ Демонтаж."
@@ -85,9 +85,9 @@
   },
   "images": [],
   "cover_image": null,
-  "category_id": "cat_12",
+  "category_id": "cat_1",
   "is_published": true,
-  "created_at": "2026-03-25T08:38:21.173119+00:00",
-  "updated_at": "2026-03-25T08:38:21.173119+00:00",
-  "views_count": 1
+  "created_at": "2026-03-25T10:10:17.437088+00:00",
+  "updated_at": "2026-03-25T10:10:17.437088+00:00",
+  "views_count": 0
 }

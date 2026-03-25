@@ -1,5 +1,5 @@
 {
-  "id": "card_1774427897153_55",
+  "id": "card_1774433392732_55",
   "slug": "uborka-i-podderzhanie-poryadka-na-obekte",
   "title": {
     "ru": "Уборка и поддержание порядка на объекте"
@@ -236,8 +236,8 @@
   "cover_image": null,
   "category_id": "cat_1",
   "is_published": true,
-  "created_at": "2026-03-25T08:38:17.162334+00:00",
-  "updated_at": "2026-03-25T08:38:17.162334+00:00",
+  "created_at": "2026-03-25T10:09:52.744760+00:00",
+  "updated_at": "2026-03-25T10:09:52.744760+00:00",
   "views_count": 0,
-  "parent_id": "card_1774427896944_11"
+  "parent_id": "card_1774433392484_11"
 }
