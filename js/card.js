@@ -68,29 +68,14 @@
 
   async function loadCard() {
     try {
-      const url = `${CONFIG.SUPABASE_URL}/rest/v1/cards?id=eq.${cardId}&select=*,category:categories(*)`;
-      
-      const response = await fetch(url, {
-        headers: {
-          'apikey': CONFIG.SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`
-        }
-      });
+      const card = await DB.getCardById(cardId);
 
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки');
-      }
-
-      const result = await response.json();
-
-      if (!result || result.length === 0) {
+      if (!card) {
         window.location.href = 'index.html';
         return;
       }
 
-      cardData = result[0];
-      console.log('Card loaded:', cardData);
-
+      cardData = card;
       renderCard(cardData);
 
     } catch (error) {

@@ -5,6 +5,7 @@ const ASSETS = [
   '/techcards/',
   '/techcards/index.html',
   '/techcards/card.html',
+  '/techcards/catalog.html',
   '/techcards/admin.html',
   '/techcards/style.css',
   '/techcards/admin.css',
