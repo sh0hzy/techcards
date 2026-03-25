@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kazarbuild-v68';
+const CACHE_NAME = 'kazarbuild-v69';
 const DATA_CACHE_NAME = 'kazarbuild-data-v1';
 
 const ASSETS = [
