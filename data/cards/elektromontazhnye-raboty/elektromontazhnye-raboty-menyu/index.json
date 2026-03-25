@@ -1,0 +1,118 @@
+{
+  "id": "card_1774427898737_Электромонтажные работы . Меню",
+  "slug": "elektromontazhnye-raboty-menyu",
+  "title": {
+    "ru": "Электромонтажные работы . Меню"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "Монтаж подрозетников",
+              "slug": "1-montazh-podrozetnikov-montazh-podrozetnikov",
+              "href": "..\\1.Монтаж подрозетников\\Монтаж подрозетников.html"
+            },
+            {
+              "text": "Монтаж кабеля",
+              "slug": "montazh-kabelya",
+              "href": "../2.Монтаж кабеля/Монтаж кабеля.html"
+            },
+            {
+              "text": "Зачистка кабеля. Соединение и коммутация проводников",
+              "slug": "zachistka-kabelya-soedinenie-i-kommutatsiya-provodnikov",
+              "href": "../3.Зачистка кабеля./Зачистка кабеля. Соединение и коммутация проводников.html"
+            },
+            {
+              "text": "Электрощит. Монтаж электрощита",
+              "slug": "elektroshchit-montazh-elektroshchita",
+              "href": "../4.Электрощит./Электрощит. Монтаж электрощита.html"
+            },
+            {
+              "text": "Заделка штробы",
+              "slug": "zadelka-shtroby",
+              "href": "../5.Заделка штробы/Заделка штробы.html"
+            },
+            {
+              "text": "Материал и инструмент",
+              "slug": "material-i-instrument",
+              "href": "../6.Материал и инструмент/Материал и инструмент.html"
+            },
+            {
+              "text": "Видеоматериалы",
+              "slug": "videomaterial",
+              "href": "../7.Видеоматериал/Видеоматериал.html"
+            },
+            {
+              "text": "Документация",
+              "slug": "dokumentatsiya",
+              "href": "../8.Документация/Документация.html"
+            },
+            {
+              "text": "ЧЕК-ЛИСТ Электромонтаж",
+              "slug": "chek-list-elektromontazh",
+              "href": "../9.ЧЕК-ЛИСТ Электромонтаж/ЧЕК-ЛИСТ Электромонтаж.html"
+            }
+          ]
+        }
+      ],
+      "navigation": [
+        {
+          "text": "Монтаж подрозетников",
+          "slug": "1-montazh-podrozetnikov-montazh-podrozetnikov",
+          "href": "..\\1.Монтаж подрозетников\\Монтаж подрозетников.html"
+        },
+        {
+          "text": "Монтаж кабеля",
+          "slug": "montazh-kabelya",
+          "href": "../2.Монтаж кабеля/Монтаж кабеля.html"
+        },
+        {
+          "text": "Зачистка кабеля. Соединение и коммутация проводников",
+          "slug": "zachistka-kabelya-soedinenie-i-kommutatsiya-provodnikov",
+          "href": "../3.Зачистка кабеля./Зачистка кабеля. Соединение и коммутация проводников.html"
+        },
+        {
+          "text": "Электрощит. Монтаж электрощита",
+          "slug": "elektroshchit-montazh-elektroshchita",
+          "href": "../4.Электрощит./Электрощит. Монтаж электрощита.html"
+        },
+        {
+          "text": "Заделка штробы",
+          "slug": "zadelka-shtroby",
+          "href": "../5.Заделка штробы/Заделка штробы.html"
+        },
+        {
+          "text": "Материал и инструмент",
+          "slug": "material-i-instrument",
+          "href": "../6.Материал и инструмент/Материал и инструмент.html"
+        },
+        {
+          "text": "Видеоматериалы",
+          "slug": "videomaterial",
+          "href": "../7.Видеоматериал/Видеоматериал.html"
+        },
+        {
+          "text": "Документация",
+          "slug": "dokumentatsiya",
+          "href": "../8.Документация/Документация.html"
+        },
+        {
+          "text": "ЧЕК-ЛИСТ Электромонтаж",
+          "slug": "chek-list-elektromontazh",
+          "href": "../9.ЧЕК-ЛИСТ Электромонтаж/ЧЕК-ЛИСТ Электромонтаж.html"
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_3",
+  "is_published": true,
+  "created_at": "2026-03-25T08:38:18.749222+00:00",
+  "updated_at": "2026-03-25T08:38:18.749222+00:00",
+  "views_count": 0
+}

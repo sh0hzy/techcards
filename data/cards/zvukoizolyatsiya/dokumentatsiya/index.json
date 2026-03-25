@@ -1,0 +1,110 @@
+{
+  "id": "card_1774427897823_Документация",
+  "slug": "dokumentatsiya",
+  "title": {
+    "ru": "Документация"
+  },
+  "description": {
+    "ru": "Бескаркасная шумоизоляция или как я избавился от шума из соседней квартиры Сергей Максимов, блог Малоэтажная Страна (m-strana.ru)\n• Базовая система позволяет добиться снижения бытового шума до нормативных значений, предусмотренных СП 5.13330.2011 \"Защита от шума\" (Актуализированная редакция СНиП 23-03-2003).\nСП 51.13330.2011\n• СП 51.13330.2011 Защита от шума. Актуализированная редакция СНиП 23-03-2003 (с изменением № 1) (mosreg.ru)\nГОСТ 23499-2009\n• ГОСТ 23499-2009 Материалы и изделия звукоизоляционные и звукопоглощающие строительные. Общие технические условия - docs.cntd.ru"
+  },
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "Бескаркасная звукоизоляция стены",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1p5gHhH9wFXSR60gfXftIaPH7Ei4hcBLt/view?usp=drive_link"
+            },
+            {
+              "text": "bazovaya-potolki-2310",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1n71vrOmq_whB8kVIS5IDP7RpEY8hoMmr/view?usp=sharing"
+            },
+            {
+              "text": "Базовая каркасная звукоизоляция потолка",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1ywybDqMdes9kKo1xLe9bZNpRCs7hqJEs/view?usp=sharing"
+            },
+            {
+              "text": "Каркасная звукоизоляция стены",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1WEMxZLNn3fk-lLg3gkpVCbnuWQZwBog3/view?usp=sharing"
+            },
+            {
+              "text": "Звукоизоляция пола ПРЕМИУМ",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1wK_-RdUWZg20MJEyf50-YKiNycq72K7m/view?usp=sharing"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Бескаркасная шумоизоляция или как я избавился от шума из соседней квартиры Сергей Максимов, блог Малоэтажная Страна (m-strana.ru)"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "Базовая система позволяет добиться снижения бытового шума до нормативных значений, предусмотренных СП 5.13330.2011 \"Защита от шума\" (Актуализированная редакция СНиП 23-03-2003)."
+          ]
+        },
+        {
+          "type": "p",
+          "text": "СП 51.13330.2011"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "СП 51.13330.2011 Защита от шума. Актуализированная редакция СНиП 23-03-2003 (с изменением № 1) (mosreg.ru)"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "ГОСТ 23499-2009"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "ГОСТ 23499-2009 Материалы и изделия звукоизоляционные и звукопоглощающие строительные. Общие технические условия - docs.cntd.ru"
+          ]
+        }
+      ],
+      "navigation": [
+        {
+          "text": "Бескаркасная звукоизоляция стены",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1p5gHhH9wFXSR60gfXftIaPH7Ei4hcBLt/view?usp=drive_link"
+        },
+        {
+          "text": "bazovaya-potolki-2310",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1n71vrOmq_whB8kVIS5IDP7RpEY8hoMmr/view?usp=sharing"
+        },
+        {
+          "text": "Базовая каркасная звукоизоляция потолка",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1ywybDqMdes9kKo1xLe9bZNpRCs7hqJEs/view?usp=sharing"
+        },
+        {
+          "text": "Каркасная звукоизоляция стены",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1WEMxZLNn3fk-lLg3gkpVCbnuWQZwBog3/view?usp=sharing"
+        },
+        {
+          "text": "Звукоизоляция пола ПРЕМИУМ",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1wK_-RdUWZg20MJEyf50-YKiNycq72K7m/view?usp=sharing"
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_2",
+  "is_published": true,
+  "created_at": "2026-03-25T08:38:17.839270+00:00",
+  "updated_at": "2026-03-25T08:38:17.839270+00:00",
+  "views_count": 0
+}

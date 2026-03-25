@@ -1,0 +1,182 @@
+{
+  "id": "card_1774427902798_Документация",
+  "slug": "dokumentatsiya",
+  "title": {
+    "ru": "Документация"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "Каталоги Knauf",
+              "slug": "1judfgtfb2fm81vckihunkh03d8nyj2ce-usp-drive-link",
+              "href": "https://drive.google.com/drive/folders/1JUdFGtfB2FM81VCkIHUnKH03D8nYj2Ce?usp=drive_link"
+            },
+            {
+              "text": "Альбомы рабочих чертежей Knauf",
+              "slug": "1wo3ooddcipg6j3ecyhquor47rgclpptz-usp-drive-link",
+              "href": "https://drive.google.com/drive/folders/1wO3OOddCIpG6j3ECyhQUoR47RGCLppTZ?usp=drive_link"
+            },
+            {
+              "text": "Технические листы Knauf",
+              "slug": "1efvs4jw5a2swe0ucucxs9fxfd2bcimiq-usp-drive-link",
+              "href": "https://drive.google.com/drive/folders/1EfVs4jW5a2sWe0UcuCxS9fxFd2bcImIq?usp=drive_link"
+            },
+            {
+              "text": "Перегородки каркас",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1U2IM7RYsyXvglMKBMVtmd-ol0yaQ_b_z/view?usp=drive_link"
+            },
+            {
+              "text": "Технические листы",
+              "slug": "1phemrylzb9jvekmyx7jtghrdjzhbg7da-usp-drive-link",
+              "href": "https://drive.google.com/drive/folders/1pHEmRylzb9JVeKmyX7jTghRdJzhBG7DA?usp=drive_link"
+            },
+            {
+              "text": "Теневой профиль",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1b75-HLNKiEMth_4hdkgxOmabSriq2Gfc/view?usp=drive_link"
+            }
+          ]
+        },
+        {
+          "type": "h2",
+          "text": "Документация"
+        },
+        {
+          "type": "p",
+          "text": "СП 163.1325800.2014"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "sp-163.1325800.2014-konstruktsii-s-primenenie-gipsokartonnykh-i-gipsovolknistykh-listov.pdf (minstroyrf.gov.ru)"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "ГОСТ 6266—97"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "ГОСТ-6266-97.pdf (studio-ar.ru)"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "СНиП 3.04.01—87"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "СП 71.13330.2017 Изоляционные и отделочные покрытия. Актуализированная редакция СНиП 3.04.01-87 (gk-adept.ru)"
+          ]
+        },
+        {
+          "type": "h2",
+          "text": "KNAUF"
+        }
+      ],
+      "navigation": [
+        {
+          "text": "Каталоги Knauf",
+          "slug": "1judfgtfb2fm81vckihunkh03d8nyj2ce-usp-drive-link",
+          "href": "https://drive.google.com/drive/folders/1JUdFGtfB2FM81VCkIHUnKH03D8nYj2Ce?usp=drive_link"
+        },
+        {
+          "text": "Альбомы рабочих чертежей Knauf",
+          "slug": "1wo3ooddcipg6j3ecyhquor47rgclpptz-usp-drive-link",
+          "href": "https://drive.google.com/drive/folders/1wO3OOddCIpG6j3ECyhQUoR47RGCLppTZ?usp=drive_link"
+        },
+        {
+          "text": "Технические листы Knauf",
+          "slug": "1efvs4jw5a2swe0ucucxs9fxfd2bcimiq-usp-drive-link",
+          "href": "https://drive.google.com/drive/folders/1EfVs4jW5a2sWe0UcuCxS9fxFd2bcImIq?usp=drive_link"
+        },
+        {
+          "text": "Перегородки каркас",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1U2IM7RYsyXvglMKBMVtmd-ol0yaQ_b_z/view?usp=drive_link"
+        },
+        {
+          "text": "Технические листы",
+          "slug": "1phemrylzb9jvekmyx7jtghrdjzhbg7da-usp-drive-link",
+          "href": "https://drive.google.com/drive/folders/1pHEmRylzb9JVeKmyX7jTghRdJzhBG7DA?usp=drive_link"
+        },
+        {
+          "text": "Теневой профиль",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1b75-HLNKiEMth_4hdkgxOmabSriq2Gfc/view?usp=drive_link"
+        }
+      ],
+      "sections": [
+        {
+          "title": "Документация",
+          "content": "СП 163.1325800.2014\n• sp-163.1325800.2014-konstruktsii-s-primenenie-gipsokartonnykh-i-gipsovolknistykh-listov.pdf (minstroyrf.gov.ru)\nГОСТ 6266—97\n• ГОСТ-6266-97.pdf (studio-ar.ru)\nСНиП 3.04.01—87\n• СП 71.13330.2017 Изоляционные и отделочные покрытия. Актуализированная редакция СНиП 3.04.01-87 (gk-adept.ru)",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Документация"
+            },
+            {
+              "type": "p",
+              "text": "СП 163.1325800.2014"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "sp-163.1325800.2014-konstruktsii-s-primenenie-gipsokartonnykh-i-gipsovolknistykh-listov.pdf (minstroyrf.gov.ru)"
+              ]
+            },
+            {
+              "type": "p",
+              "text": "ГОСТ 6266—97"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "ГОСТ-6266-97.pdf (studio-ar.ru)"
+              ]
+            },
+            {
+              "type": "p",
+              "text": "СНиП 3.04.01—87"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "СП 71.13330.2017 Изоляционные и отделочные покрытия. Актуализированная редакция СНиП 3.04.01-87 (gk-adept.ru)"
+              ]
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "KNAUF",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "KNAUF"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_15",
+  "is_published": true,
+  "created_at": "2026-03-25T08:38:22.810089+00:00",
+  "updated_at": "2026-03-25T08:38:22.810089+00:00",
+  "views_count": 0
+}

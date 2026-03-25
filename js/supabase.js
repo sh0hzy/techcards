@@ -1,41 +1,44 @@
-// IndexedDB key-value store (no size limit vs localStorage's 5MB)
+// Local file-based store — backed by server.py running on localhost:8000
+// Store.get / Store.set mirror the same interface as before so admin.js is unchanged.
 window.Store = (() => {
-  const DB_NAME = 'techcards_db';
-  const STORE_NAME = 'kv';
-  let _db = null;
+  const SERVER = 'http://localhost:8000';
 
-  function open() {
-    if (_db) return Promise.resolve(_db);
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = e => e.target.result.createObjectStore(STORE_NAME);
-      req.onsuccess = e => { _db = e.target.result; resolve(_db); };
-      req.onerror = () => reject(req.error);
-    });
+  async function apiFetch(path, options) {
+    const r = await fetch(SERVER + path, options);
+    if (!r.ok) throw new Error(`API ${path} -> ${r.status}`);
+    return r.json();
   }
 
   return {
     async get(key) {
       try {
-        const db = await open();
-        return await new Promise((resolve, reject) => {
-          const req = db.transaction(STORE_NAME, 'readonly')
-            .objectStore(STORE_NAME).get(key);
-          req.onsuccess = () => resolve(req.result ?? []);
-          req.onerror = () => reject(req.error);
-        });
-      } catch { return []; }
+        if (key === 'techcards_cards')      return apiFetch('/api/cards');
+        if (key === 'techcards_categories') return apiFetch('/api/categories');
+        return [];
+      } catch(e) {
+        console.warn('Store.get failed (is server.py running?):', e.message);
+        return [];
+      }
     },
+
     async set(key, value) {
       try {
-        const db = await open();
-        await new Promise((resolve, reject) => {
-          const req = db.transaction(STORE_NAME, 'readwrite')
-            .objectStore(STORE_NAME).put(value, key);
-          req.onsuccess = () => resolve();
-          req.onerror = () => reject(req.error);
-        });
-      } catch(e) { console.warn('Store.set failed:', e); }
+        if (key === 'techcards_cards') {
+          await apiFetch('/api/sync/cards', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(value)
+          });
+        } else if (key === 'techcards_categories') {
+          await apiFetch('/api/sync/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(value)
+          });
+        }
+      } catch(e) {
+        console.warn('Store.set failed (is server.py running?):', e.message);
+      }
     }
   };
 })();
