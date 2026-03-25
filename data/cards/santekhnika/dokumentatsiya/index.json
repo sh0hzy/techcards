@@ -109,7 +109,7 @@
         },
         {
           "title": "Размеры электрощитов",
-          "content": "• ABB",
+          "content": "• ABB\n• Tekfor/KEAZ\n• Hager",
           "blocks": [
             {
               "type": "h2",
@@ -120,29 +120,13 @@
               "items": [
                 "ABB"
               ]
-            }
-          ],
-          "images": [],
-          "nestedSections": []
-        },
-        {
-          "title": "",
-          "content": "• Tekfor/KEAZ",
-          "blocks": [
+            },
             {
               "type": "ul",
               "items": [
                 "Tekfor/KEAZ"
               ]
-            }
-          ],
-          "images": [],
-          "nestedSections": []
-        },
-        {
-          "title": "",
-          "content": "• Hager",
-          "blocks": [
+            },
             {
               "type": "ul",
               "items": [
