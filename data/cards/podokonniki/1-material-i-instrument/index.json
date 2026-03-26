@@ -1,0 +1,37 @@
+{
+  "id": "card_1774532380955_133",
+  "slug": "1-material-i-instrument",
+  "title": {
+    "ru": "Материал и инструмент"
+  },
+  "description": {
+    "ru": ""
+  },
+  "content": {
+    "ru": {
+      "sections": [
+        {
+          "title": "Материалы",
+          "content": "• Малярный скотч\n• Герметик\n• Монтажная пена",
+          "blocks": [],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Инструменты",
+          "content": "• Рулетка\n• Болгарка",
+          "blocks": [],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_21",
+  "is_published": true,
+  "created_at": "2026-03-26T00:00:00.000000+00:00",
+  "updated_at": "2026-03-26T00:00:00.000000+00:00",
+  "views_count": 0
+}

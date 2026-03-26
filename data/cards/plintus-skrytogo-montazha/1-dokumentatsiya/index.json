@@ -1,0 +1,30 @@
+{
+  "id": "card_1774532380955_52",
+  "slug": "1-dokumentatsiya",
+  "title": {
+    "ru": "Документация"
+  },
+  "description": {
+    "ru": ""
+  },
+  "content": {
+    "ru": {
+      "sections": [
+        {
+          "title": "Документация",
+          "content": "• ГОСТ 19111-2001\nГОСТ 19111-2001 Изделия погонажные профильные поливинилхлоридные для внутренней отделки. Технические условия - docs.cntd.ru\n• Технологическая карта теневых профилей GIPPS by KRAAB",
+          "blocks": [],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_8",
+  "is_published": true,
+  "created_at": "2026-03-26T00:00:00.000000+00:00",
+  "updated_at": "2026-03-26T00:00:00.000000+00:00",
+  "views_count": 0
+}

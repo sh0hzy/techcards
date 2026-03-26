@@ -1,0 +1,30 @@
+{
+  "id": "card_1774532380955_134",
+  "slug": "2-videomaterial",
+  "title": {
+    "ru": "Видеоматериал"
+  },
+  "description": {
+    "ru": ""
+  },
+  "content": {
+    "ru": {
+      "sections": [
+        {
+          "title": "2.Видеоматериал",
+          "content": "",
+          "blocks": [],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_21",
+  "is_published": true,
+  "created_at": "2026-03-26T00:00:00.000000+00:00",
+  "updated_at": "2026-03-26T00:00:00.000000+00:00",
+  "views_count": 0
+}

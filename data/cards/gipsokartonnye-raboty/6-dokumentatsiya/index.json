@@ -1,0 +1,30 @@
+{
+  "id": "card_1774532380955_101",
+  "slug": "6-dokumentatsiya",
+  "title": {
+    "ru": "Документация"
+  },
+  "description": {
+    "ru": ""
+  },
+  "content": {
+    "ru": {
+      "sections": [
+        {
+          "title": "Документация",
+          "content": "СП 163.1325800.2014\n• sp-163.1325800.2014-konstruktsii-s-primenenie-gipsokartonnykh-i-gipsovolknistykh-listov.pdf (minstroyrf.gov.ru)\nГОСТ 6266—97\n• ГОСТ-6266-97.pdf (studio-ar.ru)\nСНиП 3.04.01—87\n• СП 71.13330.2017 Изоляционные и отделочные покрытия. Актуализированная редакция СНиП 3.04.01-87 (gk-adept.ru)",
+          "blocks": [],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_15",
+  "is_published": true,
+  "created_at": "2026-03-26T00:00:00.000000+00:00",
+  "updated_at": "2026-03-26T00:00:00.000000+00:00",
+  "views_count": 0
+}

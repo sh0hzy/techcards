@@ -1,0 +1,37 @@
+{
+  "id": "card_1774532380955_68",
+  "slug": "1-material-i-instrument",
+  "title": {
+    "ru": "Материал и инструмент"
+  },
+  "description": {
+    "ru": ""
+  },
+  "content": {
+    "ru": {
+      "sections": [
+        {
+          "title": "Материалы",
+          "content": "• Грунт\n• Гидроизоляция обмазочная MAPEI MAPEGUM WPS или аналог.\n• Лента гидроизоляционная MAPEI MAPEBAND 50 м х 12 см или аналог.\n• Угловой элемент гидроизоляционный внутренний MAPEI MAPEBAND Easy 90° или аналог.\n• Угловой элемент гидроизоляционный внешний MAPEI MAPEBAND Easy 270° или аналог.\n• Манжета гидроизоляционная настенная.\n• Скотч.",
+          "blocks": [],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Инструменты",
+          "content": "• Лезвия для ножа\n• Кисть\n• Валик\n• Шпатель\n• Перчатки\n• Нож\n• Миксер\n• Ножницы\n• Пистолет для герметика\n• Пылесос",
+          "blocks": [],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_11",
+  "is_published": true,
+  "created_at": "2026-03-26T00:00:00.000000+00:00",
+  "updated_at": "2026-03-26T00:00:00.000000+00:00",
+  "views_count": 0
+}
