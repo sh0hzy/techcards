@@ -372,6 +372,12 @@
       }
       if (trimmed.startsWith('•')) {
         bulletBuffer.push(trimmed.substring(1).trim());
+      } else if (trimmed.startsWith('## ')) {
+        flushBullets();
+        var headingText = trimmed.substring(3).trim();
+        var headingType = getSectionType(headingText);
+        var headingClass = headingType ? ' class="content-heading-' + headingType + '"' : '';
+        html += '<h3' + headingClass + '>' + escapeHtml(headingText) + '</h3>';
       } else {
         flushBullets();
         html += '<p>' + escapeHtml(trimmed) + '</p>';

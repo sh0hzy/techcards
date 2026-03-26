@@ -853,14 +853,35 @@ body {
 }
 
 .card-block-content h3 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: #1f2933;
-  margin: 20px 0 10px;
+  margin: 20px 0 8px;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  border-radius: 8px;
 }
 
 .card-block-content h3:first-child {
   margin-top: 0;
+}
+
+.card-block-content h3.content-heading-important {
+  background: #fffbeb;
+  color: #78350f;
+  border-left: 3px solid #f59e0b;
+}
+
+.card-block-content h3.content-heading-forbidden {
+  background: #fff5f5;
+  color: #7f1d1d;
+  border-left: 3px solid #ef4444;
+}
+
+.card-block-content h3.content-heading-allowed {
+  background: #f0fdf4;
+  color: #14532d;
+  border-left: 3px solid #22c55e;
 }
 
 .card-block-content p {
