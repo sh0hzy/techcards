@@ -156,6 +156,15 @@
     }
   }
 
+  function getSectionType(title) {
+    if (!title) return '';
+    const t = title.toUpperCase();
+    if (t.includes('ВАЖНО')) return 'important';
+    if (t.includes('ЗАПРЕЩЕНО')) return 'forbidden';
+    if (t.includes('РАЗРЕШЕНО') || t.includes('МОЖНО')) return 'allowed';
+    return '';
+  }
+
   // === Рендер секций как кнопок ===
   function renderSections(sections) {
     if (!elements.sections) return;
@@ -173,8 +182,10 @@
       const sectionTitle = section.title || 'Секция ' + (index + 1);
       const sectionContent = section.content || '';
       const previewText = getPreviewText(sectionContent);
+      const sectionType = getSectionType(sectionTitle);
+      const typeClass = sectionType ? ' section-' + sectionType : '';
 
-      html += '<button class="card-section-btn" data-section-index="' + index + '">';
+      html += '<button class="card-section-btn' + typeClass + '" data-section-index="' + index + '" data-section-type="' + sectionType + '">';
       html += '<div class="card-section-btn-content">';
       html += '<div class="card-section-btn-title">' + escapeHtml(sectionTitle) + '</div>';
       if (previewText) {
@@ -227,10 +238,16 @@
 
     elements.sectionPageTitle.textContent = section.title || 'Секция ' + (index + 1);
 
+    var sectionType = getSectionType(section.title);
+    var sectionPageHeader = elements.sectionPage.querySelector('.section-page-header');
+    if (sectionPageHeader) {
+      sectionPageHeader.className = 'section-page-header' + (sectionType ? ' section-' + sectionType : '');
+    }
+
     var contentHtml = '';
 
     if (section.content) {
-      contentHtml += '<div class="card-block-content">' + processContent(sanitizeHtml(section.content)) + '</div>';
+      contentHtml += '<div class="card-block-content">' + processContent(formatPlainText(section.content)) + '</div>';
     }
 
     var sectionImages = section.images || [];
@@ -288,7 +305,7 @@
 
     var contentHtml = '';
     if (nested.content) {
-      contentHtml += '<div class="card-block-content">' + processContent(sanitizeHtml(nested.content)) + '</div>';
+      contentHtml += '<div class="card-block-content">' + processContent(formatPlainText(nested.content)) + '</div>';
     }
 
     var nestedImages = nested.images || [];
@@ -326,6 +343,43 @@
       elements.sectionPage.classList.remove('open');
       document.body.style.overflow = '';
     }
+  }
+
+  // === Форматирование plain-text контента в HTML ===
+  function formatPlainText(text) {
+    if (!text) return '';
+
+    var lines = text.split('\n');
+    var html = '';
+    var bulletBuffer = [];
+
+    function flushBullets() {
+      if (bulletBuffer.length > 0) {
+        html += '<ul>';
+        bulletBuffer.forEach(function(b) {
+          html += '<li>' + escapeHtml(b) + '</li>';
+        });
+        html += '</ul>';
+        bulletBuffer = [];
+      }
+    }
+
+    lines.forEach(function(line) {
+      var trimmed = line.trim();
+      if (!trimmed) {
+        flushBullets();
+        return;
+      }
+      if (trimmed.startsWith('•')) {
+        bulletBuffer.push(trimmed.substring(1).trim());
+      } else {
+        flushBullets();
+        html += '<p>' + escapeHtml(trimmed) + '</p>';
+      }
+    });
+
+    flushBullets();
+    return html;
   }
 
   // === Обработка контента ===

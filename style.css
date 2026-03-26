@@ -644,9 +644,9 @@ body {
 }
 
 .card-block-content {
-  font-size: 15px;
-  line-height: 1.6;
-  color: #4b5563;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #374151;
 }
 
 .card-block-content p {
@@ -873,12 +873,23 @@ body {
 
 .card-block-content ul,
 .card-block-content ol {
-  margin: 12px 0;
-  padding-left: 24px;
+  margin: 10px 0;
+  padding-left: 22px;
 }
 
 .card-block-content li {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  line-height: 1.65;
+}
+
+.card-block-content p {
+  margin: 0 0 10px;
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.card-block-content p + ul {
+  margin-top: 4px;
 }
 
 .card-block-content b,
@@ -950,6 +961,69 @@ body {
   background: #f0effe;
 }
 
+/* Section type color coding */
+.card-section-btn.section-important {
+  background: #fffbeb;
+  border-left-color: #f59e0b;
+}
+.card-section-btn.section-important .card-section-btn-title {
+  color: #78350f;
+}
+.card-section-btn.section-important:hover {
+  background: #fef3c7;
+  border-left-color: #d97706;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.15);
+}
+.card-section-btn.section-important .card-section-btn-arrow {
+  color: #d97706;
+}
+
+.card-section-btn.section-forbidden {
+  background: #fff5f5;
+  border-left-color: #ef4444;
+}
+.card-section-btn.section-forbidden .card-section-btn-title {
+  color: #7f1d1d;
+}
+.card-section-btn.section-forbidden:hover {
+  background: #fee2e2;
+  border-left-color: #dc2626;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15);
+}
+.card-section-btn.section-forbidden .card-section-btn-arrow {
+  color: #dc2626;
+}
+
+.card-section-btn.section-allowed {
+  background: #f0fdf4;
+  border-left-color: #22c55e;
+}
+.card-section-btn.section-allowed .card-section-btn-title {
+  color: #14532d;
+}
+.card-section-btn.section-allowed:hover {
+  background: #dcfce7;
+  border-left-color: #16a34a;
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.15);
+}
+.card-section-btn.section-allowed .card-section-btn-arrow {
+  color: #16a34a;
+}
+
+/* Section page header type colors */
+.section-page-header.section-important {
+  background: #fffbeb;
+  border-bottom-color: #f59e0b;
+}
+.section-page-header.section-forbidden {
+  background: #fff5f5;
+  border-bottom-color: #ef4444;
+}
+.section-page-header.section-allowed {
+  background: #f0fdf4;
+  border-bottom-color: #22c55e;
+}
+
 .card-section-btn-icon {
   display: none;
 }
@@ -966,14 +1040,14 @@ body {
 }
 
 .card-section-btn-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: #000000;
   margin-bottom: 8px;
 }
 
 .card-section-btn-preview {
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.5;
   color: #7e7e7e;
   display: -webkit-box;
@@ -1185,7 +1259,7 @@ body {
 }
 
 .section-page-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #1f2933;
   margin: 0;
