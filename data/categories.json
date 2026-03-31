@@ -1,194 +1,194 @@
 [
   {
     "id": "cat_1",
-    "name": "Начало и запуск объекта",
+    "name": "Начало  и запуск объекта",
     "slug": "nachalo-i-zapusk-obekta",
     "sort_order": 1
   },
   {
     "id": "cat_2",
-    "name": "Звукоизоляция",
-    "slug": "zvukoizolyatsiya",
+    "name": "Демонтажные работы",
+    "slug": "demontazhnye-raboty",
     "sort_order": 2
   },
   {
     "id": "cat_3",
-    "name": "Электромонтажные работы",
-    "slug": "elektromontazhnye-raboty",
+    "name": "Переустройство и перепланировка",
+    "slug": "pereustroystvo-i-pereplanirovka",
     "sort_order": 3
   },
   {
     "id": "cat_4",
-    "name": "Слаботочка",
-    "slug": "slabotochka",
+    "name": "Кладка стен",
+    "slug": "kladka-sten",
     "sort_order": 4
   },
   {
     "id": "cat_5",
-    "name": "Подрозетники и проходки",
-    "slug": "podrozetniki-i-prokhodki",
+    "name": "Штукатурка",
+    "slug": "shtukaturka",
     "sort_order": 5
   },
   {
     "id": "cat_6",
-    "name": "Вентиляция и кондиционирование",
-    "slug": "ventilyatsiya-i-konditsionirovanie",
+    "name": "Окна",
+    "slug": "okna",
     "sort_order": 6
   },
   {
     "id": "cat_7",
-    "name": "Стяжка",
-    "slug": "styazhka",
+    "name": "Теплоизоляция",
+    "slug": "teploizolyatsiya",
     "sort_order": 7
   },
   {
     "id": "cat_8",
-    "name": "Плинтус скрытого монтажа",
-    "slug": "plintus-skrytogo-montazha",
+    "name": "Откосы",
+    "slug": "otkosy",
     "sort_order": 8
   },
   {
     "id": "cat_9",
-    "name": "Двери",
-    "slug": "dveri",
+    "name": "Сантехника",
+    "slug": "santekhnika",
     "sort_order": 9
   },
   {
     "id": "cat_10",
-    "name": "Электрические теплые полы",
-    "slug": "elektricheskie-teplye-poly",
+    "name": "Звукоизоляция",
+    "slug": "zvukoizolyatsiya",
     "sort_order": 10
   },
   {
     "id": "cat_11",
-    "name": "Гидроизоляция",
-    "slug": "gidroizolyatsiya",
+    "name": "Электромонтажные работы",
+    "slug": "elektromontazhnye-raboty",
     "sort_order": 11
   },
   {
     "id": "cat_12",
-    "name": "Демонтажные работы",
-    "slug": "demontazhnye-raboty",
+    "name": "Слаботочка",
+    "slug": "slabotochka",
     "sort_order": 12
   },
   {
     "id": "cat_13",
-    "name": "Плитка",
-    "slug": "plitka",
+    "name": "Подрозетники и проходки",
+    "slug": "podrozetniki-i-prokhodki",
     "sort_order": 13
   },
   {
     "id": "cat_14",
-    "name": "Затирка швов",
-    "slug": "zatirka-shvov",
+    "name": "Вентиляция и кондиционирование",
+    "slug": "ventilyatsiya-i-konditsionirovanie",
     "sort_order": 14
   },
   {
     "id": "cat_15",
-    "name": "Гипсокартонные работы",
-    "slug": "gipsokartonnye-raboty",
+    "name": "Стяжка",
+    "slug": "styazhka",
     "sort_order": 15
   },
   {
     "id": "cat_16",
-    "name": "Шпаклёвка",
-    "slug": "shpaklyovka",
+    "name": "Плинтус скрытого монтажа",
+    "slug": "plintus-skrytogo-montazha",
     "sort_order": 16
   },
   {
     "id": "cat_17",
-    "name": "Наливной пол",
-    "slug": "nalivnoy-pol",
+    "name": "Двери",
+    "slug": "dveri",
     "sort_order": 17
   },
   {
     "id": "cat_18",
-    "name": "Гипсовая лепнина, панели и молдинги",
-    "slug": "gipsovaya-lepnina-paneli-i-moldingi",
+    "name": "Электрические теплые полы",
+    "slug": "elektricheskie-teplye-poly",
     "sort_order": 18
   },
   {
     "id": "cat_19",
-    "name": "Напольные покрытия",
-    "slug": "napolnye-pokrytiya",
+    "name": "Гидроизоляция",
+    "slug": "gidroizolyatsiya",
     "sort_order": 19
   },
   {
     "id": "cat_20",
-    "name": "Натяжные потолки",
-    "slug": "natyazhnye-potolki",
+    "name": "Плитка",
+    "slug": "plitka",
     "sort_order": 20
   },
   {
     "id": "cat_21",
-    "name": "Подоконники",
-    "slug": "podokonniki",
+    "name": "Затирка швов",
+    "slug": "zatirka-shvov",
     "sort_order": 21
   },
   {
     "id": "cat_22",
-    "name": "Уборка",
-    "slug": "uborka",
+    "name": "Гипсокартонные работы",
+    "slug": "gipsokartonnye-raboty",
     "sort_order": 22
   },
   {
     "id": "cat_23",
-    "name": "Переустройство и перепланировка",
-    "slug": "pereustroystvo-i-pereplanirovka",
+    "name": "Шпаклёвка",
+    "slug": "shpaklyovka",
     "sort_order": 23
   },
   {
     "id": "cat_24",
-    "name": "Плинтус",
-    "slug": "plintus",
+    "name": "Наливной пол",
+    "slug": "nalivnoy-pol",
     "sort_order": 24
   },
   {
     "id": "cat_25",
-    "name": "Мебель",
-    "slug": "mebel",
+    "name": "Гипсовая лепнина, панели и молдинги",
+    "slug": "gipsovaya-lepnina-paneli-i-moldingi",
     "sort_order": 25
   },
   {
     "id": "cat_26",
-    "name": "Покраска",
-    "slug": "pokraska",
+    "name": "Напольные покрытия",
+    "slug": "napolnye-pokrytiya",
     "sort_order": 26
   },
   {
     "id": "cat_27",
-    "name": "Кладка стен",
-    "slug": "kladka-sten",
+    "name": "Натяжные потолки",
+    "slug": "natyazhnye-potolki",
     "sort_order": 27
   },
   {
     "id": "cat_28",
-    "name": "Штукатурка",
-    "slug": "shtukaturka",
+    "name": "Подоконники",
+    "slug": "podokonniki",
     "sort_order": 28
   },
   {
     "id": "cat_29",
-    "name": "Окна",
-    "slug": "okna",
+    "name": "Уборка",
+    "slug": "uborka",
     "sort_order": 29
   },
   {
     "id": "cat_30",
-    "name": "Теплоизоляция",
-    "slug": "teploizolyatsiya",
+    "name": "Плинтус",
+    "slug": "plintus",
     "sort_order": 30
   },
   {
     "id": "cat_31",
-    "name": "Откосы",
-    "slug": "otkosy",
+    "name": "Мебель",
+    "slug": "mebel",
     "sort_order": 31
   },
   {
     "id": "cat_32",
-    "name": "Сантехника",
-    "slug": "santekhnika",
+    "name": "Покраска",
+    "slug": "pokraska",
     "sort_order": 32
   }
 ]

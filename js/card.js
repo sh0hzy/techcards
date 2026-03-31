@@ -24,6 +24,7 @@
       carousel: document.getElementById('card-carousel'),
       description: document.getElementById('card-description'),
       descriptionBlock: document.getElementById('description-block'),
+      navigation: document.getElementById('card-navigation'),
       sections: document.getElementById('card-sections'),
       checklistBtn: document.getElementById('checklist-btn'),
       checklistBtnText: document.getElementById('checklist-btn-text'),
@@ -112,6 +113,7 @@
     renderCarousel(card.images || [], card.cover_image);
 
     const content = getLocalized(card.content, lang) || {};
+    renderNavigation(content.navigation || []);
     renderSections(content.sections || []);
 
     renderChecklist(content.checklist || []);
@@ -121,6 +123,34 @@
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
     return obj[lang] || obj['ru'] || obj['en'] || obj['kz'] || '';
+  }
+
+  function renderNavigation(navItems) {
+    if (!elements.navigation) return;
+    if (!navItems || navItems.length === 0) {
+      elements.navigation.innerHTML = '';
+      return;
+    }
+
+    var html = '';
+    navItems.forEach(function(item) {
+      var href = item.card_id ? 'card.html?id=' + encodeURIComponent(item.card_id) : '#';
+      html += '<a class="card-section-btn card-nav-btn" href="' + href + '">';
+      html += '<div class="card-section-btn-content">';
+      html += '<div class="card-section-btn-title">' + escapeHtml(item.text || '') + '</div>';
+      html += '</div>';
+      html += '<div class="card-section-btn-divider"></div>';
+      html += '<div class="card-section-btn-bottom">';
+      html += '<div class="card-section-btn-divider-vertical"></div>';
+      html += '<div class="card-section-btn-arrow">';
+      html += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+      html += '<path d="M5 12h14M12 5l7 7-7 7"/>';
+      html += '</svg>';
+      html += '</div>';
+      html += '</div>';
+      html += '</a>';
+    });
+    elements.navigation.innerHTML = html;
   }
 
   function renderCarousel(images, coverImage) {

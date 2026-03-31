@@ -1,0 +1,39 @@
+{
+  "id": "card_1774972577064_Видеоматериал",
+  "slug": "videomaterial",
+  "title": {
+    "ru": "Видеоматериал"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "h2",
+          "text": "Как обработать примыкание при покраске потолка и стен"
+        }
+      ],
+      "sections": [
+        {
+          "title": "Как обработать примыкание при покраске потолка и стен",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Как обработать примыкание при покраске потолка и стен"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_32",
+  "is_published": true,
+  "created_at": "2026-03-31T15:56:17.096654+00:00",
+  "updated_at": "2026-03-31T15:56:17.096654+00:00",
+  "views_count": 0
+}

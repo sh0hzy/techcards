@@ -1,0 +1,20 @@
+{
+  "id": "card_1774972570309_Видеоматериалы",
+  "slug": "videomaterialy",
+  "title": {
+    "ru": "Видеоматериалы"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": []
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_20",
+  "is_published": true,
+  "created_at": "2026-03-31T15:56:10.325811+00:00",
+  "updated_at": "2026-03-31T15:56:10.325811+00:00",
+  "views_count": 0
+}

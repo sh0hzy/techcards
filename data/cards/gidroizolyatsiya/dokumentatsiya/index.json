@@ -1,0 +1,68 @@
+{
+  "id": "card_1774972569552_Документация",
+  "slug": "dokumentatsiya",
+  "title": {
+    "ru": "Документация"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "Mapei особенности.pdf",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1CK8QLnUROQ8KHJdwkLUsaAy1lB0qSsWs/view?usp=sharing"
+            }
+          ]
+        },
+        {
+          "type": "h2",
+          "text": "Общие требования и СНиП 3.04.01-87. Изоляционные и отделочные покрытия"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "СП 71.13330.2017 Изоляционные и отделочные покрытия. Актуализированная редакция СНиП 3.04.01-87 (с Изменением N 1) (fkr-spb.ru)"
+          ]
+        }
+      ],
+      "navigation": [
+        {
+          "text": "Mapei особенности.pdf",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1CK8QLnUROQ8KHJdwkLUsaAy1lB0qSsWs/view?usp=sharing"
+        }
+      ],
+      "sections": [
+        {
+          "title": "Общие требования и СНиП 3.04.01-87. Изоляционные и отделочные покрытия",
+          "content": "• СП 71.13330.2017 Изоляционные и отделочные покрытия. Актуализированная редакция СНиП 3.04.01-87 (с Изменением N 1) (fkr-spb.ru)",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Общие требования и СНиП 3.04.01-87. Изоляционные и отделочные покрытия"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "СП 71.13330.2017 Изоляционные и отделочные покрытия. Актуализированная редакция СНиП 3.04.01-87 (с Изменением N 1) (fkr-spb.ru)"
+              ]
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_19",
+  "is_published": true,
+  "created_at": "2026-03-31T15:56:09.579989+00:00",
+  "updated_at": "2026-03-31T15:56:09.579989+00:00",
+  "views_count": 0
+}
