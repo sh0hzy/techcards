@@ -24,8 +24,10 @@
       carousel: document.getElementById('card-carousel'),
       description: document.getElementById('card-description'),
       descriptionBlock: document.getElementById('description-block'),
+      backBtn: document.getElementById('card-back-btn'),
       navigation: document.getElementById('card-navigation'),
       sections: document.getElementById('card-sections'),
+      siblingNav: document.getElementById('card-sibling-nav'),
       checklistBtn: document.getElementById('checklist-btn'),
       checklistBtnText: document.getElementById('checklist-btn-text'),
       checklistPanel: document.getElementById('checklist-panel'),
@@ -78,6 +80,14 @@
 
       cardData = card;
       renderCard(cardData);
+
+      // Обновляем кнопку "Назад" → категория
+      if (elements.backBtn && card.category_id) {
+        elements.backBtn.href = 'catalog.html?category=' + encodeURIComponent(card.category_id);
+      }
+
+      // Загружаем соседние карточки для prev/next
+      loadSiblingNav(card);
 
     } catch (error) {
       console.error('Load error:', error);
@@ -151,6 +161,46 @@
       html += '</a>';
     });
     elements.navigation.innerHTML = html;
+  }
+
+  async function loadSiblingNav(card) {
+    if (!elements.siblingNav || !card.category_id) return;
+
+    try {
+      var siblings = await DB.getCards({ categoryId: card.category_id });
+      var idx = siblings.findIndex(function(c) { return c.id === card.id; });
+      if (idx === -1 || siblings.length < 2) {
+        elements.siblingNav.innerHTML = '';
+        return;
+      }
+
+      var prev = idx > 0 ? siblings[idx - 1] : null;
+      var next = idx < siblings.length - 1 ? siblings[idx + 1] : null;
+      var lang = localStorage.getItem('locale') || 'ru';
+
+      var html = '<div class="card-sibling-nav">';
+      if (prev) {
+        var prevTitle = getLocalized(prev.title, lang) || 'Предыдущая';
+        html += '<a class="sibling-nav-btn sibling-prev" href="card.html?id=' + encodeURIComponent(prev.id) + '">';
+        html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>';
+        html += '<span>' + escapeHtml(prevTitle) + '</span>';
+        html += '</a>';
+      } else {
+        html += '<div></div>';
+      }
+      if (next) {
+        var nextTitle = getLocalized(next.title, lang) || 'Следующая';
+        html += '<a class="sibling-nav-btn sibling-next" href="card.html?id=' + encodeURIComponent(next.id) + '">';
+        html += '<span>' + escapeHtml(nextTitle) + '</span>';
+        html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+        html += '</a>';
+      }
+      html += '</div>';
+
+      elements.siblingNav.innerHTML = html;
+    } catch (e) {
+      elements.siblingNav.innerHTML = '';
+    }
   }
 
   function renderCarousel(images, coverImage) {
