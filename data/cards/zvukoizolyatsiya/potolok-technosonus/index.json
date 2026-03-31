@@ -1,0 +1,606 @@
+{
+  "id": "card_1774972559649_Потолок TECHNOSONUS",
+  "slug": "potolok-technosonus",
+  "title": {
+    "ru": "Потолок TECHNOSONUS"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "ПТ 1 Каркас ЗИ потолка «Базовая»",
+              "slug": "technosonus1-4-rec738808222",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808222"
+            },
+            {
+              "text": "ПТ 2 Каркас ЗИ потолка «Стандарт П»",
+              "slug": "technosonus1-4-rec738808227",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808227"
+            },
+            {
+              "text": "ПТ 3 Каркас ЗИ потолка «Стандарт М»",
+              "slug": "technosonus1-4-rec738808232",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808232"
+            },
+            {
+              "text": "ПТ 4 Каркас ЗИ потолка «Стандарт М1»",
+              "slug": "technosonus1-4-rec738808237",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808237"
+            },
+            {
+              "text": "ПТ 5 Каркас ЗИ потолка «Премиум П»",
+              "slug": "technosonus1-4-rec738808242",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808242"
+            },
+            {
+              "text": "ПТ 6 Каркас ЗИ потолка «Премиум М»",
+              "slug": "technosonus1-4-rec738808247",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808247"
+            },
+            {
+              "text": "ПТ 7 Каркас ЗИ потолка «Премиум М1»",
+              "slug": "technosonus1-4-rec738808252",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808252"
+            },
+            {
+              "text": "ПТ 8 (натяжной потолок) «Базовая»",
+              "slug": "technosonus1-4-rec738808257",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808257"
+            },
+            {
+              "text": "ПТ 9 (натяжной потолок) «Стандарт М»",
+              "slug": "technosonus1-4-rec738808262",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808262"
+            },
+            {
+              "text": "ПТ 10 (натяжной потолок) «Слим А»",
+              "slug": "technosonus1-4-rec738808267",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808267"
+            },
+            {
+              "text": "2022 BIM Потолок",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1U3g0y5GmmX1Hg0vqTwbhqZY7GUt8xo1b/view?usp=drive_link"
+            },
+            {
+              "text": "2022_BIM_Potolok_techno_sonus",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1MsdPTXzLK7sxmD2TYYONrpkdCLy85RYH/view?usp=drive_link"
+            },
+            {
+              "text": "BIM Описание Потолки",
+              "slug": "edit-usp-drive-link-ouid-116572206468529445791-rtpof-true-sd-true",
+              "href": "https://docs.google.com/document/d/1vt6w_D0WzxOCDl1zxtfz_m-bK7-d-3Up/edit?usp=drive_link&ouid=116572206468529445791&rtpof=true&sd=true"
+            },
+            {
+              "text": "4. Монтажная инструкция Потолок Базовая",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1OJ-TKQdgZwLXIjlme8SYSr2hXXdb1ElU/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Потолок Стандарт_П",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1lnV5z71ovFtr0HULDgC2NkbbSNfutcgs/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Потолок Стандарт_М",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1lnV5z71ovFtr0HULDgC2NkbbSNfutcgs/view?usp=drive_link"
+            },
+            {
+              "text": "ПТ3 Каркасная система звукоизоляции потолка «Стандарт М» тех.лист",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1Yp5Vmt34wu0U9KzfnXnOQTb40c1m6MD3/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Потолок Стандарт_М1",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/18JgLCjtUy4aMR-93dr13pxjBzThs6wWv/view?usp=drive_link"
+            },
+            {
+              "text": "4 Монтажная инструкция Премиум_П",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1DBP2va3ZC9CvmULK4IB5PBYrd3Nv8Cm-/view?usp=drive_link"
+            },
+            {
+              "text": "4 Монтажная инструкция Потолок Премиум_М",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1anTEtPWtT8VCTbo85SJGNbsllZ1BY2Ne/view?usp=drive_link"
+            },
+            {
+              "text": "4 Монтажные инструкции Потолок Премиум_М1",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1xFUlyqyL4KG6zDkEDwEi-9TRB6T4VhfL/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Базовая_под натяжной потолок",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1YsueA4dNJksXdhs0lbxZ3Fs3xhwoLiN_/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Стандарт_М_под_натяжной_потолок",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1KP77L4g6696h4_4Xv4sYUaBLioXf88bn/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Слим_А",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1Mhz0JiTkjaQ-I8xoETzBmzAlvgreTeum/view?usp=drive_link"
+            }
+          ]
+        },
+        {
+          "type": "h2",
+          "text": "BIM Каталог звукоизолирующих облицовок. Revit"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 1 Каркас ЗИ потолка «Базовая»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 2 Каркас ЗИ потолка «Стандарт П»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 3 Каркас ЗИ потолка «Стандарт М»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 4 Каркас ЗИ потолка «Стандарт М1»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 5 Каркас ЗИ потолка «Премиум П»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 6 Каркас ЗИ потолка «Премиум М»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 7 Каркас ЗИ потолка «Премиум М1»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 8 (натяжной потолок) «Базовая»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 9 (натяжной потолок) «Стандарт М»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "ПТ 10 (натяжной потолок) «Слим А»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        }
+      ],
+      "navigation": [
+        {
+          "text": "ПТ 1 Каркас ЗИ потолка «Базовая»",
+          "slug": "technosonus1-4-rec738808222",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808222"
+        },
+        {
+          "text": "ПТ 2 Каркас ЗИ потолка «Стандарт П»",
+          "slug": "technosonus1-4-rec738808227",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808227"
+        },
+        {
+          "text": "ПТ 3 Каркас ЗИ потолка «Стандарт М»",
+          "slug": "technosonus1-4-rec738808232",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808232"
+        },
+        {
+          "text": "ПТ 4 Каркас ЗИ потолка «Стандарт М1»",
+          "slug": "technosonus1-4-rec738808237",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808237"
+        },
+        {
+          "text": "ПТ 5 Каркас ЗИ потолка «Премиум П»",
+          "slug": "technosonus1-4-rec738808242",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808242"
+        },
+        {
+          "text": "ПТ 6 Каркас ЗИ потолка «Премиум М»",
+          "slug": "technosonus1-4-rec738808247",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808247"
+        },
+        {
+          "text": "ПТ 7 Каркас ЗИ потолка «Премиум М1»",
+          "slug": "technosonus1-4-rec738808252",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808252"
+        },
+        {
+          "text": "ПТ 8 (натяжной потолок) «Базовая»",
+          "slug": "technosonus1-4-rec738808257",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808257"
+        },
+        {
+          "text": "ПТ 9 (натяжной потолок) «Стандарт М»",
+          "slug": "technosonus1-4-rec738808262",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808262"
+        },
+        {
+          "text": "ПТ 10 (натяжной потолок) «Слим А»",
+          "slug": "technosonus1-4-rec738808267",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-4#rec738808267"
+        },
+        {
+          "text": "2022 BIM Потолок",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1U3g0y5GmmX1Hg0vqTwbhqZY7GUt8xo1b/view?usp=drive_link"
+        },
+        {
+          "text": "2022_BIM_Potolok_techno_sonus",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1MsdPTXzLK7sxmD2TYYONrpkdCLy85RYH/view?usp=drive_link"
+        },
+        {
+          "text": "BIM Описание Потолки",
+          "slug": "edit-usp-drive-link-ouid-116572206468529445791-rtpof-true-sd-true",
+          "href": "https://docs.google.com/document/d/1vt6w_D0WzxOCDl1zxtfz_m-bK7-d-3Up/edit?usp=drive_link&ouid=116572206468529445791&rtpof=true&sd=true"
+        },
+        {
+          "text": "4. Монтажная инструкция Потолок Базовая",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1OJ-TKQdgZwLXIjlme8SYSr2hXXdb1ElU/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Потолок Стандарт_П",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1lnV5z71ovFtr0HULDgC2NkbbSNfutcgs/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Потолок Стандарт_М",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1lnV5z71ovFtr0HULDgC2NkbbSNfutcgs/view?usp=drive_link"
+        },
+        {
+          "text": "ПТ3 Каркасная система звукоизоляции потолка «Стандарт М» тех.лист",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1Yp5Vmt34wu0U9KzfnXnOQTb40c1m6MD3/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Потолок Стандарт_М1",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/18JgLCjtUy4aMR-93dr13pxjBzThs6wWv/view?usp=drive_link"
+        },
+        {
+          "text": "4 Монтажная инструкция Премиум_П",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1DBP2va3ZC9CvmULK4IB5PBYrd3Nv8Cm-/view?usp=drive_link"
+        },
+        {
+          "text": "4 Монтажная инструкция Потолок Премиум_М",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1anTEtPWtT8VCTbo85SJGNbsllZ1BY2Ne/view?usp=drive_link"
+        },
+        {
+          "text": "4 Монтажные инструкции Потолок Премиум_М1",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1xFUlyqyL4KG6zDkEDwEi-9TRB6T4VhfL/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Базовая_под натяжной потолок",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1YsueA4dNJksXdhs0lbxZ3Fs3xhwoLiN_/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Стандарт_М_под_натяжной_потолок",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1KP77L4g6696h4_4Xv4sYUaBLioXf88bn/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Слим_А",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1Mhz0JiTkjaQ-I8xoETzBmzAlvgreTeum/view?usp=drive_link"
+        }
+      ],
+      "sections": [
+        {
+          "title": "BIM Каталог звукоизолирующих облицовок. Revit",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "BIM Каталог звукоизолирующих облицовок. Revit"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 1 Каркас ЗИ потолка «Базовая»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 1 Каркас ЗИ потолка «Базовая»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 2 Каркас ЗИ потолка «Стандарт П»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 2 Каркас ЗИ потолка «Стандарт П»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 3 Каркас ЗИ потолка «Стандарт М»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 3 Каркас ЗИ потолка «Стандарт М»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 4 Каркас ЗИ потолка «Стандарт М1»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 4 Каркас ЗИ потолка «Стандарт М1»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 5 Каркас ЗИ потолка «Премиум П»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 5 Каркас ЗИ потолка «Премиум П»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 6 Каркас ЗИ потолка «Премиум М»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 6 Каркас ЗИ потолка «Премиум М»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 7 Каркас ЗИ потолка «Премиум М1»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 7 Каркас ЗИ потолка «Премиум М1»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 8 (натяжной потолок) «Базовая»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 8 (натяжной потолок) «Базовая»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 9 (натяжной потолок) «Стандарт М»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 9 (натяжной потолок) «Стандарт М»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "ПТ 10 (натяжной потолок) «Слим А»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "ПТ 10 (натяжной потолок) «Слим А»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_10",
+  "is_published": true,
+  "created_at": "2026-03-31T15:55:59.827071+00:00",
+  "updated_at": "2026-03-31T15:55:59.827071+00:00",
+  "views_count": 0
+}

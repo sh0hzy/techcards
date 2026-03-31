@@ -1,0 +1,77 @@
+{
+  "id": "card_1774972553250_Документация",
+  "slug": "dokumentatsiya",
+  "title": {
+    "ru": "Документация"
+  },
+  "description": {
+    "ru": "• https://www.ytong.ru/ru/docs/baubuch-ytong.pdf\n• https://istkult.ru/blog/mezhkomnatnye_peregorodki_iz_gazobetona/\nСП 15.13330.2012\n• СП 15.13330.2012 Каменные и армокаменные конструкции. Актуализированная редакция СНиП II-22-81* (с Изменениями N 1, 2, 3) - docs.cntd.ru\nГОСТ 530-2012\n• gost-530-2012.pdf (gubskiy-kirpich.ru)"
+  },
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "Газоблок",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1w4TVomQqKpSxRteHmOMzEIKAaj3Z--Kl/view?usp=sharing"
+            },
+            {
+              "text": "КАМЕННЫЕ И АРМОКАМЕННЫ Е КОНСТРУКЦИИ СНиП 11-22-81",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1j2gvKl-ddrVzBwigm48P2rKRLkwh_ud9/view?usp=sharing"
+            }
+          ]
+        },
+        {
+          "type": "ul",
+          "items": [
+            "https://www.ytong.ru/ru/docs/baubuch-ytong.pdf",
+            "https://istkult.ru/blog/mezhkomnatnye_peregorodki_iz_gazobetona/"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "СП 15.13330.2012"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "СП 15.13330.2012 Каменные и армокаменные конструкции. Актуализированная редакция СНиП II-22-81* (с Изменениями N 1, 2, 3) - docs.cntd.ru"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "ГОСТ 530-2012"
+        },
+        {
+          "type": "ul",
+          "items": [
+            "gost-530-2012.pdf (gubskiy-kirpich.ru)"
+          ]
+        }
+      ],
+      "navigation": [
+        {
+          "text": "Газоблок",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1w4TVomQqKpSxRteHmOMzEIKAaj3Z--Kl/view?usp=sharing"
+        },
+        {
+          "text": "КАМЕННЫЕ И АРМОКАМЕННЫ Е КОНСТРУКЦИИ СНиП 11-22-81",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1j2gvKl-ddrVzBwigm48P2rKRLkwh_ud9/view?usp=sharing"
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_4",
+  "is_published": true,
+  "created_at": "2026-03-31T15:55:53.260516+00:00",
+  "updated_at": "2026-03-31T15:55:53.260516+00:00",
+  "views_count": 0
+}

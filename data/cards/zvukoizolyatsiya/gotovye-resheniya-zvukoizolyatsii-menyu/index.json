@@ -1,0 +1,270 @@
+{
+  "id": "card_1774972560041_Готовые решения звукоизоляции TECHNOSONUS",
+  "slug": "gotovye-resheniya-zvukoizolyatsii-technosonus",
+  "title": {
+    "ru": "Готовые решения звукоизоляции TECHNOSONUS"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "Стены TECHNOSONUS",
+              "slug": "steny-technosonus",
+              "href": "../../1.Готовые решения звукоизоляции TECHNOSONUS/1.Стены TECHNOSONUS/Стены TECHNOSONUS.МЕНЮ/Стены TECHNOSONUS.html"
+            },
+            {
+              "text": "Перегородки TECHNOSONUS",
+              "slug": "peregorodki-technosonus",
+              "href": "../../1.Готовые решения звукоизоляции TECHNOSONUS/2.Перегородки TECHNOSONUS/Перегородки TECHNOSONUS.html"
+            },
+            {
+              "text": "Пол TECHNOSONUS",
+              "slug": "pol-technosonus",
+              "href": "../../1.Готовые решения звукоизоляции TECHNOSONUS/3.Пол TECHNOSONUS/Пол TECHNOSONUS.html"
+            },
+            {
+              "text": "Потолок TECHNOSONUS",
+              "slug": "potolok-technosonus",
+              "href": "../../1.Готовые решения звукоизоляции TECHNOSONUS/4.Потолок TECHNOSONUS/Потолок TECHNOSONUS.html"
+            },
+            {
+              "text": "Инструкции по монтажу ЗИ коммуникаций Стандарт",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1nZzZoVx5OXu86cV4oA7XxdiP5jrzXr9N/view?usp=sharing"
+            },
+            {
+              "text": "Инструкции по монтажу ЗИ коммуникаций Премиум",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1gxu63l1xRCQCs3Qw0CWmHVjlpA_xWIfF/view?usp=drive_link"
+            },
+            {
+              "text": "TS Расчет систем звукоизоляции",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1NYhpmx5cyN9cUSUaE45XrWTjrN_KoDT-/view?usp=drive_link"
+            },
+            {
+              "text": "АТР 2022- гостиницы",
+              "slug": "view-usp-sharing",
+              "href": "https://drive.google.com/file/d/1cyYIklN6WJwT_QYWy8ATeeLHOE7sJf3h/view?usp=sharing"
+            },
+            {
+              "text": "АТР 2023",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1NxgaDteqYNCCDs4ht847SZlONSro18-7/view?usp=drive_link"
+            },
+            {
+              "text": "АТР Дополнительные узлы 2023",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/19GaJASQSzTiOUPOKHSZbOlBvPUzgubIG/view?usp=drive_link"
+            },
+            {
+              "text": "АТР_киноконцертные залы 2022",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1AGAKEYv4Ne21aEf-r6GbFWIo8zB_4bFV/view?usp=drive_link"
+            },
+            {
+              "text": "Восприятие изменения уровня звука",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1zkvpsOL3WkPkuiEVWUWNVQssgBdg2X7a/view?usp=drive_link"
+            },
+            {
+              "text": "Дополнение ATP 2023",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1ZCYCnZdxWZClsan06gKGNotKEcUyv_Fd/view?usp=drive_link"
+            },
+            {
+              "text": "Схема Готовых решений",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1I2Jf7DagNmh-NkKRF3e40dEPtPO8jrIU/view?usp=drive_link"
+            },
+            {
+              "text": "2023 Дополнительные узлы АТР",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1Mx_SWmWUGKLfMokOM-RcRzpTN-3qqC6t/view?usp=drive_link"
+            },
+            {
+              "text": "АТР 2022- гостиницы",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/17C44sUtIPwnO5Xot1Z7JU7AQjKKxwDH6/view?usp=drive_link"
+            }
+          ]
+        },
+        {
+          "type": "h2",
+          "text": "Инженерные коммуникации"
+        },
+        {
+          "type": "p",
+          "text": "Стандарт"
+        },
+        {
+          "type": "p",
+          "text": "Система звукоизоляции труб “Стандарт”"
+        },
+        {
+          "type": "p",
+          "text": "Премиум"
+        },
+        {
+          "type": "p",
+          "text": "Система звукоизоляции труб “Премиум”"
+        },
+        {
+          "type": "h2",
+          "text": "Калькулятор готовых решений"
+        },
+        {
+          "type": "h2",
+          "text": "Документация"
+        }
+      ],
+      "navigation": [
+        {
+          "text": "Стены TECHNOSONUS",
+          "slug": "steny-technosonus",
+          "href": "../../1.Готовые решения звукоизоляции TECHNOSONUS/1.Стены TECHNOSONUS/Стены TECHNOSONUS.МЕНЮ/Стены TECHNOSONUS.html"
+        },
+        {
+          "text": "Перегородки TECHNOSONUS",
+          "slug": "peregorodki-technosonus",
+          "href": "../../1.Готовые решения звукоизоляции TECHNOSONUS/2.Перегородки TECHNOSONUS/Перегородки TECHNOSONUS.html"
+        },
+        {
+          "text": "Пол TECHNOSONUS",
+          "slug": "pol-technosonus",
+          "href": "../../1.Готовые решения звукоизоляции TECHNOSONUS/3.Пол TECHNOSONUS/Пол TECHNOSONUS.html"
+        },
+        {
+          "text": "Потолок TECHNOSONUS",
+          "slug": "potolok-technosonus",
+          "href": "../../1.Готовые решения звукоизоляции TECHNOSONUS/4.Потолок TECHNOSONUS/Потолок TECHNOSONUS.html"
+        },
+        {
+          "text": "Инструкции по монтажу ЗИ коммуникаций Стандарт",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1nZzZoVx5OXu86cV4oA7XxdiP5jrzXr9N/view?usp=sharing"
+        },
+        {
+          "text": "Инструкции по монтажу ЗИ коммуникаций Премиум",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1gxu63l1xRCQCs3Qw0CWmHVjlpA_xWIfF/view?usp=drive_link"
+        },
+        {
+          "text": "TS Расчет систем звукоизоляции",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1NYhpmx5cyN9cUSUaE45XrWTjrN_KoDT-/view?usp=drive_link"
+        },
+        {
+          "text": "АТР 2022- гостиницы",
+          "slug": "view-usp-sharing",
+          "href": "https://drive.google.com/file/d/1cyYIklN6WJwT_QYWy8ATeeLHOE7sJf3h/view?usp=sharing"
+        },
+        {
+          "text": "АТР 2023",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1NxgaDteqYNCCDs4ht847SZlONSro18-7/view?usp=drive_link"
+        },
+        {
+          "text": "АТР Дополнительные узлы 2023",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/19GaJASQSzTiOUPOKHSZbOlBvPUzgubIG/view?usp=drive_link"
+        },
+        {
+          "text": "АТР_киноконцертные залы 2022",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1AGAKEYv4Ne21aEf-r6GbFWIo8zB_4bFV/view?usp=drive_link"
+        },
+        {
+          "text": "Восприятие изменения уровня звука",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1zkvpsOL3WkPkuiEVWUWNVQssgBdg2X7a/view?usp=drive_link"
+        },
+        {
+          "text": "Дополнение ATP 2023",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1ZCYCnZdxWZClsan06gKGNotKEcUyv_Fd/view?usp=drive_link"
+        },
+        {
+          "text": "Схема Готовых решений",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1I2Jf7DagNmh-NkKRF3e40dEPtPO8jrIU/view?usp=drive_link"
+        },
+        {
+          "text": "2023 Дополнительные узлы АТР",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1Mx_SWmWUGKLfMokOM-RcRzpTN-3qqC6t/view?usp=drive_link"
+        },
+        {
+          "text": "АТР 2022- гостиницы",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/17C44sUtIPwnO5Xot1Z7JU7AQjKKxwDH6/view?usp=drive_link"
+        }
+      ],
+      "sections": [
+        {
+          "title": "Инженерные коммуникации",
+          "content": "Стандарт\nСистема звукоизоляции труб “Стандарт”\nПремиум\nСистема звукоизоляции труб “Премиум”",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Инженерные коммуникации"
+            },
+            {
+              "type": "p",
+              "text": "Стандарт"
+            },
+            {
+              "type": "p",
+              "text": "Система звукоизоляции труб “Стандарт”"
+            },
+            {
+              "type": "p",
+              "text": "Премиум"
+            },
+            {
+              "type": "p",
+              "text": "Система звукоизоляции труб “Премиум”"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Калькулятор готовых решений",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Калькулятор готовых решений"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Документация",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Документация"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_10",
+  "is_published": true,
+  "created_at": "2026-03-31T15:56:00.146501+00:00",
+  "updated_at": "2026-03-31T15:56:00.146501+00:00",
+  "views_count": 0
+}

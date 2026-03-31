@@ -1,0 +1,696 @@
+{
+  "id": "card_1774972558500_Стены TECHNOSONUS",
+  "slug": "steny-technosonus",
+  "title": {
+    "ru": "Стены TECHNOSONUS"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "С1 ЗИ стен «Базовая»",
+              "slug": "rec738794383",
+              "href": "#rec738794383"
+            },
+            {
+              "text": "С2 ЗИ стен «Стандарт П»",
+              "slug": "rec738794504",
+              "href": "#rec738794504"
+            },
+            {
+              "text": "С3 ЗИ стен «Стандарт М»",
+              "slug": "rec738794547",
+              "href": "#rec738794547"
+            },
+            {
+              "text": "С4 ЗИ стен «Стандарт М1»",
+              "slug": "rec738794770",
+              "href": "#rec738794770"
+            },
+            {
+              "text": "С5 ЗИ стен «Премиум П»",
+              "slug": "rec738794862",
+              "href": "#rec738794862"
+            },
+            {
+              "text": "С6 ЗИ стен «Премиум М»",
+              "slug": "rec738794963",
+              "href": "#rec738794963"
+            },
+            {
+              "text": "С7 ЗИ стен «Премиум М1»",
+              "slug": "rec738795050",
+              "href": "#rec738795050"
+            },
+            {
+              "text": "С13 ЗИ стен «Слим П»",
+              "slug": "rec738795126",
+              "href": "#rec738795126"
+            },
+            {
+              "text": "С15 ЗИ стен «Слим Премиум»",
+              "slug": "rec738795165",
+              "href": "#rec738795165"
+            },
+            {
+              "text": "С16 ЗИ стен «Слим А»",
+              "slug": "rec738795186",
+              "href": "#rec738795186"
+            },
+            {
+              "text": "BIM Описание Стены",
+              "slug": "edit-usp-drive-link-ouid-116572206468529445791-rtpof-true-sd-true",
+              "href": "https://docs.google.com/document/d/14BlEWy8FdZXPbQV1rk4TFeSCoZQDNutj/edit?usp=drive_link&ouid=116572206468529445791&rtpof=true&sd=true"
+            },
+            {
+              "text": "2022_BIM_Stena_techno_sonus",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1xK_x2NWTjSOaNzUeRXMRJe1Unx3oDniF/view?usp=drive_link"
+            },
+            {
+              "text": "2022 BIM стены",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/11Zb_dzYDFYi521DZbOOJoJ98ryWsfigC/view?usp=drive_link"
+            },
+            {
+              "text": "3.2 С1 ЗИ стен «Базовая» тех.лист",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1--gPi7yIYgLTDmjuKjZMQddIZB7IOvO9/view?usp=drive_link"
+            },
+            {
+              "text": "4.1 Монтажная инструкция Стена Базовая на независимом каркасе",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/13ncLfjTlC0GM4iD9uJwwFlrg5rxVeYbO/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Стена Базовая",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1IWYPfrLTZ0OqwZscEJ_k7_r5hOiYBfwB/view?usp=drive_link"
+            },
+            {
+              "text": "3.2 ЗИ стен «Стандарт П» тех.лист",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1lSpOCEt2d3oPB_dikY0tPkknT8aFVwiu/view?usp=drive_link"
+            },
+            {
+              "text": "4.1 Монтажная инструкция Стена Стандарт П на независимом каркасе",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1-JhDJXai_PbMliZlqBx6QE7L0h-6b99q/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Стена Стандарт П",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1KFGUTU6b0bLo9jeMXxfnc4i6_5rSpn8c/view?usp=drive_link"
+            },
+            {
+              "text": "4.1 Монтажная инструкция Стена СтандартМ на независимом каркасе",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1vv7HD9pIot1p7R-AEReSfA_PvS2jMp4r/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Стена СтандартМ",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1QIKtiAO66ck0UuJVS7tbFpRm1FxxLPMp/view?usp=drive_link"
+            },
+            {
+              "text": "4.1 Монтажная инструкция Стена Стандарт_М1 на независимом каркасе",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1cWhf4Cgfh5zL2PBRmJ_5NZ8N7Tzi7M77/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Стена Стандарт_М1",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1gZr7IlyNd2kXfD00z15P0SzACHY2P9lR/view?usp=drive_link"
+            },
+            {
+              "text": "3.1 Технический лист ЗИ стен «Премиум П»",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/16TF2291R7K4wMoStnQcdUzR421E4h29L/view?usp=drive_link"
+            },
+            {
+              "text": "4.1 Монтажная инструкция Стена Премиум_П на независимом каркасе",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/16jccIpdh3eOAAbAUQxIXE2T_nPDG6hws/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Стена Премиум_П",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/15T9ukiRJoHH9bzM_WZAGqxVrFzaukcs8/view?usp=drive_link"
+            },
+            {
+              "text": "4.1 Монтажная инструкция Стена Премиум_М на независимом каркасе",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1lmkb3xgENSffCIXFcy70E_QDzxWzoGax/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Стена Премиум_М",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/13SI2WhdhCYOlft6oHzbnMJvimfszD145/view?usp=drive_link"
+            },
+            {
+              "text": "4.1 Монтажная инструкция Стена Премиум_М1 на независимом каркасе",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1ziHfo6HYU_eOPsA0Jtz0p_z-efumVoi0/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Стена Премиум_М1",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1aa0_OzWTD1FmSaoC41i8sDx6rdE1ZcR1/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Стена Слим П",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1IQrLpKKC33oJqdaUlaM7TuqsSmzhF05M/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Стена Слим_Премиум",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1fWQCq-m5ueNOI12mBElkMpaEvJ0ekoXn/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Стена Слим А",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1w27dFHLfPM0nVNQ6t7nraZSYV6JKBF_p/view?usp=drive_link"
+            }
+          ]
+        },
+        {
+          "type": "h2",
+          "text": "BIM Каталог звукоизолирующих облицовок. Revit"
+        },
+        {
+          "type": "h2",
+          "text": "С1 ЗИ стен «Базовая»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С2 ЗИ стен «Стандарт П»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С3 ЗИ стен «Стандарт М»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С4 ЗИ стен «Стандарт М1»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С5 ЗИ стен «Премиум П»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С6 ЗИ стен «Премиум М»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С7 ЗИ стен «Премиум М1»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С13 ЗИ стен «Слим П»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С15 ЗИ стен «Слим Премиум»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "С16 ЗИ стен «Слим А»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        }
+      ],
+      "navigation": [
+        {
+          "text": "С1 ЗИ стен «Базовая»",
+          "slug": "rec738794383",
+          "href": "#rec738794383"
+        },
+        {
+          "text": "С2 ЗИ стен «Стандарт П»",
+          "slug": "rec738794504",
+          "href": "#rec738794504"
+        },
+        {
+          "text": "С3 ЗИ стен «Стандарт М»",
+          "slug": "rec738794547",
+          "href": "#rec738794547"
+        },
+        {
+          "text": "С4 ЗИ стен «Стандарт М1»",
+          "slug": "rec738794770",
+          "href": "#rec738794770"
+        },
+        {
+          "text": "С5 ЗИ стен «Премиум П»",
+          "slug": "rec738794862",
+          "href": "#rec738794862"
+        },
+        {
+          "text": "С6 ЗИ стен «Премиум М»",
+          "slug": "rec738794963",
+          "href": "#rec738794963"
+        },
+        {
+          "text": "С7 ЗИ стен «Премиум М1»",
+          "slug": "rec738795050",
+          "href": "#rec738795050"
+        },
+        {
+          "text": "С13 ЗИ стен «Слим П»",
+          "slug": "rec738795126",
+          "href": "#rec738795126"
+        },
+        {
+          "text": "С15 ЗИ стен «Слим Премиум»",
+          "slug": "rec738795165",
+          "href": "#rec738795165"
+        },
+        {
+          "text": "С16 ЗИ стен «Слим А»",
+          "slug": "rec738795186",
+          "href": "#rec738795186"
+        },
+        {
+          "text": "BIM Описание Стены",
+          "slug": "edit-usp-drive-link-ouid-116572206468529445791-rtpof-true-sd-true",
+          "href": "https://docs.google.com/document/d/14BlEWy8FdZXPbQV1rk4TFeSCoZQDNutj/edit?usp=drive_link&ouid=116572206468529445791&rtpof=true&sd=true"
+        },
+        {
+          "text": "2022_BIM_Stena_techno_sonus",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1xK_x2NWTjSOaNzUeRXMRJe1Unx3oDniF/view?usp=drive_link"
+        },
+        {
+          "text": "2022 BIM стены",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/11Zb_dzYDFYi521DZbOOJoJ98ryWsfigC/view?usp=drive_link"
+        },
+        {
+          "text": "3.2 С1 ЗИ стен «Базовая» тех.лист",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1--gPi7yIYgLTDmjuKjZMQddIZB7IOvO9/view?usp=drive_link"
+        },
+        {
+          "text": "4.1 Монтажная инструкция Стена Базовая на независимом каркасе",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/13ncLfjTlC0GM4iD9uJwwFlrg5rxVeYbO/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Стена Базовая",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1IWYPfrLTZ0OqwZscEJ_k7_r5hOiYBfwB/view?usp=drive_link"
+        },
+        {
+          "text": "3.2 ЗИ стен «Стандарт П» тех.лист",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1lSpOCEt2d3oPB_dikY0tPkknT8aFVwiu/view?usp=drive_link"
+        },
+        {
+          "text": "4.1 Монтажная инструкция Стена Стандарт П на независимом каркасе",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1-JhDJXai_PbMliZlqBx6QE7L0h-6b99q/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Стена Стандарт П",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1KFGUTU6b0bLo9jeMXxfnc4i6_5rSpn8c/view?usp=drive_link"
+        },
+        {
+          "text": "4.1 Монтажная инструкция Стена СтандартМ на независимом каркасе",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1vv7HD9pIot1p7R-AEReSfA_PvS2jMp4r/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Стена СтандартМ",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1QIKtiAO66ck0UuJVS7tbFpRm1FxxLPMp/view?usp=drive_link"
+        },
+        {
+          "text": "4.1 Монтажная инструкция Стена Стандарт_М1 на независимом каркасе",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1cWhf4Cgfh5zL2PBRmJ_5NZ8N7Tzi7M77/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Стена Стандарт_М1",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1gZr7IlyNd2kXfD00z15P0SzACHY2P9lR/view?usp=drive_link"
+        },
+        {
+          "text": "3.1 Технический лист ЗИ стен «Премиум П»",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/16TF2291R7K4wMoStnQcdUzR421E4h29L/view?usp=drive_link"
+        },
+        {
+          "text": "4.1 Монтажная инструкция Стена Премиум_П на независимом каркасе",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/16jccIpdh3eOAAbAUQxIXE2T_nPDG6hws/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Стена Премиум_П",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/15T9ukiRJoHH9bzM_WZAGqxVrFzaukcs8/view?usp=drive_link"
+        },
+        {
+          "text": "4.1 Монтажная инструкция Стена Премиум_М на независимом каркасе",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1lmkb3xgENSffCIXFcy70E_QDzxWzoGax/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Стена Премиум_М",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/13SI2WhdhCYOlft6oHzbnMJvimfszD145/view?usp=drive_link"
+        },
+        {
+          "text": "4.1 Монтажная инструкция Стена Премиум_М1 на независимом каркасе",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1ziHfo6HYU_eOPsA0Jtz0p_z-efumVoi0/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Стена Премиум_М1",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1aa0_OzWTD1FmSaoC41i8sDx6rdE1ZcR1/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Стена Слим П",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1IQrLpKKC33oJqdaUlaM7TuqsSmzhF05M/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Стена Слим_Премиум",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1fWQCq-m5ueNOI12mBElkMpaEvJ0ekoXn/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Стена Слим А",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1w27dFHLfPM0nVNQ6t7nraZSYV6JKBF_p/view?usp=drive_link"
+        }
+      ],
+      "sections": [
+        {
+          "title": "BIM Каталог звукоизолирующих облицовок. Revit",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "BIM Каталог звукоизолирующих облицовок. Revit"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С1 ЗИ стен «Базовая»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С1 ЗИ стен «Базовая»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С2 ЗИ стен «Стандарт П»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С2 ЗИ стен «Стандарт П»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С3 ЗИ стен «Стандарт М»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С3 ЗИ стен «Стандарт М»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С4 ЗИ стен «Стандарт М1»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С4 ЗИ стен «Стандарт М1»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С5 ЗИ стен «Премиум П»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С5 ЗИ стен «Премиум П»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С6 ЗИ стен «Премиум М»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С6 ЗИ стен «Премиум М»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С7 ЗИ стен «Премиум М1»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С7 ЗИ стен «Премиум М1»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С13 ЗИ стен «Слим П»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С13 ЗИ стен «Слим П»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С15 ЗИ стен «Слим Премиум»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С15 ЗИ стен «Слим Премиум»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "С16 ЗИ стен «Слим А»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "С16 ЗИ стен «Слим А»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_10",
+  "is_published": true,
+  "created_at": "2026-03-31T15:55:58.710535+00:00",
+  "updated_at": "2026-03-31T15:55:58.710535+00:00",
+  "views_count": 0
+}

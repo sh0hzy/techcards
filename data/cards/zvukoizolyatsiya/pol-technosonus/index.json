@@ -1,0 +1,512 @@
+{
+  "id": "card_1774972559292_Пол TECHNOSONUS",
+  "slug": "pol-technosonus",
+  "title": {
+    "ru": "Пол TECHNOSONUS"
+  },
+  "description": {},
+  "content": {
+    "ru": {
+      "blocks": [
+        {
+          "type": "nav",
+          "items": [
+            {
+              "text": "П1 Стандарт 1»",
+              "slug": "technosonus1-3-rec738808161",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808161"
+            },
+            {
+              "text": "П2 «Стандарт 2» (ребрендинг Звукоизол Флор,СтопЗвук-М)",
+              "slug": "technosonus1-3-rec738808166",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808166"
+            },
+            {
+              "text": "П3 «Стандарт 3» (Звукоизол Гидро)",
+              "slug": "technosonus1-3-rec738808171",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808171"
+            },
+            {
+              "text": "П4 «Стандарт 4» (Звукоизол ВП)",
+              "slug": "technosonus1-3-rec738808176",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808176"
+            },
+            {
+              "text": "П5 «Профи Премиум»",
+              "slug": "technosonus1-3-rec738808181",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808181"
+            },
+            {
+              "text": "П6 «Усиленная Премиум»",
+              "slug": "technosonus1-3-rec738808186",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808186"
+            },
+            {
+              "text": "П7 «Премиум»",
+              "slug": "technosonus1-3-rec738808191",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808191"
+            },
+            {
+              "text": "П8 «Стандарт М»",
+              "slug": "technosonus1-3-rec738808196",
+              "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808196"
+            },
+            {
+              "text": "2022 BIM Полы",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1x3uYxB-lnlUq-6zUVOt6pOGAgdDgkTQH/view?usp=drive_link"
+            },
+            {
+              "text": "2022_BIM_Pol_techno_sonus",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/16wCW_PJHX8VRBvwiVWFnFUk57GZL17q5/view?usp=drive_link"
+            },
+            {
+              "text": "BIM Описание Полы",
+              "slug": "edit-usp-drive-link-ouid-116572206468529445791-rtpof-true-sd-true",
+              "href": "https://docs.google.com/document/d/14_r-bMaG2cwaYR_CZr-dTbH64O5pSoJ6/edit?usp=drive_link&ouid=116572206468529445791&rtpof=true&sd=true"
+            },
+            {
+              "text": "4. Монтажная инструкция Пол Стандарт_1",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1KjIa-aBzbw96c5yMlk8Vx8HWlUsQJBPo/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция пол Стандарт_2",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1rv9lrdFM0LBY-V4IFSNOV6uWGfw2GEPR/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Пол Стандарт_3",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1qEXnD_6YjS-Jtsr1Jm7opXLNimOk_-Xf/view?usp=drive_link"
+            },
+            {
+              "text": "3. Монтажная инструкция Пол Стандарт_4",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1vAChhL3DjdMNuQDYc6LsaSFAa3oluAob/view?usp=drive_link"
+            },
+            {
+              "text": "Дополнение к АТР Пол Стандарт 4 (Звукоизол ВП)",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1Kwc0pWyy6jeeh-pnA5nIOOQPVNk0_jDM/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Пол Профи_Премиум Плюс",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1UBoBR_JqrtBzRfiafOABYbSzXOTMVLpr/view?usp=drive_link"
+            },
+            {
+              "text": "4.1 Монтажная инструкция Пол Усиленная_Премиум",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1JuS_aRACzAvv2XAmzf9_NJ0faFfT_jS1/view?usp=drive_link"
+            },
+            {
+              "text": "4.2 Монтажная инструкция Пол Усиленная_Премиум",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1GkVNlG2cuggpLCFrtQJthAzURfhVA8qM/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Пол Премиум",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1_Fq6oPNJwSnHn_P8DNnXtnCFzL9Vu3WI/view?usp=drive_link"
+            },
+            {
+              "text": "4. Монтажная инструкция Пол Стандарт М",
+              "slug": "view-usp-drive-link",
+              "href": "https://drive.google.com/file/d/1Cz8QqkKBfnAf8Vls57I3sZOQaio7icM6/view?usp=drive_link"
+            }
+          ]
+        },
+        {
+          "type": "h2",
+          "text": "BIM Каталог звукоизолирующих облицовок. Revit"
+        },
+        {
+          "type": "h2",
+          "text": "П1 (плавающая стяжка) «Стандарт 1»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "П2 (плавающая стяжка) «Стандарт 2» (ребрендинг Звукоизол Флор,СтопЗвук-М)"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "П3 (плавающая стяжка) «Стандарт 3» (Звукоизол Гидро)"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "П4 (плавающая стяжка) «Стандарт 4» (Звукоизол ВП)"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "П5 (плавающая стяжка) «Профи Премиум»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "П6 (плавающая стяжка) «Усиленная Премиум»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "П7 (плавающая стяжка) «Премиум»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        },
+        {
+          "type": "h2",
+          "text": "П8 (под чистый пол) «Стандарт М»"
+        },
+        {
+          "type": "h2",
+          "text": "Схема системы и инструкция"
+        }
+      ],
+      "navigation": [
+        {
+          "text": "П1 Стандарт 1»",
+          "slug": "technosonus1-3-rec738808161",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808161"
+        },
+        {
+          "text": "П2 «Стандарт 2» (ребрендинг Звукоизол Флор,СтопЗвук-М)",
+          "slug": "technosonus1-3-rec738808166",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808166"
+        },
+        {
+          "text": "П3 «Стандарт 3» (Звукоизол Гидро)",
+          "slug": "technosonus1-3-rec738808171",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808171"
+        },
+        {
+          "text": "П4 «Стандарт 4» (Звукоизол ВП)",
+          "slug": "technosonus1-3-rec738808176",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808176"
+        },
+        {
+          "text": "П5 «Профи Премиум»",
+          "slug": "technosonus1-3-rec738808181",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808181"
+        },
+        {
+          "text": "П6 «Усиленная Премиум»",
+          "slug": "technosonus1-3-rec738808186",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808186"
+        },
+        {
+          "text": "П7 «Премиум»",
+          "slug": "technosonus1-3-rec738808191",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808191"
+        },
+        {
+          "text": "П8 «Стандарт М»",
+          "slug": "technosonus1-3-rec738808196",
+          "href": "https://xn--80aafma3abvkxse9a7f.xn--p1ai/technosonus1-3#rec738808196"
+        },
+        {
+          "text": "2022 BIM Полы",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1x3uYxB-lnlUq-6zUVOt6pOGAgdDgkTQH/view?usp=drive_link"
+        },
+        {
+          "text": "2022_BIM_Pol_techno_sonus",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/16wCW_PJHX8VRBvwiVWFnFUk57GZL17q5/view?usp=drive_link"
+        },
+        {
+          "text": "BIM Описание Полы",
+          "slug": "edit-usp-drive-link-ouid-116572206468529445791-rtpof-true-sd-true",
+          "href": "https://docs.google.com/document/d/14_r-bMaG2cwaYR_CZr-dTbH64O5pSoJ6/edit?usp=drive_link&ouid=116572206468529445791&rtpof=true&sd=true"
+        },
+        {
+          "text": "4. Монтажная инструкция Пол Стандарт_1",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1KjIa-aBzbw96c5yMlk8Vx8HWlUsQJBPo/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция пол Стандарт_2",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1rv9lrdFM0LBY-V4IFSNOV6uWGfw2GEPR/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Пол Стандарт_3",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1qEXnD_6YjS-Jtsr1Jm7opXLNimOk_-Xf/view?usp=drive_link"
+        },
+        {
+          "text": "3. Монтажная инструкция Пол Стандарт_4",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1vAChhL3DjdMNuQDYc6LsaSFAa3oluAob/view?usp=drive_link"
+        },
+        {
+          "text": "Дополнение к АТР Пол Стандарт 4 (Звукоизол ВП)",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1Kwc0pWyy6jeeh-pnA5nIOOQPVNk0_jDM/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Пол Профи_Премиум Плюс",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1UBoBR_JqrtBzRfiafOABYbSzXOTMVLpr/view?usp=drive_link"
+        },
+        {
+          "text": "4.1 Монтажная инструкция Пол Усиленная_Премиум",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1JuS_aRACzAvv2XAmzf9_NJ0faFfT_jS1/view?usp=drive_link"
+        },
+        {
+          "text": "4.2 Монтажная инструкция Пол Усиленная_Премиум",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1GkVNlG2cuggpLCFrtQJthAzURfhVA8qM/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Пол Премиум",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1_Fq6oPNJwSnHn_P8DNnXtnCFzL9Vu3WI/view?usp=drive_link"
+        },
+        {
+          "text": "4. Монтажная инструкция Пол Стандарт М",
+          "slug": "view-usp-drive-link",
+          "href": "https://drive.google.com/file/d/1Cz8QqkKBfnAf8Vls57I3sZOQaio7icM6/view?usp=drive_link"
+        }
+      ],
+      "sections": [
+        {
+          "title": "BIM Каталог звукоизолирующих облицовок. Revit",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "BIM Каталог звукоизолирующих облицовок. Revit"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "П1 (плавающая стяжка) «Стандарт 1»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "П1 (плавающая стяжка) «Стандарт 1»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "П2 (плавающая стяжка) «Стандарт 2» (ребрендинг Звукоизол Флор,СтопЗвук-М)",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "П2 (плавающая стяжка) «Стандарт 2» (ребрендинг Звукоизол Флор,СтопЗвук-М)"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "П3 (плавающая стяжка) «Стандарт 3» (Звукоизол Гидро)",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "П3 (плавающая стяжка) «Стандарт 3» (Звукоизол Гидро)"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "П4 (плавающая стяжка) «Стандарт 4» (Звукоизол ВП)",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "П4 (плавающая стяжка) «Стандарт 4» (Звукоизол ВП)"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "П5 (плавающая стяжка) «Профи Премиум»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "П5 (плавающая стяжка) «Профи Премиум»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "П6 (плавающая стяжка) «Усиленная Премиум»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "П6 (плавающая стяжка) «Усиленная Премиум»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "П7 (плавающая стяжка) «Премиум»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "П7 (плавающая стяжка) «Премиум»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "П8 (под чистый пол) «Стандарт М»",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "П8 (под чистый пол) «Стандарт М»"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        },
+        {
+          "title": "Схема системы и инструкция",
+          "content": "",
+          "blocks": [
+            {
+              "type": "h2",
+              "text": "Схема системы и инструкция"
+            }
+          ],
+          "images": [],
+          "nestedSections": []
+        }
+      ]
+    }
+  },
+  "images": [],
+  "cover_image": null,
+  "category_id": "cat_10",
+  "is_published": true,
+  "created_at": "2026-03-31T15:55:59.442985+00:00",
+  "updated_at": "2026-03-31T15:55:59.442985+00:00",
+  "views_count": 0
+}
