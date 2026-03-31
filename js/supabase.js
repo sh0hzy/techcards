@@ -1,7 +1,10 @@
-// Local file-based store — backed by server.py running on localhost:8000
-// Store.get / Store.set mirror the same interface as before so admin.js is unchanged.
+// Data store: tries localhost:8000 (dev server) first, falls back to static JSON files
 window.Store = (() => {
   const SERVER = 'http://localhost:8000';
+
+  // In-memory cache for static data (avoid re-fetching on every call)
+  let _staticCategories = null;
+  let _staticCards = null;
 
   async function apiFetch(path, options) {
     const r = await fetch(SERVER + path, options);
@@ -9,19 +12,46 @@ window.Store = (() => {
     return r.json();
   }
 
+  async function staticGet(key) {
+    if (key === 'techcards_categories') {
+      if (!_staticCategories) {
+        const r = await fetch('data/categories.json');
+        if (!r.ok) throw new Error('categories.json not found');
+        _staticCategories = await r.json();
+      }
+      return _staticCategories;
+    }
+    if (key === 'techcards_cards') {
+      if (!_staticCards) {
+        const r = await fetch('data/cards.json');
+        if (!r.ok) throw new Error('cards.json not found');
+        _staticCards = await r.json();
+      }
+      return _staticCards;
+    }
+    return [];
+  }
+
   return {
     async get(key) {
+      // Try dev server first
       try {
-        if (key === 'techcards_cards')      return apiFetch('/api/cards');
-        if (key === 'techcards_categories') return apiFetch('/api/categories');
+        if (key === 'techcards_cards')      return await apiFetch('/api/cards');
+        if (key === 'techcards_categories') return await apiFetch('/api/categories');
         return [];
-      } catch(e) {
-        console.warn('Store.get failed (is server.py running?):', e.message);
-        return [];
+      } catch (e) {
+        // Fall back to static JSON files (GitHub Pages / offline)
+        try {
+          return await staticGet(key);
+        } catch (e2) {
+          console.warn('Store.get failed:', e2.message);
+          return [];
+        }
       }
     },
 
     async set(key, value) {
+      // Write to dev server if available; update in-memory cache either way
       try {
         if (key === 'techcards_cards') {
           await apiFetch('/api/sync/cards', {
@@ -36,9 +66,12 @@ window.Store = (() => {
             body: JSON.stringify(value)
           });
         }
-      } catch(e) {
-        console.warn('Store.set failed (is server.py running?):', e.message);
+      } catch (e) {
+        // Server unavailable — update only in-memory cache
       }
+      // Always update in-memory so the page reflects changes in this session
+      if (key === 'techcards_categories') _staticCategories = value;
+      if (key === 'techcards_cards')      _staticCards = value;
     }
   };
 })();
